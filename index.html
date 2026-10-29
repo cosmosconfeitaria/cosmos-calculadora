@@ -271,8 +271,6 @@ function calcSection(sec, necessario){
     out.somaBase += nz(it.qty);
   });
 
-  // O rendimento base é a soma real dos ingredientes (equivalente a =SOMA(...) do Excel),
-  // garantindo que alterações nos ingredientes atualizem o fator proporcional automaticamente.
   var rend = out.somaBase;
 
   var valido = rend > 0;
@@ -382,7 +380,6 @@ function update(){
     R.need.textContent=fmtG(c.necessario);
     R.sb.textContent=fmtG(c.somaBase);
     R.sa.textContent=c.valido?fmtG(c.somaAj):'—';
-    // Atualiza o campo visual de rendimento com a soma real (exatamente igual ao Excel)
     R.yield.value = c.somaBase > 0 ? fmt(c.somaBase) : '';
     state[s.key].yield = R.yield.value;
     c.ajustados.forEach(function(v,i){ if(R.cells[i]) R.cells[i].textContent=(v===null)?'—':fmtG(v); });
@@ -507,17 +504,16 @@ function setUserSession(user) {
 async function saveFichaToCloud(nome, copia) {
   if (!supabaseClient || !currentUser) return { error: null, id: null };
   try {
-    // CORREÇÃO: Removido o campo "atualizado em" do payload para evitar erro no schema cache do Supabase.
     const payload = {
       user_id: currentUser.id,
       nome_sabor: nome,
       unidades: parseNum(copia.units),
-      "gramas massa por unidade": parseNum(copia.wMassa),
-      "gramas recheio base por unidade": parseNum(copia.wBase),
-      "gramas recheio complementar por unidade": parseNum(copia.wComp),
+      gramas_massa_por_unidade: parseNum(copia.wMassa),
+      gramas_recheio_base_por_unidade: parseNum(copia.wBase),
+      gramas_recheio_complementar_por_unidade: parseNum(copia.wComp),
       massa: copia.massa,
-      "recheio base": copia.base,
-      "recheio complementar": copia.comp
+      recheio_base: copia.base,
+      recheio_complementar: copia.comp
     };
 
     let query;
@@ -537,7 +533,6 @@ async function saveFichaToCloud(nome, copia) {
 
     const { data, error } = await query;
     
-    // CORREÇÃO: Valida se houve erro OU se uma atualização retornou zero linhas afetadas
     if (error || !data || data.length === 0) {
       return { error: error || new Error('Registro não encontrado na nuvem ou sem permissão (RLS).'), id: null };
     }
@@ -570,12 +565,12 @@ async function loadCloudFichas() {
             id: recId,
             cookie: nomeSabor || '',
             units: row.unidades != null ? String(row.unidades) : '',
-            wMassa: row["gramas massa por unidade"] != null ? String(row["gramas massa por unidade"]) : '',
-            wBase: row["gramas recheio base por unidade"] != null ? String(row["gramas recheio base por unidade"]) : '',
-            wComp: row["gramas recheio complementar por unidade"] != null ? String(row["gramas recheio complementar por unidade"]) : '',
+            wMassa: row.gramas_massa_por_unidade != null ? String(row.gramas_massa_por_unidade) : '',
+            wBase: row.gramas_recheio_base_por_unidade != null ? String(row.gramas_recheio_base_por_unidade) : '',
+            wComp: row.gramas_recheio_complementar_por_unidade != null ? String(row.gramas_recheio_complementar_por_unidade) : '',
             massa: row.massa || {yield:'', items:[]},
-            base: row["recheio base"] || {yield:'', items:[]},
-            comp: row["recheio complementar"] || {yield:'', items:[]}
+            base: row.recheio_base || {yield:'', items:[]},
+            comp: row.recheio_complementar || {yield:'', items:[]}
           };
 
           f[cloudKey] = normalize(cloudMapped);
@@ -595,7 +590,7 @@ async function loadCloudFichas() {
 /* ---------- EVENTOS DE FICHAS ---------- */
 async function saveFicha(){
   var nome=String(state.cookie||'').trim().toUpperCase();
-  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR LA FICHA.');$('cookie').focus();return;}
+  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
   var f=getFichas();
   
   var targetKey = state.id ? ('cloud_' + state.id) : ('local_' + Date.now());
@@ -726,12 +721,17 @@ $('btnSignup').addEventListener('click', async () => {
 
 $('btnLogout').addEventListener('click', async () => {
   if (!supabaseClient) return;
-  const { error } = await supabaseClient.auth.signOut();
-  if (error) {
-    $('authStatus').textContent = 'ERRO AO SAIR: ' + error.message;
-  } else {
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      $('authStatus').textContent = 'ERRO AO SAIR: ' + error.message;
+      return;
+    }
     setUserSession(null);
     $('authStatus').textContent = 'DESCONECTADO DA NUVEM.';
+  } catch (err) {
+    console.error('Erro logout:', err);
+    $('authStatus').textContent = 'ERRO AO DESCONECTAR DA NUVEM.';
   }
 });
 
@@ -748,11 +748,11 @@ checkAuthUser();
 
 if(!storageOk) say('ATENÇÃO: ARMAZENAMENTO LOCAL INDISPONÍVEL NESTE NAVEGADOR.');
 
-$('save').addEventListener('click',saveFicha);
-$('open').addEventListener('click',openFicha);
-$('del').addEventListener('click',delFicha);
-$('newF').addEventListener('click',novaFicha);
-$('reset').addEventListener('click',restaurar);
+$('save').addEventListener('click', saveFicha);
+$('open').addEventListener('click', openFicha);
+$('del').addEventListener('click', delFicha);
+$('newF').addEventListener('click', novaFicha);
+$('reset').addEventListener('click', restaurar);
 })();
 </script>
 </body>
