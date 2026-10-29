@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LEB COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
+<title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
 <style>
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff}
 *{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif;text-transform:uppercase}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;text-transform:uppercase}
 .wrap{max-width:900px;margin:auto;padding:20px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:2px solid var(--ink);padding:8px 0 18px;margin-bottom:22px}
 .brand{font-weight:900;letter-spacing:.12em;font-size:13px;color:var(--blue)}
@@ -54,8 +54,39 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .info{display:none;background:var(--cream);border:1px dashed var(--blue);color:var(--blue);border-radius:10px;padding:11px 12px;font-size:10px;letter-spacing:.06em;font-weight:800;line-height:1.5;margin-top:12px}
 .info.show{display:block}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
-.footer{font-size:9px;color:var(--muted);letter-spacing:.08em;text-align:center;padding:20px 0}
 .fichas{display:grid;grid-template-columns:1fr;gap:10px}
+
+/* RODAPÉ MINIMALISTA COSMOS */
+.footer-cosmos{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:36px 12px 24px;
+  gap:6px;
+  background:transparent;
+  width:100%;
+}
+.footer-cosmos .line-brand{
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.18em;
+  color:var(--blue);
+}
+.footer-cosmos .line-tagline{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.14em;
+  color:var(--ink);
+}
+.footer-cosmos .line-est{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+
 @media(max-width:560px){
   .wrap{padding:14px}.panel{padding:14px}
   .grid{grid-template-columns:1fr}
@@ -74,7 +105,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 </head>
 <body>
 <div class="wrap">
-  <header class="top"><div class="brand">LEB COSMOS COOKIE LAB</div><div class="tag">CALCULADORA DE RECEITAS</div></header>
+  <header class="top"><div class="brand">COSMOS COOKIE LAB</div><div class="tag">CALCULADORA DE RECEITAS</div></header>
   <h1>CALCULADORA<br>DE RECEITAS</h1>
   <p class="intro">INFORME O COOKIE, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
 
@@ -114,7 +145,11 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
     <p class="note">O SALVAMENTO É LOCAL: FUNCIONA APENAS NESTE NAVEGADOR E NESTE DISPOSITIVO. NÃO HÁ SINCRONIZAÇÃO AUTOMÁTICA ENTRE CELULAR, COMPUTADOR OU OUTROS NAVEGADORES. LIMPAR OS DADOS DO NAVEGADOR APAGA AS FICHAS. SUAS ALTERAÇÕES TAMBÉM SÃO GUARDADAS AUTOMATICAMENTE; USE "SALVAR FICHA" PARA GUARDAR UMA FICHA COM O NOME DO COOKIE E VOLTAR A ELA DEPOIS.</p>
   </section>
 
-  <div class="footer">LEB COSMOS COOKIE LAB · #2263D2 / #F6F4F1</div>
+  <footer class="footer-cosmos">
+    <div class="line-brand">★ COSMOS ★</div>
+    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
+    <div class="line-est">EST. 2024</div>
+  </footer>
 </div>
 
 <script>
@@ -130,18 +165,32 @@ var SECTIONS = [
 var KEY_ATUAL  = 'cosmos.calculadora.atual.v1';
 var KEY_FICHAS = 'cosmos.calculadora.fichas.v1';
 
-/* ---------- DADOS DE EXEMPLO (todos editáveis; não são receitas oficiais) ---------- */
+/* ---------- DADOS DE EXEMPLO (BOSCO RED VELVET TESTE REGRESSÃO) ---------- */
 function exemplo(){
   return {
     example:true,
-    cookie:'BOSCO', units:'12', wMassa:'70', wBase:'20', wComp:'10',
-    massa:{yield:'1000', items:[
-      {name:'FARINHA DE TRIGO',qty:'300'},{name:'AÇÚCAR MASCAVO',qty:'220'},
-      {name:'MANTEIGA',qty:'200'},{name:'OVO',qty:'180'},{name:'GOTAS DE CHOCOLATE',qty:'100'}]},
-    base:{yield:'500', items:[
-      {name:'INGREDIENTE EXEMPLO A',qty:'300'},{name:'INGREDIENTE EXEMPLO B',qty:'200'}]},
-    comp:{yield:'200', items:[
-      {name:'INGREDIENTE EXEMPLO C',qty:'120'},{name:'INGREDIENTE EXEMPLO D',qty:'80'}]}
+    cookie:'BOSCO', units:'30', wMassa:'71', wBase:'21', wComp:'11',
+    massa:{yield:'723', items:[
+      {name:'MANTEIGA',qty:'105'},
+      {name:'AÇÚCAR REFINADO',qty:'60'},
+      {name:'AÇÚCAR MASCAVO',qty:'60'},
+      {name:'OVOS',qty:'50'},
+      {name:'BAUNILHA',qty:'5'},
+      {name:'CORANTE',qty:'5'},
+      {name:'FARINHA DE TRIGO',qty:'210'},
+      {name:'AMIDO DE MILHO',qty:'30'},
+      {name:'CACAU EM PÓ',qty:'10'},
+      {name:'LEITE EM PÓ',qty:'30'},
+      {name:'BICARBONATO',qty:'4'},
+      {name:'SAL',qty:'4'},
+      {name:'CHOCOLATE BRANCO',qty:'150'}
+    ]},
+    base:{yield:'630', items:[
+      {name:'GANACHE BASE',qty:'630'}
+    ]},
+    comp:{yield:'330', items:[
+      {name:'GELEIA COMPLEMENTAR',qty:'330'}
+    ]}
   };
 }
 function emBranco(){
@@ -172,20 +221,40 @@ function fmtG(n){ return fmt(n)+' G'; }
 
 /* ---------- CÁLCULO (núcleo) ---------- */
 function calcSection(sec, necessario){
+  var out = {valido:false, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
+  
+  // Calcular soma teórica dos ingredientes
+  sec.items.forEach(function(it){
+    out.somaBase += nz(it.qty);
+  });
+
   var rend = parseNum(sec.yield);
-  var valido = !isNaN(rend) && rend>0;
-  var out = {valido:valido, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
+  
+  // Se o rendimento não for digitado, utilizar a soma dos ingredientes como padrão
+  if(isNaN(rend) || rend <= 0){
+    if(out.somaBase > 0){
+      rend = out.somaBase;
+    }
+  }
+
+  var valido = !isNaN(rend) && rend > 0;
+  out.valido = valido;
+
   sec.items.forEach(function(it){
     var q = nz(it.qty);
-    out.somaBase += q;
     if(valido){
-      var aj = q*necessario/rend;                // = quantidade original × (necessário ÷ rendimento)
-      out.ajustados.push(aj); out.somaAj += aj;
-    } else out.ajustados.push(null);
+      var aj = q * necessario / rend;   // quantidade_ajustada = quantidade_base * necessario / rendimento_base
+      out.ajustados.push(aj); 
+      out.somaAj += aj;
+    } else {
+      out.ajustados.push(null);
+    }
   });
-  if(valido) out.fator = necessario/rend;
+
+  if(valido) out.fator = necessario / rend;
   return out;
 }
+
 function calcAll(){
   var u = nz(state.units);
   var needs = {massa:u*nz(state.wMassa), base:u*nz(state.wBase), comp:u*nz(state.wComp)};
@@ -203,7 +272,7 @@ function buildSections(){
     p.innerHTML =
       '<div class="section-title">'+s.num+' / '+s.title+'<span class="badge" data-r="ex">EXEMPLO</span></div>'+
       '<div class="grid">'+
-        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 1000"></div>'+
+        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 723"></div>'+
         '<div><label>FATOR DE AJUSTE</label><input data-r="fator" value="—" readonly aria-label="FATOR DE AJUSTE"></div>'+
       '</div>'+
       '<div class="warn" data-r="warn" role="alert">INFORME UM RENDIMENTO-BASE VÁLIDO (MAIOR QUE ZERO) PARA CALCULAR ESTA PREPARAÇÃO.</div>'+
@@ -240,7 +309,11 @@ function renderRows(key){
     var td2=document.createElement('td'); td2.className='c-base'; td2.setAttribute('data-label','BASE (G)');
     var qty=document.createElement('input'); qty.type='text'; qty.inputMode='decimal'; qty.value=item.qty; qty.placeholder='0';
     qty.setAttribute('aria-label','QUANTIDADE BASE EM GRAMAS'); qty.autocomplete='off';
-    qty.addEventListener('input',function(e){item.qty=e.target.value;touched();update();});
+    qty.addEventListener('input',function(e){
+      item.qty=e.target.value;
+      touched();
+      update();
+    });
     td2.appendChild(qty);
     var td3=document.createElement('td'); td3.className='c-adj'; td3.setAttribute('data-label','AJUSTADO (G)');
     var v=document.createElement('span'); v.className='v'; td3.appendChild(v);
