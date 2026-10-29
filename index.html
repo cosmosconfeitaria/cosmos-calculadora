@@ -237,9 +237,37 @@ function exemplo(){
     ]}
   };
 }
+
 function emBranco(){
-  return {example:false, id:null, cookie:'', units:'', wMassa:'', wBase:'', wComp:'',
-    massa:{yield:'',items:[]}, base:{yield:'',items:[]}, comp:{yield:'',items:[]}};
+  var ingredientesPadraoMassa = [
+    'MANTEIGA SEM SAL',
+    'AÇÚCAR MASCAVO',
+    'AÇÚCAR REFINADO',
+    'OVO',
+    'BAUNILHA',
+    'FARINHA DE TRIGO',
+    'LEITE EM PÓ',
+    'AMIDO DE MILHO',
+    'CACAU EM PÓ',
+    'CACAU BLACK',
+    'FERMENTO EM PÓ',
+    'BICARBONATO DE SÓDIO',
+    'SAL',
+    'CHOCOLATE'
+  ].map(function(nome){ return {name: nome, qty: ''}; });
+
+  return {
+    example: false,
+    id: null,
+    cookie: '',
+    units: '',
+    wMassa: '',
+    wBase: '',
+    wComp: '',
+    massa: { yield: '', items: ingredientesPadraoMassa },
+    base: { yield: '', items: [] },
+    comp: { yield: '', items: [] }
+  };
 }
 
 var state = exemplo();
@@ -308,7 +336,7 @@ function buildSections(){
     p.innerHTML =
       '<div class="section-title">'+s.num+' / '+s.title+'<span class="badge" data-r="ex">EXEMPLO</span></div>'+
       '<div class="grid">'+
-        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 723"></div>'+
+        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 723" readonly></div>'+
         '<div><label>FATOR DE AJUSTE</label><input data-r="fator" value="—" readonly aria-label="FATOR DE AJUSTE"></div>'+
       '</div>'+
       '<div class="warn" data-r="warn" role="alert">INFORME UM RENDIMENTO-BASE VÁLIDO (MAIOR QUE ZERO) PARA CALCULAR ESTA PREPARAÇÃO.</div>'+
@@ -325,7 +353,6 @@ function buildSections(){
     var q=function(n){return p.querySelector('[data-r="'+n+'"]')};
     refs[s.key]={yield:p.querySelector('#y-'+s.key),fator:q('fator'),warn:q('warn'),zero:q('zero'),need:q('need'),
       sb:q('sb'),sa:q('sa'),body:q('body'),empty:q('empty'),add:q('add'),ex:q('ex'),cells:[]};
-    refs[s.key].yield.addEventListener('input',function(e){state[s.key].yield=e.target.value;touched();update();});
     refs[s.key].add.addEventListener('click',function(){
       state[s.key].items.push({name:'',qty:''});touched(true);renderRows(s.key);update();
       var inp=refs[s.key].body.querySelectorAll('tr:last-child input')[0]; if(inp) inp.focus();
@@ -442,9 +469,6 @@ function refreshSelect(selectedKey){
     var o=document.createElement('option');
     o.value=k;
     var labelName = (f[k].cookie || 'SEM NOME').toUpperCase();
-    if (k.indexOf('cloud_') === 0) {
-      labelName += ' (NUVEM)';
-    }
     o.textContent = labelName;
     sel.appendChild(o);
   });
