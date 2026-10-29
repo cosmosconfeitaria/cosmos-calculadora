@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff}
 *{box-sizing:border-box}
@@ -105,9 +106,36 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 </head>
 <body>
 <div class="wrap">
-  <header class="top"><div class="brand">COSMOS COOKIE LAB</div><div class="tag">CALCULADORA DE RECEITAS</div></header>
+  <header class="top">
+    <div class="brand">COSMOS COOKIE LAB</div>
+    <div class="tag" id="cloudTag">LOCAL</div>
+  </header>
   <h1>CALCULADORA<br>DE RECEITAS</h1>
   <p class="intro">INFORME O COOKIE, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
+
+  <!-- PAINEL DE AUTENTICAÇÃO E NUVEM (SUPABASE) -->
+  <section class="panel" id="authPanel">
+    <div class="section-title">00 / CONTA & NUVEM (SUPABASE)<span class="badge" id="authBadge">OFFLINE</span></div>
+    <div id="loggedOutView">
+      <p class="intro" style="margin-bottom:12px;">FAÇA LOGIN COM SEU E-MAIL E SENHA PARA SALVAR E SINCRONIZAR SUAS FICHAS NA NUVEM.</p>
+      <div class="grid">
+        <div><label for="authEmail">E-MAIL</label><input id="authEmail" type="email" autocomplete="email" placeholder="SEU@EMAIL.COM"></div>
+        <div><label for="authPassword">SENHA</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btnLogin">ENTRAR</button>
+        <button class="secondary" id="btnSignup">CADASTRAR</button>
+      </div>
+    </div>
+    <div id="loggedInView" style="display:none;">
+      <p class="intro" id="userEmailDisplay" style="margin-bottom:12px; font-weight:800; color:var(--blue);"></p>
+      <div class="actions">
+        <button class="secondary" id="btnLogout">SAIR (LOGOUT)</button>
+        <button class="primary" id="btnSyncCloud">SINCRONIZAR COM A NUVEM</button>
+      </div>
+    </div>
+    <div class="status" id="authStatus" role="status" aria-live="polite"></div>
+  </section>
 
   <section class="panel">
     <div class="section-title">01 / DADOS DE PRODUÇÃO<span class="badge" id="exBadge">DADOS DE EXEMPLO</span></div>
@@ -132,7 +160,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   <section class="panel">
     <div class="section-title">05 / FICHAS SALVAS</div>
     <div class="fichas">
-      <div><label for="fichaSel">FICHAS DESTE NAVEGADOR</label><select id="fichaSel" aria-label="FICHAS SALVAS"></select></div>
+      <div><label for="fichaSel">FICHAS DESTE NAVEGADOR / NUVEM</label><select id="fichaSel" aria-label="FICHAS SALVAS"></select></div>
     </div>
     <div class="actions">
       <button class="primary" id="save">SALVAR FICHA</button>
@@ -142,7 +170,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
       <button class="secondary" id="reset">RESTAURAR EXEMPLO</button>
     </div>
     <div class="status" id="status" role="status" aria-live="polite"></div>
-    <p class="note">O SALVAMENTO É LOCAL: FUNCIONA APENAS NESTE NAVEGADOR E NESTE DISPOSITIVO. NÃO HÁ SINCRONIZAÇÃO AUTOMÁTICA ENTRE CELULAR, COMPUTADOR OU OUTROS NAVEGADORES. LIMPAR OS DADOS DO NAVEGADOR APAGA AS FICHAS. SUAS ALTERAÇÕES TAMBÉM SÃO GUARDADAS AUTOMATICAMENTE; USE "SALVAR FICHA" PARA GUARDAR UMA FICHA COM O NOME DO COOKIE E VOLTAR A ELA DEPOIS.</p>
+    <p class="note">O SALVAMENTO É LOCAL E NA NUVEM: AO FAZER LOGIN, SUAS FICHAS SÃO SINCRONIZADAS COM O SUPABASE. ALTERAÇÕES TAMBÉM SÃO GUARDADAS AUTOMATICAMENTE; USE "SALVAR FICHA" PARA GUARDAR COM O NOME DO COOKIE.</p>
   </section>
 
   <footer class="footer-cosmos">
@@ -155,6 +183,21 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 <script>
 (function(){
 'use strict';
+
+/* ---------- CONFIGURAÇÃO SUPABASE ---------- */
+var SUPABASE_URL = 'https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+var supabaseClient = null;
+var currentUser = null;
+var isAuthInitialized = false;
+
+try {
+  if (window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e) {
+  console.error("Erro ao iniciar Supabase:", e);
+}
 
 /* ---------- CONFIGURAÇÃO DAS TRÊS PREPARAÇÕES (independentes) ---------- */
 var SECTIONS = [
@@ -169,6 +212,7 @@ var KEY_FICHAS = 'cosmos.calculadora.fichas.v1';
 function exemplo(){
   return {
     example:true,
+    id:null,
     cookie:'BOSCO', units:'30', wMassa:'71', wBase:'21', wComp:'11',
     massa:{yield:'723', items:[
       {name:'MANTEIGA',qty:'105'},
@@ -194,7 +238,7 @@ function exemplo(){
   };
 }
 function emBranco(){
-  return {example:false, cookie:'', units:'', wMassa:'', wBase:'', wComp:'',
+  return {example:false, id:null, cookie:'', units:'', wMassa:'', wBase:'', wComp:'',
     massa:{yield:'',items:[]}, base:{yield:'',items:[]}, comp:{yield:'',items:[]}};
 }
 
@@ -223,14 +267,11 @@ function fmtG(n){ return fmt(n)+' G'; }
 function calcSection(sec, necessario){
   var out = {valido:false, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
   
-  // Calcular soma teórica dos ingredientes
   sec.items.forEach(function(it){
     out.somaBase += nz(it.qty);
   });
 
   var rend = parseNum(sec.yield);
-  
-  // Se o rendimento não for digitado, utilizar a soma dos ingredientes como padrão
   if(isNaN(rend) || rend <= 0){
     if(out.somaBase > 0){
       rend = out.somaBase;
@@ -243,7 +284,7 @@ function calcSection(sec, necessario){
   sec.items.forEach(function(it){
     var q = nz(it.qty);
     if(valido){
-      var aj = q * necessario / rend;   // quantidade_ajustada = quantidade_base * necessario / rendimento_base
+      var aj = q * necessario / rend;
       out.ajustados.push(aj); 
       out.somaAj += aj;
     } else {
@@ -359,7 +400,7 @@ function fillAll(){
   update();
 }
 
-/* ---------- PERSISTÊNCIA (localStorage; apenas neste navegador/dispositivo) ---------- */
+/* ---------- PERSISTÊNCIA & SUPABASE ---------- */
 var storageOk=true;
 function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){storageOk=false;return null}}
 function lsSet(k,v){try{window.localStorage.setItem(k,v);return true}catch(e){storageOk=false;return false}}
@@ -368,6 +409,7 @@ function normalize(d){
   if(!d||typeof d!=='object') return null;
   var out=emBranco();
   out.example=!!d.example;
+  out.id=d.id!==undefined?d.id:null;
   ['cookie','units','wMassa','wBase','wComp'].forEach(function(k){out[k]=(d[k]==null)?'':String(d[k]);});
   SECTIONS.forEach(function(s){
     var sec=d[s.key]; if(!sec||typeof sec!=='object') return;
@@ -388,53 +430,330 @@ function getFichas(){
   var raw=lsGet(KEY_FICHAS); if(!raw) return {};
   try{var o=JSON.parse(raw);return (o&&typeof o==='object'&&!Array.isArray(o))?o:{};}catch(e){return {};}
 }
-function refreshSelect(selected){
-  var f=getFichas(), names=Object.keys(f).sort(), sel=$('fichaSel');
+function refreshSelect(selectedKey){
+  var f=getFichas(), keys=Object.keys(f), sel=$('fichaSel');
   sel.innerHTML='';
-  if(!names.length){var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA SALVA';sel.appendChild(o);return;}
-  names.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
-  if(selected&&names.indexOf(selected)>-1) sel.value=selected;
+  if(!keys.length){var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA SALVA';sel.appendChild(o);return;}
+  
+  // Ordena por nome do cookie para exibição amigável
+  keys.sort(function(a, b) {
+    var nameA = (f[a].cookie || '').toUpperCase();
+    var nameB = (f[b].cookie || '').toUpperCase();
+    return nameA.localeCompare(nameB);
+  });
+
+  keys.forEach(function(k){
+    var o=document.createElement('option');
+    o.value=k;
+    var labelName = (f[k].cookie || 'SEM NOME').toUpperCase();
+    if (k.indexOf('cloud_') === 0) {
+      labelName += ' (NUVEM)';
+    }
+    o.textContent = labelName;
+    sel.appendChild(o);
+  });
+
+  if(selectedKey && f.hasOwnProperty(selectedKey)){
+    sel.value = selectedKey;
+  } else if(keys.length > 0){
+    sel.value = keys[0];
+  }
 }
 function say(msg){$('status').textContent=msg;}
 function hora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 
-function saveFicha(){
+/* ---------- OPERAÇÕES NUVEM (SUPABASE) COM COLUNAS REAIS ---------- */
+async function checkAuthUser() {
+  if (!supabaseClient) return;
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    setUserSession(session?.user || null);
+    
+    if (!isAuthInitialized) {
+      isAuthInitialized = true;
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        const prevUser = currentUser;
+        setUserSession(session?.user || null);
+        if (session?.user && (!prevUser || prevUser.id !== session.user.id)) {
+          loadCloudFichas();
+        }
+      });
+    }
+  } catch(e) {
+    console.error("Erro auth session:", e);
+  }
+}
+
+function setUserSession(user) {
+  currentUser = user;
+  const loggedOut = $('loggedOutView');
+  const loggedIn = $('loggedInView');
+  const authBadge = $('authBadge');
+  const cloudTag = $('cloudTag');
+  
+  if (user) {
+    loggedOut.style.display = 'none';
+    loggedIn.style.display = 'block';
+    $('userEmailDisplay').textContent = 'CONECTADO: ' + user.email.toUpperCase();
+    authBadge.textContent = 'ONLINE';
+    cloudTag.textContent = 'NUVEM ATIVA';
+  } else {
+    loggedOut.style.display = 'block';
+    loggedIn.style.display = 'none';
+    authBadge.textContent = 'OFFLINE';
+    cloudTag.textContent = 'LOCAL';
+  }
+}
+
+async function saveFichaToCloud(nome, copia) {
+  if (!supabaseClient || !currentUser) return { error: null, id: null };
+  try {
+    const payload = {
+      user_id: currentUser.id,
+      nome_sabor: nome,
+      unidades: parseNum(copia.units),
+      "gramas massa por unidade": parseNum(copia.wMassa),
+      "gramas recheio base por unidade": parseNum(copia.wBase),
+      "gramas recheio complementar por unidade": parseNum(copia.wComp),
+      massa: copia.massa,
+      "recheio base": copia.base,
+      "recheio complementar": copia.comp,
+      "atualizado em": new Date().toISOString()
+    };
+
+    let query;
+    if (copia.id) {
+      query = supabaseClient
+        .from('cosmos_receitas')
+        .update(payload)
+        .eq('id', copia.id)
+        .eq('user_id', currentUser.id)
+        .select();
+    } else {
+      query = supabaseClient
+        .from('cosmos_receitas')
+        .insert([payload])
+        .select();
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      return { error: error, id: null };
+    }
+    if (data && data.length > 0) {
+      return { error: null, id: data[0].id };
+    }
+    return { error: null, id: null };
+  } catch (err) {
+    return { error: err, id: null };
+  }
+}
+
+async function loadCloudFichas() {
+  if (!supabaseClient || !currentUser) return;
+  say('SINCRONIZANDO FICHAS DA NUVEM...');
+  try {
+    const { data, error } = await supabaseClient
+      .from('cosmos_receitas')
+      .select('*');
+    if (error) {
+      say('ERRO AO CARREGAR NUVEM: ' + error.message);
+      return;
+    }
+    if (data && data.length > 0) {
+      let f = getFichas();
+      data.forEach(row => {
+        var recId = row.id;
+        var nomeSabor = row.nome_sabor;
+        if (recId) {
+          var cloudKey = 'cloud_' + recId;
+          var cloudMapped = {
+            example: false,
+            id: recId,
+            cookie: nomeSabor || '',
+            units: row.unidades != null ? String(row.unidades) : '',
+            wMassa: row["gramas massa por unidade"] != null ? String(row["gramas massa por unidade"]) : '',
+            wBase: row["gramas recheio base por unidade"] != null ? String(row["gramas recheio base por unidade"]) : '',
+            wComp: row["gramas recheio complementar por unidade"] != null ? String(row["gramas recheio complementar por unidade"]) : '',
+            massa: row.massa || {yield:'', items:[]},
+            base: row["recheio base"] || {yield:'', items:[]},
+            comp: row["recheio complementar"] || {yield:'', items:[]}
+          };
+
+          // Insere ou atualiza estritamente pela chave única baseada no ID da nuvem
+          f[cloudKey] = normalize(cloudMapped);
+        }
+      });
+      lsSet(KEY_FICHAS, JSON.stringify(f));
+      refreshSelect($('fichaSel').value);
+      say('FICHAS SINCRONIZADAS COM SUCESSO!');
+    } else {
+      say('NENHUMA FICHA NA NUVEM ENCONTRADA.');
+    }
+  } catch (err) {
+    say('ERRO DE CONEXÃO COM A NUVEM.');
+  }
+}
+
+/* ---------- EVENTOS DE FICHAS ---------- */
+async function saveFicha(){
   var nome=String(state.cookie||'').trim().toUpperCase();
   if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
-  var f=getFichas(), existia=f.hasOwnProperty(nome);
+  var f=getFichas();
+  
+  // Não associe registros pelo nome. state.id é mantido se a ficha foi aberta da nuvem ou sincronizada.
+  var targetKey = state.id ? ('cloud_' + state.id) : ('local_' + Date.now());
+  
   var copia=clone(state); copia.example=false;
-  f[nome]=copia;
+  f[targetKey]=copia;
+  
   if(lsSet(KEY_FICHAS,JSON.stringify(f))&&lsSet(KEY_ATUAL,JSON.stringify(state))){
-    state.example=false; update(); refreshSelect(nome);
-    say((existia?'FICHA ATUALIZADA: ':'FICHA SALVA: ')+nome+' · '+hora()+' · SOMENTE NESTE NAVEGADOR.');
-  } else say('NÃO FOI POSSÍVEL SALVAR: O ARMAZENAMENTO LOCAL ESTÁ INDISPONÍVEL NESTE NAVEGADOR.');
+    state.example=false; update(); refreshSelect(targetKey);
+    
+    if (supabaseClient && currentUser) {
+      say('SALVANDO NA NUVEM...');
+      const cloudRes = await saveFichaToCloud(nome, copia);
+      if (cloudRes.error) {
+        say('SALVO LOCALMENTE (ERRO NA NUVEM: ' + cloudRes.error.message + ')');
+      } else {
+        if (cloudRes.id && !copia.id) {
+          copia.id = cloudRes.id;
+          state.id = cloudRes.id;
+          delete f[targetKey];
+          var newCloudKey = 'cloud_' + cloudRes.id;
+          f[newCloudKey] = copia;
+          lsSet(KEY_FICHAS, JSON.stringify(f));
+          refreshSelect(newCloudKey);
+        }
+        say('FICHA SALVA COM SUCESSO · '+hora()+' · LOCAL & NUVEM.');
+      }
+    } else {
+      say('FICHA SALVA COM SUCESSO · '+hora()+' · LOCAL.');
+    }
+  } else {
+    say('NÃO FOI POSSÍVEL SALVAR NO NAVEGADOR.');
+  }
 }
+
 function openFicha(){
-  var nome=$('fichaSel').value; if(!nome){say('NENHUMA FICHA SELECIONADA.');return;}
-  var d=normalize(getFichas()[nome]); if(!d){say('FICHA NÃO ENCONTRADA.');return;}
-  state=d; fillAll(); autosave(); say('FICHA ABERTA: '+nome+'.');
+  var selKey=$('fichaSel').value; if(!selKey){say('NENHUMA FICHA SELECIONADA.');return;}
+  var f=getFichas();
+  var d=normalize(f[selKey]); if(!d){say('FICHA NÃO ENCONTRADA.');return;}
+  state=d; fillAll(); autosave(); say('FICHA ABERTA: '+(state.cookie||selKey)+'.');
 }
-function delFicha(){
-  var nome=$('fichaSel').value; if(!nome){say('NENHUMA FICHA SELECIONADA.');return;}
-  if(!window.confirm('EXCLUIR A FICHA "'+nome+'" DESTE NAVEGADOR?')) return;
-  var f=getFichas(); delete f[nome]; lsSet(KEY_FICHAS,JSON.stringify(f));
-  refreshSelect(); say('FICHA EXCLUÍDA: '+nome+'.');
+
+async function delFicha(){
+  var selKey=$('fichaSel').value; if(!selKey){say('NENHUMA FICHA SELECIONADA.');return;}
+  var f=getFichas();
+  var rec = f[selKey];
+  if(!rec){say('FICHA NÃO ENCONTRADA.');return;}
+
+  if(!window.confirm('EXCLUIR A FICHA "'+(rec.cookie||selKey)+'"?')) return;
+
+  // Exclusão segura na nuvem se for ficha da nuvem
+  if (supabaseClient && currentUser && rec.id && selKey.indexOf('cloud_') === 0) {
+    say('EXCLUINDO DA NUVEM...');
+    const { data, error } = await supabaseClient
+      .from('cosmos_receitas')
+      .delete()
+      .match({ id: rec.id, user_id: currentUser.id })
+      .select('id');
+
+    if (error || !data || data.length === 0) {
+      say('FALHA AO EXCLUIR DA NUVEM: ' + (error ? error.message : 'REGISTRO NÃO ENCONTRADO') + '. A FICHA FOI PRESERVADA.');
+      return;
+    }
+  }
+
+  // Só remove localmente após confirmação bem-sucedida na nuvem ou se for puramente local
+  delete f[selKey];
+  lsSet(KEY_FICHAS,JSON.stringify(f));
+  refreshSelect();
+  
+  if (supabaseClient && currentUser && rec.id && selKey.indexOf('cloud_') === 0) {
+    say('FICHA EXCLUÍDA COM SUCESSO DA NUVEM E DO NAVEGADOR.');
+  } else {
+    say('FICHA EXCLUÍDA DO NAVEGADOR (LOCAL).');
+  }
 }
+
 function novaFicha(){
   if(!window.confirm('LIMPAR A TELA E COMEÇAR UMA FICHA EM BRANCO? AS FICHAS JÁ SALVAS NÃO SÃO APAGADAS.')) return;
   state=emBranco(); fillAll(); autosave(); say('FICHA EM BRANCO. PREENCHA OS DADOS E TOQUE EM "SALVAR FICHA".');
 }
+
 function restaurar(){
-  if(!window.confirm('RESTAURAR OS DADOS DE EXEMPLO? AS ALTERAÇÕES ATUAIS NA TELA SERÃO SUBSTITUÍDAS. AS FICHAS SALVAS NÃO SÃO APAGADAS.')) return;
+  if(!window.confirm('RESTAURAR OS DADOS DE EXEMPLO? AS ALTERAÇÕES ATUAIS NA TELA SERÃO SUBSTITUÍDAS.')) return;
   state=exemplo(); fillAll(); autosave(); say('DADOS DE EXEMPLO RESTAURADOS.');
 }
+
+/* ---------- BOTÕES DE AUTH ---------- */
+$('btnLogin').addEventListener('click', async () => {
+  if (!supabaseClient) {
+    $('authStatus').textContent = 'CLIENTE SUPABASE NÃO DISPONÍVEL.';
+    return;
+  }
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  if (!email || !password) {
+    $('authStatus').textContent = 'INFORME E-MAIL E SENHA.';
+    return;
+  }
+  $('authStatus').textContent = 'ENTRANDO...';
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    $('authStatus').textContent = 'ERRO AO ENTRAR: ' + error.message;
+  } else {
+    $('authStatus').textContent = 'LOGIN REALIZADO COM SUCESSO!';
+    setUserSession(data?.user || null);
+    loadCloudFichas();
+  }
+});
+
+$('btnSignup').addEventListener('click', async () => {
+  if (!supabaseClient) {
+    $('authStatus').textContent = 'CLIENTE SUPABASE NÃO DISPONÍVEL.';
+    return;
+  }
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  if (!email || !password) {
+    $('authStatus').textContent = 'INFORME E-MAIL E SENHA PARA CADASTRO.';
+    return;
+  }
+  $('authStatus').textContent = 'CADASTRANDO...';
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) {
+    $('authStatus').textContent = 'ERRO NO CADASTRO: ' + error.message;
+  } else {
+    $('authStatus').textContent = 'CADASTRO REALIZADO! VERIFIQUE SEU E-MAIL.';
+  }
+});
+
+$('btnLogout').addEventListener('click', async () => {
+  if (!supabaseClient) return;
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) {
+    $('authStatus').textContent = 'ERRO AO SAIR: ' + error.message;
+  } else {
+    setUserSession(null);
+    $('authStatus').textContent = 'DESCONECTADO DA NUVEM.';
+  }
+});
+
+$('btnSyncCloud').addEventListener('click', () => {
+  loadCloudFichas();
+});
 
 /* ---------- INÍCIO ---------- */
 buildSections(); bindTop();
 var salvo=lsGet(KEY_ATUAL);
 if(salvo){ try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} }
 fillAll(); refreshSelect();
-if(!storageOk) say('ATENÇÃO: O ARMAZENAMENTO LOCAL ESTÁ INDISPONÍVEL NESTE NAVEGADOR; AS ALTERAÇÕES NÃO SERÃO GUARDADAS.');
+checkAuthUser();
+
+if(!storageOk) say('ATENÇÃO: ARMAZENAMENTO LOCAL INDISPONÍVEL NESTE NAVEGADOR.');
+
 $('save').addEventListener('click',saveFicha);
 $('open').addEventListener('click',openFicha);
 $('del').addEventListener('click',delFicha);
