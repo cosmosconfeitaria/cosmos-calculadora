@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEB COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
+<style>
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif;text-transform:uppercase}
+.wrap{max-width:900px;margin:auto;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:2px solid var(--ink);padding:8px 0 18px;margin-bottom:22px}
+.brand{font-weight:900;letter-spacing:.12em;font-size:13px;color:var(--blue)}
+.tag{font-size:10px;letter-spacing:.12em;border:1px solid var(--ink);padding:7px 9px;border-radius:99px}
+h1{font-size:clamp(25px,5vw,42px);line-height:1.02;letter-spacing:-.04em;margin:0 0 8px;font-weight:900}
+.intro{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 22px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+.section-title{font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:900;margin-bottom:14px}
+.badge{display:inline-block;font-size:9px;letter-spacing:.1em;border:1px solid var(--blue);color:var(--blue);padding:3px 8px;border-radius:99px;margin-left:8px;vertical-align:middle;font-weight:800}
+.badge[hidden]{display:none}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid .full{grid-column:1/-1}
+label{display:block;font-size:10px;letter-spacing:.08em;font-weight:800;margin-bottom:7px}
+input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;font:inherit;font-size:16px;background:#fff;color:var(--ink);text-transform:uppercase;outline:none}
+input::placeholder{color:#a5a29d;text-transform:uppercase}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21c}
+input[readonly]{background:#f3f2f0;color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.metrics.m-top{margin-top:16px}
+.metric{background:var(--cream);border-radius:12px;padding:14px}
+.metric span{display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;line-height:1.3}
+.metric strong{font-size:clamp(17px,3vw,24px);font-weight:900;color:var(--blue);overflow-wrap:anywhere}
+.tablewrap{margin-top:14px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:9px;letter-spacing:.09em;color:var(--muted);padding:10px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid #eee;font-size:12px;vertical-align:middle}
+td input{padding:10px 8px;font-size:14px}
+th.c-base,td.c-base{width:22%}
+th.c-adj,td.c-adj{width:22%}
+th.c-rm,td.c-rm{width:46px;padding-right:0}
+td.c-adj{text-align:right;font-weight:900;color:var(--blue);white-space:nowrap}
+th.c-adj{text-align:right}
+.x{width:34px;height:34px;padding:0;border-radius:50%;background:var(--cream);border:1px solid var(--line);font-size:18px;line-height:1;color:var(--ink)}
+.empty{font-size:10px;color:var(--muted);letter-spacing:.06em;padding:14px 6px;display:none}
+.empty.show{display:block}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+button{border:0;border-radius:999px;padding:12px 15px;font:inherit;font-size:10px;font-weight:900;letter-spacing:.07em;cursor:pointer;text-transform:uppercase}
+button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
+.primary{background:var(--blue);color:white}
+.secondary{background:var(--cream);color:var(--ink);border:1px solid var(--line)}
+.note{font-size:10px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+.warn{display:none;background:#fdf0ed;border:1px solid #e3b0a4;color:#9b2c1a;border-radius:10px;padding:11px 12px;font-size:10px;letter-spacing:.06em;font-weight:800;line-height:1.5;margin-top:12px}
+.warn.show{display:block}
+.info{display:none;background:var(--cream);border:1px dashed var(--blue);color:var(--blue);border-radius:10px;padding:11px 12px;font-size:10px;letter-spacing:.06em;font-weight:800;line-height:1.5;margin-top:12px}
+.info.show{display:block}
+.status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
+.footer{font-size:9px;color:var(--muted);letter-spacing:.08em;text-align:center;padding:20px 0}
+.fichas{display:grid;grid-template-columns:1fr;gap:10px}
+@media(max-width:560px){
+  .wrap{padding:14px}.panel{padding:14px}
+  .grid{grid-template-columns:1fr}
+  .metrics{grid-template-columns:1fr 1fr}.metrics .metric:last-child{grid-column:1/-1}
+  .top{align-items:flex-start}.tag{font-size:9px}
+  .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block}
+  .tablewrap thead{display:none}
+  .tablewrap tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
+  .tablewrap td{border:0;padding:0;width:auto!important;text-align:left!important}
+  .tablewrap td.c-nm{grid-column:1/-1;padding-right:44px}
+  .tablewrap td.c-rm{position:absolute;top:12px;right:0}
+  .tablewrap td[data-label]::before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;font-weight:800}
+  .tablewrap td.c-adj .v{display:block;background:var(--cream);border-radius:10px;padding:13px 10px;font-size:15px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><div class="brand">LEB COSMOS COOKIE LAB</div><div class="tag">CALCULADORA DE RECEITAS</div></header>
+  <h1>CALCULADORA<br>DE RECEITAS</h1>
+  <p class="intro">INFORME O COOKIE, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
+
+  <section class="panel">
+    <div class="section-title">01 / DADOS DE PRODUÇÃO<span class="badge" id="exBadge">DADOS DE EXEMPLO</span></div>
+    <div class="grid">
+      <div class="full"><label for="cookie">NOME DO COOKIE</label><input id="cookie" type="text" autocomplete="off" placeholder="EX.: BOSCO"></div>
+      <div class="full"><label for="units">QUANTIDADE DE UNIDADES QUE QUERO PRODUZIR</label><input id="units" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div><label for="wMassa">PESO DA MASSA POR COOKIE (G)</label><input id="wMassa" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div><label for="wBase">PESO DO RECHEIO BASE POR COOKIE (G)</label><input id="wBase" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="full"><label for="wComp">PESO DO RECHEIO COMPLEMENTAR POR COOKIE (G)</label><input id="wComp" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+    </div>
+    <div class="metrics m-top">
+      <div class="metric"><span>MASSA NECESSÁRIA</span><strong id="needMassa">0 G</strong></div>
+      <div class="metric"><span>RECHEIO BASE NECESSÁRIO</span><strong id="needBase">0 G</strong></div>
+      <div class="metric"><span>RECHEIO COMPLEMENTAR NECESSÁRIO</span><strong id="needComp">0 G</strong></div>
+    </div>
+    <p class="note" id="totalNote"></p>
+    <p class="note">OS PESOS SÃO DEFINIDOS POR VOCÊ PARA CADA SABOR; A SOMA NÃO PRECISA SER 100 G. COLOQUE 0 G EM UMA PREPARAÇÃO QUE O COOKIE NÃO USA. USE VÍRGULA OU PONTO PARA DECIMAIS.</p>
+  </section>
+
+  <div id="sections"></div>
+
+  <section class="panel">
+    <div class="section-title">05 / FICHAS SALVAS</div>
+    <div class="fichas">
+      <div><label for="fichaSel">FICHAS DESTE NAVEGADOR</label><select id="fichaSel" aria-label="FICHAS SALVAS"></select></div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="save">SALVAR FICHA</button>
+      <button class="secondary" id="open">ABRIR FICHA</button>
+      <button class="secondary" id="del">EXCLUIR FICHA</button>
+      <button class="secondary" id="newF">NOVA FICHA EM BRANCO</button>
+      <button class="secondary" id="reset">RESTAURAR EXEMPLO</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <p class="note">O SALVAMENTO É LOCAL: FUNCIONA APENAS NESTE NAVEGADOR E NESTE DISPOSITIVO. NÃO HÁ SINCRONIZAÇÃO AUTOMÁTICA ENTRE CELULAR, COMPUTADOR OU OUTROS NAVEGADORES. LIMPAR OS DADOS DO NAVEGADOR APAGA AS FICHAS. SUAS ALTERAÇÕES TAMBÉM SÃO GUARDADAS AUTOMATICAMENTE; USE "SALVAR FICHA" PARA GUARDAR UMA FICHA COM O NOME DO COOKIE E VOLTAR A ELA DEPOIS.</p>
+  </section>
+
+  <div class="footer">LEB COSMOS COOKIE LAB · #2263D2 / #F6F4F1</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- CONFIGURAÇÃO DAS TRÊS PREPARAÇÕES (independentes) ---------- */
+var SECTIONS = [
+  {key:'massa', num:'02', title:'MASSA',                weightId:'wMassa'},
+  {key:'base',  num:'03', title:'RECHEIO BASE',         weightId:'wBase'},
+  {key:'comp',  num:'04', title:'RECHEIO COMPLEMENTAR', weightId:'wComp'}
+];
+var KEY_ATUAL  = 'cosmos.calculadora.atual.v1';
+var KEY_FICHAS = 'cosmos.calculadora.fichas.v1';
+
+/* ---------- DADOS DE EXEMPLO (todos editáveis; não são receitas oficiais) ---------- */
+function exemplo(){
+  return {
+    example:true,
+    cookie:'BOSCO', units:'12', wMassa:'70', wBase:'20', wComp:'10',
+    massa:{yield:'1000', items:[
+      {name:'FARINHA DE TRIGO',qty:'300'},{name:'AÇÚCAR MASCAVO',qty:'220'},
+      {name:'MANTEIGA',qty:'200'},{name:'OVO',qty:'180'},{name:'GOTAS DE CHOCOLATE',qty:'100'}]},
+    base:{yield:'500', items:[
+      {name:'INGREDIENTE EXEMPLO A',qty:'300'},{name:'INGREDIENTE EXEMPLO B',qty:'200'}]},
+    comp:{yield:'200', items:[
+      {name:'INGREDIENTE EXEMPLO C',qty:'120'},{name:'INGREDIENTE EXEMPLO D',qty:'80'}]}
+  };
+}
+function emBranco(){
+  return {example:false, cookie:'', units:'', wMassa:'', wBase:'', wComp:'',
+    massa:{yield:'',items:[]}, base:{yield:'',items:[]}, comp:{yield:'',items:[]}};
+}
+
+var state = exemplo();
+var refs = {};   // referências de DOM por seção
+var $ = function(id){return document.getElementById(id)};
+
+/* ---------- NÚMEROS (vírgula ou ponto na entrada; vírgula na apresentação) ---------- */
+function parseNum(v){
+  if(v===null||v===undefined) return NaN;
+  var s=String(v).trim().replace(/\s/g,'');
+  if(s==='') return NaN;
+  if(s.indexOf(',')>-1){ s=s.replace(/\./g,'').replace(',','.'); }
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s)){ s=s.replace(/\./g,''); }
+  if(!/^-?\d*\.?\d+$/.test(s) && !/^-?\d+\.$/.test(s)) return NaN;
+  var n=parseFloat(s);
+  return isFinite(n)?n:NaN;
+}
+function nz(v){ var n=parseNum(v); return (isNaN(n)||n<0)?0:n; }   // vazio/inválido/negativo -> 0
+var nf  = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
+var nfF = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:4});
+function fmt(n){ return nf.format(Math.round(n*100)/100); }
+function fmtG(n){ return fmt(n)+' G'; }
+
+/* ---------- CÁLCULO (núcleo) ---------- */
+function calcSection(sec, necessario){
+  var rend = parseNum(sec.yield);
+  var valido = !isNaN(rend) && rend>0;
+  var out = {valido:valido, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
+  sec.items.forEach(function(it){
+    var q = nz(it.qty);
+    out.somaBase += q;
+    if(valido){
+      var aj = q*necessario/rend;                // = quantidade original × (necessário ÷ rendimento)
+      out.ajustados.push(aj); out.somaAj += aj;
+    } else out.ajustados.push(null);
+  });
+  if(valido) out.fator = necessario/rend;
+  return out;
+}
+function calcAll(){
+  var u = nz(state.units);
+  var needs = {massa:u*nz(state.wMassa), base:u*nz(state.wBase), comp:u*nz(state.wComp)};
+  var r = {needs:needs};
+  SECTIONS.forEach(function(s){ r[s.key]=calcSection(state[s.key], needs[s.key]); });
+  return r;
+}
+window.__cosmos = {parseNum:parseNum, calcSection:calcSection, calcAll:calcAll, getState:function(){return state}};
+
+/* ---------- INTERFACE ---------- */
+function buildSections(){
+  var host=$('sections'); host.innerHTML='';
+  SECTIONS.forEach(function(s){
+    var p=document.createElement('section'); p.className='panel';
+    p.innerHTML =
+      '<div class="section-title">'+s.num+' / '+s.title+'<span class="badge" data-r="ex">EXEMPLO</span></div>'+
+      '<div class="grid">'+
+        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 1000"></div>'+
+        '<div><label>FATOR DE AJUSTE</label><input data-r="fator" value="—" readonly aria-label="FATOR DE AJUSTE"></div>'+
+      '</div>'+
+      '<div class="warn" data-r="warn" role="alert">INFORME UM RENDIMENTO-BASE VÁLIDO (MAIOR QUE ZERO) PARA CALCULAR ESTA PREPARAÇÃO.</div>'+
+      '<div class="info" data-r="zero">PESO DE 0 G POR COOKIE: ESTA PREPARAÇÃO NÃO É USADA E TODAS AS QUANTIDADES AJUSTADAS FICAM EM ZERO.</div>'+
+      '<div class="metrics m-top">'+
+        '<div class="metric"><span>NECESSÁRIO</span><strong data-r="need">0 G</strong></div>'+
+        '<div class="metric"><span>SOMA BASE</span><strong data-r="sb">0 G</strong></div>'+
+        '<div class="metric"><span>SOMA AJUSTADA</span><strong data-r="sa">—</strong></div>'+
+      '</div>'+
+      '<div class="tablewrap"><table><thead><tr><th>INGREDIENTE</th><th class="c-base">BASE (G)</th><th class="c-adj">AJUSTADO (G)</th><th class="c-rm"></th></tr></thead><tbody data-r="body"></tbody></table>'+
+      '<div class="empty" data-r="empty">NENHUM INGREDIENTE. TOQUE EM "ADICIONAR INGREDIENTE".</div></div>'+
+      '<div class="actions"><button class="primary" data-r="add">+ ADICIONAR INGREDIENTE</button></div>';
+    host.appendChild(p);
+    var q=function(n){return p.querySelector('[data-r="'+n+'"]')};
+    refs[s.key]={yield:p.querySelector('#y-'+s.key),fator:q('fator'),warn:q('warn'),zero:q('zero'),need:q('need'),
+      sb:q('sb'),sa:q('sa'),body:q('body'),empty:q('empty'),add:q('add'),ex:q('ex'),cells:[]};
+    refs[s.key].yield.addEventListener('input',function(e){state[s.key].yield=e.target.value;touched();update();});
+    refs[s.key].add.addEventListener('click',function(){
+      state[s.key].items.push({name:'',qty:''});touched(true);renderRows(s.key);update();
+      var inp=refs[s.key].body.querySelectorAll('tr:last-child input')[0]; if(inp) inp.focus();
+    });
+  });
+}
+function renderRows(key){
+  var R=refs[key], list=state[key].items;
+  R.body.innerHTML=''; R.cells=[];
+  list.forEach(function(item,i){
+    var tr=document.createElement('tr');
+    var td1=document.createElement('td'); td1.className='c-nm';
+    var name=document.createElement('input'); name.type='text'; name.value=item.name; name.placeholder='NOME DO INGREDIENTE';
+    name.setAttribute('aria-label','NOME DO INGREDIENTE'); name.autocomplete='off';
+    name.addEventListener('input',function(e){item.name=e.target.value;touched();});
+    td1.appendChild(name);
+    var td2=document.createElement('td'); td2.className='c-base'; td2.setAttribute('data-label','BASE (G)');
+    var qty=document.createElement('input'); qty.type='text'; qty.inputMode='decimal'; qty.value=item.qty; qty.placeholder='0';
+    qty.setAttribute('aria-label','QUANTIDADE BASE EM GRAMAS'); qty.autocomplete='off';
+    qty.addEventListener('input',function(e){item.qty=e.target.value;touched();update();});
+    td2.appendChild(qty);
+    var td3=document.createElement('td'); td3.className='c-adj'; td3.setAttribute('data-label','AJUSTADO (G)');
+    var v=document.createElement('span'); v.className='v'; td3.appendChild(v);
+    R.cells.push(v);
+    var td4=document.createElement('td'); td4.className='c-rm';
+    var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.textContent='×';
+    rm.setAttribute('aria-label','REMOVER INGREDIENTE'); rm.title='REMOVER INGREDIENTE';
+    rm.addEventListener('click',function(){state[key].items.splice(i,1);touched(true);renderRows(key);update();});
+    td4.appendChild(rm);
+    tr.append(td1,td2,td3,td4); R.body.appendChild(tr);
+  });
+  R.empty.classList.toggle('show',list.length===0);
+}
+function update(){
+  var r=calcAll();
+  $('needMassa').textContent=fmtG(r.needs.massa);
+  $('needBase').textContent=fmtG(r.needs.base);
+  $('needComp').textContent=fmtG(r.needs.comp);
+  var tot=nz(state.wMassa)+nz(state.wBase)+nz(state.wComp);
+  $('totalNote').textContent='PESO TOTAL POR COOKIE: '+fmtG(tot)+' (MASSA + RECHEIO BASE + RECHEIO COMPLEMENTAR).';
+  $('exBadge').hidden=!state.example;
+  SECTIONS.forEach(function(s){
+    var c=r[s.key], R=refs[s.key];
+    R.ex.hidden=!state.example;
+    R.fator.value=c.valido?(nfF.format(c.fator)+'×'):'—';
+    R.warn.classList.toggle('show',!c.valido);
+    R.zero.classList.toggle('show',c.valido && c.necessario===0);
+    R.need.textContent=fmtG(c.necessario);
+    R.sb.textContent=fmtG(c.somaBase);
+    R.sa.textContent=c.valido?fmtG(c.somaAj):'—';
+    c.ajustados.forEach(function(v,i){ if(R.cells[i]) R.cells[i].textContent=(v===null)?'—':fmtG(v); });
+  });
+}
+function bindTop(){
+  var map={cookie:'cookie',units:'units',wMassa:'wMassa',wBase:'wBase',wComp:'wComp'};
+  Object.keys(map).forEach(function(k){
+    $(k).addEventListener('input',function(e){state[k]=e.target.value;touched();update();});
+  });
+}
+function fillAll(){
+  ['cookie','units','wMassa','wBase','wComp'].forEach(function(k){$(k).value=state[k];});
+  SECTIONS.forEach(function(s){refs[s.key].yield.value=state[s.key].yield;renderRows(s.key);});
+  update();
+}
+
+/* ---------- PERSISTÊNCIA (localStorage; apenas neste navegador/dispositivo) ---------- */
+var storageOk=true;
+function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){storageOk=false;return null}}
+function lsSet(k,v){try{window.localStorage.setItem(k,v);return true}catch(e){storageOk=false;return false}}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function normalize(d){
+  if(!d||typeof d!=='object') return null;
+  var out=emBranco();
+  out.example=!!d.example;
+  ['cookie','units','wMassa','wBase','wComp'].forEach(function(k){out[k]=(d[k]==null)?'':String(d[k]);});
+  SECTIONS.forEach(function(s){
+    var sec=d[s.key]; if(!sec||typeof sec!=='object') return;
+    out[s.key].yield=(sec.yield==null)?'':String(sec.yield);
+    if(Array.isArray(sec.items)) out[s.key].items=sec.items.map(function(it){
+      return {name:(it&&it.name!=null)?String(it.name):'',qty:(it&&it.qty!=null)?String(it.qty):''};});
+  });
+  return out;
+}
+var autoTimer=null;
+function touched(structural){
+  if(state.example){state.example=false;update();}
+  clearTimeout(autoTimer);
+  autoTimer=setTimeout(autosave,250);
+}
+function autosave(){ lsSet(KEY_ATUAL,JSON.stringify(state)); }
+function getFichas(){
+  var raw=lsGet(KEY_FICHAS); if(!raw) return {};
+  try{var o=JSON.parse(raw);return (o&&typeof o==='object'&&!Array.isArray(o))?o:{};}catch(e){return {};}
+}
+function refreshSelect(selected){
+  var f=getFichas(), names=Object.keys(f).sort(), sel=$('fichaSel');
+  sel.innerHTML='';
+  if(!names.length){var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA SALVA';sel.appendChild(o);return;}
+  names.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+  if(selected&&names.indexOf(selected)>-1) sel.value=selected;
+}
+function say(msg){$('status').textContent=msg;}
+function hora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+
+function saveFicha(){
+  var nome=String(state.cookie||'').trim().toUpperCase();
+  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
+  var f=getFichas(), existia=f.hasOwnProperty(nome);
+  var copia=clone(state); copia.example=false;
+  f[nome]=copia;
+  if(lsSet(KEY_FICHAS,JSON.stringify(f))&&lsSet(KEY_ATUAL,JSON.stringify(state))){
+    state.example=false; update(); refreshSelect(nome);
+    say((existia?'FICHA ATUALIZADA: ':'FICHA SALVA: ')+nome+' · '+hora()+' · SOMENTE NESTE NAVEGADOR.');
+  } else say('NÃO FOI POSSÍVEL SALVAR: O ARMAZENAMENTO LOCAL ESTÁ INDISPONÍVEL NESTE NAVEGADOR.');
+}
+function openFicha(){
+  var nome=$('fichaSel').value; if(!nome){say('NENHUMA FICHA SELECIONADA.');return;}
+  var d=normalize(getFichas()[nome]); if(!d){say('FICHA NÃO ENCONTRADA.');return;}
+  state=d; fillAll(); autosave(); say('FICHA ABERTA: '+nome+'.');
+}
+function delFicha(){
+  var nome=$('fichaSel').value; if(!nome){say('NENHUMA FICHA SELECIONADA.');return;}
+  if(!window.confirm('EXCLUIR A FICHA "'+nome+'" DESTE NAVEGADOR?')) return;
+  var f=getFichas(); delete f[nome]; lsSet(KEY_FICHAS,JSON.stringify(f));
+  refreshSelect(); say('FICHA EXCLUÍDA: '+nome+'.');
+}
+function novaFicha(){
+  if(!window.confirm('LIMPAR A TELA E COMEÇAR UMA FICHA EM BRANCO? AS FICHAS JÁ SALVAS NÃO SÃO APAGADAS.')) return;
+  state=emBranco(); fillAll(); autosave(); say('FICHA EM BRANCO. PREENCHA OS DADOS E TOQUE EM "SALVAR FICHA".');
+}
+function restaurar(){
+  if(!window.confirm('RESTAURAR OS DADOS DE EXEMPLO? AS ALTERAÇÕES ATUAIS NA TELA SERÃO SUBSTITUÍDAS. AS FICHAS SALVAS NÃO SÃO APAGADAS.')) return;
+  state=exemplo(); fillAll(); autosave(); say('DADOS DE EXEMPLO RESTAURADOS.');
+}
+
+/* ---------- INÍCIO ---------- */
+buildSections(); bindTop();
+var salvo=lsGet(KEY_ATUAL);
+if(salvo){ try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} }
+fillAll(); refreshSelect();
+if(!storageOk) say('ATENÇÃO: O ARMAZENAMENTO LOCAL ESTÁ INDISPONÍVEL NESTE NAVEGADOR; AS ALTERAÇÕES NÃO SERÃO GUARDADAS.');
+$('save').addEventListener('click',saveFicha);
+$('open').addEventListener('click',openFicha);
+$('del').addEventListener('click',delFicha);
+$('newF').addEventListener('click',novaFicha);
+$('reset').addEventListener('click',restaurar);
+})();
+</script>
+</body>
+</html>
