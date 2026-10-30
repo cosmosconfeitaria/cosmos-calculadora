@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -62,7 +63,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
 .fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ */
+/* CRONÔMETRO FLUTUANTE COM A IMAGEM DO TIMER COSMOS (TRANSPARENTE) */
 .floating-star-timer{
   position:fixed;
   bottom:20px;
@@ -71,39 +72,44 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   display:flex;
   flex-direction:column;
   align-items:center;
-  background:rgba(246, 244, 241, 0.95);
-  border:2px solid var(--line);
-  border-radius:20px;
-  padding:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.2);
-  backdrop-filter:blur(4px);
+  background:transparent;
+  border:none;
+  padding:0;
+  box-shadow:none;
+  backdrop-filter:none;
 }
-.star-timer-body{
+.timer-image-wrap{
   position:relative;
-  width:140px;
-  height:140px;
-  background:linear-gradient(135deg, #e0e0e0, #9e9e9e 50%, #616161);
-  clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  width:160px;
+  height:160px;
+  margin-bottom:6px;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
-  margin-bottom:8px;
-  border:2px solid #fff;
+}
+.timer-image-wrap img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
 }
 .star-timer-screen{
-  background:#111;
-  color:#0ff;
+  position:absolute;
+  top:33%;
+  left:22.5%;
+  width:55%;
+  height:21%;
+  background:transparent;
+  color:#0d2c5e;
   font-family:monospace;
   font-size:13px;
-  font-weight:bold;
-  padding:6px 8px;
-  border-radius:4px;
-  border:2px inset #444;
-  letter-spacing:1px;
-  box-shadow:inset 0 0 6px rgba(0,255,255,0.4);
-  width:100px;
-  text-align:center;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  box-shadow:none;
+  letter-spacing:1.5px;
 }
 .star-timer-controls{
   display:flex;
@@ -113,6 +119,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .star-timer-controls button{
   padding:6px 8px;
   font-size:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
 }
 
 /* RODAPÉ MINIMALISTA COSMOS */
@@ -152,9 +159,9 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   .metrics{grid-template-columns:1fr 1fr}.metrics .metric:last-child{grid-column:1/-1}
   .top{align-items:flex-start}.tag{font-size:9px}
   .fichas{grid-template-columns:1fr}
-  .floating-star-timer{bottom:10px;right:10px;padding:8px;}
-  .star-timer-body{width:110px;height:110px;}
-  .star-timer-screen{font-size:11px;width:80px;padding:4px;}
+  .floating-star-timer{bottom:10px;right:10px;}
+  .timer-image-wrap{width:130px;height:130px;}
+  .star-timer-screen{font-size:10px;}
   .star-timer-controls button{padding:4px 6px;font-size:7px;}
   .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block}
   .tablewrap thead{display:none}
@@ -245,9 +252,10 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 
   <div id="sections"></div>
 
-  <!-- CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ -->
+  <!-- CRONÔMETRO FLUTUANTE COM A IMAGEM DO TIMER COSMOS -->
   <div class="floating-star-timer" id="floatingTimer">
-    <div class="star-timer-body">
+    <div class="timer-image-wrap">
+      <img src="image_2.png" alt="Timer Cosmos">
       <div class="star-timer-screen" id="timerDisplay">00:00:00</div>
     </div>
     <div class="star-timer-controls">
@@ -756,8 +764,6 @@ function refreshSelect(selectedKey){
   if(targetKey){
     sel.value = targetKey;
   } else {
-    // Se a ficha atual não pertence à categoria filtrada, não selecione outra automaticamente.
-    // Exibimos um aviso claro no topo do seletor para representar corretamente a realidade.
     var o=document.createElement('option');
     o.value='';
     o.disabled = true;
@@ -982,7 +988,7 @@ async function syncPendingLocalFichas(){
 /* ---------- OPERAÇÕES DOS BOTÕES DE FICHAS ---------- */
 async function saveFicha(){
   var nome=String(state.cookie||'').trim().toUpperCase();
-  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR LA FICHA.');$('cookie').focus();return;}
+  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
   
   state.categoria = $('categoria').value || 'COOKIE';
   addCategoria(state.categoria);
@@ -1076,7 +1082,6 @@ async function delFicha(){
   var f = getFichas();
   var targetKey = null;
 
-  // Garantir que a exclusão apague estritamente a ficha ativa no formulário (state)
   Object.keys(f).forEach(function(k){
     var item = f[k];
     if(item && ((state.id && item.id === state.id) || (state.localId && item.localId === state.localId))){
@@ -1084,7 +1089,6 @@ async function delFicha(){
     }
   });
 
-  // Fallback para o valor selecionado no seletor caso não encontre por state
   if(!targetKey){
     targetKey = $('fichaSel').value;
   }
@@ -1213,7 +1217,7 @@ $('btnSyncCloud').addEventListener('click', async () => {
   loadCloudFichas();
 });
 
-/* ---------- CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ ---------- */
+/* ---------- CRONÔMETRO FLUTUANTE ---------- */
 var TIMER_KEY = 'cosmos.calculadora.timer.v1';
 var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
 
