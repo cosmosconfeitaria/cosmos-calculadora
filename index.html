@@ -6,7 +6,7 @@
 <title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff}
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff;--pink:#e06d8a;--pink-light:#f9ecef}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;text-transform:uppercase}
 .wrap{max-width:900px;margin:auto;padding:20px}
@@ -36,12 +36,17 @@ table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:9px;letter-spacing:.09em;color:var(--muted);padding:10px 6px;border-bottom:1px solid var(--line)}
 td{padding:8px 6px;border-bottom:1px solid #eee;font-size:12px;vertical-align:middle}
 td input{padding:10px 8px;font-size:14px}
-th.c-base,td.c-base{width:22%}
-th.c-adj,td.c-adj{width:22%}
+th.c-chk,td.c-chk{width:36px;text-align:center;padding-right:0}
+th.c-base,td.c-base{width:20%}
+th.c-adj,td.c-adj{width:20%}
 th.c-rm,td.c-rm{width:46px;padding-right:0}
 td.c-adj{text-align:right;font-weight:900;color:var(--blue);white-space:nowrap}
 th.c-adj{text-align:right}
 .x{width:34px;height:34px;padding:0;border-radius:50%;background:var(--cream);border:1px solid var(--line);font-size:18px;line-height:1;color:var(--ink)}
+.chk-box{width:20px;height:20px;accent-color:var(--pink);cursor:pointer;vertical-align:middle}
+tr.checked-row td{background:var(--pink-light)!important;color:#9b2c1a}
+tr.checked-row td input{background:transparent!important;color:#9b2c1a;text-decoration:line-through}
+tr.checked-row td .v{color:#9b2c1a;text-decoration:line-through}
 .empty{font-size:10px;color:var(--muted);letter-spacing:.06em;padding:14px 6px;display:none}
 .empty.show{display:block}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -55,7 +60,60 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .info{display:none;background:var(--cream);border:1px dashed var(--blue);color:var(--blue);border-radius:10px;padding:11px 12px;font-size:10px;letter-spacing:.06em;font-weight:800;line-height:1.5;margin-top:12px}
 .info.show{display:block}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
-.fichas{display:grid;grid-template-columns:1fr;gap:10px}
+.fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ */
+.floating-star-timer{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  background:rgba(246, 244, 241, 0.95);
+  border:2px solid var(--line);
+  border-radius:20px;
+  padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+  backdrop-filter:blur(4px);
+}
+.star-timer-body{
+  position:relative;
+  width:140px;
+  height:140px;
+  background:linear-gradient(135deg, #e0e0e0, #9e9e9e 50%, #616161);
+  clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  margin-bottom:8px;
+  border:2px solid #fff;
+}
+.star-timer-screen{
+  background:#111;
+  color:#0ff;
+  font-family:monospace;
+  font-size:13px;
+  font-weight:bold;
+  padding:6px 8px;
+  border-radius:4px;
+  border:2px inset #444;
+  letter-spacing:1px;
+  box-shadow:inset 0 0 6px rgba(0,255,255,0.4);
+  width:100px;
+  text-align:center;
+}
+.star-timer-controls{
+  display:flex;
+  gap:4px;
+  justify-content:center;
+}
+.star-timer-controls button{
+  padding:6px 8px;
+  font-size:8px;
+}
 
 /* RODAPÉ MINIMALISTA COSMOS */
 .footer-cosmos{
@@ -93,11 +151,17 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   .grid{grid-template-columns:1fr}
   .metrics{grid-template-columns:1fr 1fr}.metrics .metric:last-child{grid-column:1/-1}
   .top{align-items:flex-start}.tag{font-size:9px}
+  .fichas{grid-template-columns:1fr}
+  .floating-star-timer{bottom:10px;right:10px;padding:8px;}
+  .star-timer-body{width:110px;height:110px;}
+  .star-timer-screen{font-size:11px;width:80px;padding:4px;}
+  .star-timer-controls button{padding:4px 6px;font-size:7px;}
   .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block}
   .tablewrap thead{display:none}
-  .tablewrap tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
+  .tablewrap tr{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
   .tablewrap td{border:0;padding:0;width:auto!important;text-align:left!important}
-  .tablewrap td.c-nm{grid-column:1/-1;padding-right:44px}
+  .tablewrap td.c-chk{grid-row:1/2;grid-column:1/2;align-self:center}
+  .tablewrap td.c-nm{grid-row:1/2;grid-column:2/4;padding-right:44px}
   .tablewrap td.c-rm{position:absolute;top:12px;right:0}
   .tablewrap td[data-label]::before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;font-weight:800}
   .tablewrap td.c-adj .v{display:block;background:var(--cream);border-radius:10px;padding:13px 10px;font-size:15px}
@@ -111,7 +175,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
     <div class="tag" id="cloudTag">LOCAL</div>
   </header>
   <h1>CALCULADORA<br>DE RECEITAS</h1>
-  <p class="intro">INFORME O COOKIE, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
+  <p class="intro">INFORME O COOKIE, A CATEGORIA, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
 
   <!-- PAINEL DE AUTENTICAÇÃO E NUVEM (SUPABASE) -->
   <section class="panel" id="authPanel">
@@ -137,11 +201,35 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
     <div class="status" id="authStatus" role="status" aria-live="polite"></div>
   </section>
 
+  <!-- LISTA DE FICHAS: FILTROS E SELEÇÃO -->
+  <section class="panel">
+    <div class="section-title">FICHAS DE PRODUÇÃO</div>
+    <div class="fichas">
+      <div><label for="filterCat">FILTRAR POR CATEGORIA</label><select id="filterCat" aria-label="FILTRAR POR CATEGORIA"></select></div>
+      <div><label for="fichaSel">SELECIONAR FICHA</label><select id="fichaSel" aria-label="SELECIONAR FICHA"></select></div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="save">SALVAR</button>
+      <button class="secondary" id="duplicar">DUPLICAR</button>
+      <button class="secondary" id="del">EXCLUIR</button>
+      <button class="secondary" id="newF">NOVA FICHA</button>
+      <button class="secondary" id="reset">RESTAURAR EXEMPLO</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </section>
+
   <section class="panel">
     <div class="section-title">01 / DADOS DE PRODUÇÃO<span class="badge" id="exBadge">DADOS DE EXEMPLO</span></div>
     <div class="grid">
       <div class="full"><label for="cookie">NOME DO COOKIE</label><input id="cookie" type="text" autocomplete="off" placeholder="EX.: BOSCO"></div>
-      <div class="full"><label for="units">QUANTIDADE DE UNIDADES QUE QUERO PRODUZIR</label><input id="units" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div>
+        <label for="categoria">CATEGORIA</label>
+        <div style="display:flex; gap:6px;">
+          <select id="categoria" aria-label="CATEGORIA" style="flex:1;"></select>
+          <button class="secondary" id="btnAddCat" type="button" title="CRIAR NOVA CATEGORIA" style="padding:10px 12px; font-weight:900;">+</button>
+        </div>
+      </div>
+      <div><label for="units">QUANTIDADE DE UNIDADES QUE QUERO PRODUZIR</label><input id="units" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
       <div><label for="wMassa">PESO DA MASSA POR COOKIE (G)</label><input id="wMassa" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
       <div><label for="wBase">PESO DO RECHEIO BASE POR COOKIE (G)</label><input id="wBase" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
       <div class="full"><label for="wComp">PESO DO RECHEIO COMPLEMENTAR POR COOKIE (G)</label><input id="wComp" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
@@ -157,21 +245,17 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 
   <div id="sections"></div>
 
-  <section class="panel">
-    <div class="section-title">05 / FICHAS SALVAS</div>
-    <div class="fichas">
-      <div><label for="fichaSel">FICHAS DESTE NAVEGADOR / NUVEM</label><select id="fichaSel" aria-label="FICHAS SALVAS"></select></div>
+  <!-- CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ -->
+  <div class="floating-star-timer" id="floatingTimer">
+    <div class="star-timer-body">
+      <div class="star-timer-screen" id="timerDisplay">00:00:00</div>
     </div>
-    <div class="actions">
-      <button class="primary" id="save">SALVAR FICHA</button>
-      <button class="secondary" id="open">ABRIR FICHA</button>
-      <button class="secondary" id="del">EXCLUIR FICHA</button>
-      <button class="secondary" id="newF">NOVA FICHA EM BRANCO</button>
-      <button class="secondary" id="reset">RESTAURAR EXEMPLO</button>
+    <div class="star-timer-controls">
+      <button class="primary" id="btnTimerStart">INICIAR</button>
+      <button class="secondary" id="btnTimerPause">PAUSAR</button>
+      <button class="secondary" id="btnTimerReset">ZERAR</button>
     </div>
-    <div class="status" id="status" role="status" aria-live="polite"></div>
-    <p class="note">O SALVAMENTO É LOCAL E NA NUVEM: AO FAZER LOGIN, SUAS FICHAS SÃO SINCRONIZADAS COM O SUPABASE. ALTERAÇÕES TAMBÉM SÃO GUARDADAS AUTOMATICAMENTE; USE "SALVAR FICHA" PARA GUARDAR COM O NOME DO COOKIE.</p>
-  </section>
+  </div>
 
   <footer class="footer-cosmos">
     <div class="line-brand">★ COSMOS ★</div>
@@ -205,35 +289,48 @@ var SECTIONS = [
   {key:'base',  num:'03', title:'RECHEIO BASE',         weightId:'wBase'},
   {key:'comp',  num:'04', title:'RECHEIO COMPLEMENTAR', weightId:'wComp'}
 ];
-var KEY_ATUAL  = 'cosmos.calculadora.atual.v1';
-var KEY_FICHAS = 'cosmos.calculadora.fichas.v1';
 
-/* ---------- DADOS DE EXEMPLO (BOSCO RED VELVET TESTE REGRESSÃO) ---------- */
+var DEFAULT_CATEGORIES = ['COOKIE', 'DOT COOKIE', 'BROOKIE', 'MINI COOKIES', 'OUTRO'];
+
+// Chaves dinâmicas baseadas no usuário autenticado
+function getStorageKeys() {
+  var userPrefix = currentUser ? ('user_' + currentUser.id) : 'user_guest';
+  return {
+    atual: 'cosmos.calculadora.atual.v3.' + userPrefix,
+    fichas: 'cosmos.calculadora.fichas.v3.' + userPrefix,
+    categorias: 'cosmos.calculadora.categorias.v3.' + userPrefix
+  };
+}
+
+/* ---------- DADOS DE EXEMPLO (BOSCO RED VELVET) ---------- */
 function exemplo(){
   return {
     example:true,
     id:null,
-    cookie:'BOSCO', units:'30', wMassa:'71', wBase:'21', wComp:'11',
+    localId:'local_exemplo_bosco',
+    cookie:'BOSCO',
+    categoria:'COOKIE',
+    units:'30', wMassa:'71', wBase:'21', wComp:'11',
     massa:{yield:'723', items:[
-      {name:'MANTEIGA',qty:'105'},
-      {name:'AÇÚCAR REFINADO',qty:'60'},
-      {name:'AÇÚCAR MASCAVO',qty:'60'},
-      {name:'OVOS',qty:'50'},
-      {name:'BAUNILHA',qty:'5'},
-      {name:'CORANTE',qty:'5'},
-      {name:'FARINHA DE TRIGO',qty:'210'},
-      {name:'AMIDO DE MILHO',qty:'30'},
-      {name:'CACAU EM PÓ',qty:'10'},
-      {name:'LEITE EM PÓ',qty:'30'},
-      {name:'BICARBONATO',qty:'4'},
-      {name:'SAL',qty:'4'},
-      {name:'CHOCOLATE BRANCO',qty:'150'}
+      {id:'m1', name:'MANTEIGA',qty:'105', checked:false},
+      {id:'m2', name:'AÇÚCAR REFINADO',qty:'60', checked:false},
+      {id:'m3', name:'AÇÚCAR MASCAVO',qty:'60', checked:false},
+      {id:'m4', name:'OVOS',qty:'50', checked:false},
+      {id:'m5', name:'BAUNILHA',qty:'5', checked:false},
+      {id:'m6', name:'CORANTE',qty:'5', checked:false},
+      {id:'m7', name:'FARINHA DE TRIGO',qty:'210', checked:false},
+      {id:'m8', name:'AMIDO DE MILHO',qty:'30', checked:false},
+      {id:'m9', name:'CACAU EM PÓ',qty:'10', checked:false},
+      {id:'m10', name:'LEITE EM PÓ',qty:'30', checked:false},
+      {id:'m11', name:'BICARBONATO',qty:'4', checked:false},
+      {id:'m12', name:'SAL',qty:'4', checked:false},
+      {id:'m13', name:'CHOCOLATE BRANCO',qty:'150', checked:false}
     ]},
     base:{yield:'630', items:[
-      {name:'GANACHE BASE',qty:'630'}
+      {id:'b1', name:'GANACHE BASE',qty:'630', checked:false}
     ]},
     comp:{yield:'330', items:[
-      {name:'GELEIA COMPLEMENTAR',qty:'330'}
+      {id:'c1', name:'GELEIA COMPLEMENTAR',qty:'330', checked:false}
     ]}
   };
 }
@@ -254,12 +351,14 @@ function emBranco(){
     'BICARBONATO DE SÓDIO',
     'SAL',
     'CHOCOLATE'
-  ].map(function(nome){ return {name: nome, qty: ''}; });
+  ].map(function(nome, idx){ return {id: 'm_def_'+idx+'_'+Math.random().toString(36).substr(2,5), name: nome, qty: '', checked: false}; });
 
   return {
     example: false,
     id: null,
+    localId: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
     cookie: '',
+    categoria: 'COOKIE',
     units: '',
     wMassa: '',
     wBase: '',
@@ -271,10 +370,74 @@ function emBranco(){
 }
 
 var state = exemplo();
-var refs = {};   // referências de DOM por seção
+var refs = {};   
 var $ = function(id){return document.getElementById(id)};
 
-/* ---------- NÚMEROS (vírgula ou ponto na entrada; vírgula na apresentação) ---------- */
+/* ---------- GERENCIAMENTO DE CATEGORIAS ---------- */
+function getCategorias(){
+  var keys = getStorageKeys();
+  var raw = lsGet(keys.categorias);
+  var cats = DEFAULT_CATEGORIES.slice();
+  if(raw){
+    try{
+      var parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)){
+        parsed.forEach(function(c){
+          var uc = String(c||'').trim().toUpperCase();
+          if(uc && cats.indexOf(uc) === -1) cats.push(uc);
+        });
+      }
+    }catch(e){}
+  }
+  return cats;
+}
+
+function addCategoria(novaCat){
+  var uc = String(novaCat||'').trim().toUpperCase();
+  if(!uc) return;
+  var cats = getCategorias();
+  if(cats.indexOf(uc) === -1){
+    cats.push(uc);
+    var keys = getStorageKeys();
+    lsSet(keys.categorias, JSON.stringify(cats));
+  }
+  atualizarSelectCategorias(uc);
+}
+
+function atualizarSelectCategorias(selecionada){
+  var cats = getCategorias();
+  var selCat = $('categoria');
+  var filterCat = $('filterCat');
+  
+  if(!selCat || !filterCat) return;
+
+  var curSel = selecionada || selCat.value || 'COOKIE';
+  var curFilter = filterCat.value || 'TODAS';
+
+  selCat.innerHTML = '';
+  cats.forEach(function(c){
+    var o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    selCat.appendChild(o);
+  });
+  if(cats.indexOf(curSel) > -1) selCat.value = curSel;
+
+  filterCat.innerHTML = '<option value="TODAS">TODAS AS CATEGORIAS</option>';
+  cats.forEach(function(c){
+    var o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    filterCat.appendChild(o);
+  });
+  if(curFilter === 'TODAS' || cats.indexOf(curFilter) > -1){
+    filterCat.value = curFilter;
+  } else {
+    filterCat.value = 'TODAS';
+  }
+}
+
+/* ---------- NÚMEROS ---------- */
 function parseNum(v){
   if(v===null||v===undefined) return NaN;
   var s=String(v).trim().replace(/\s/g,'');
@@ -285,13 +448,13 @@ function parseNum(v){
   var n=parseFloat(s);
   return isFinite(n)?n:NaN;
 }
-function nz(v){ var n=parseNum(v); return (isNaN(n)||n<0)?0:n; }   // vazio/inválido/negativo -> 0
+function nz(v){ var n=parseNum(v); return (isNaN(n)||n<0)?0:n; }   
 var nf  = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
 var nfF = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:4});
 function fmt(n){ return nf.format(Math.round(n*100)/100); }
 function fmtG(n){ return fmt(n)+' G'; }
 
-/* ---------- CÁLCULO (núcleo) - LÓGICA EXCEL (=SOMA DOS INGREDIENTES) ---------- */
+/* ---------- CÁLCULO (NÚCLEO) ---------- */
 function calcSection(sec, necessario){
   var out = {valido:false, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
   
@@ -300,7 +463,6 @@ function calcSection(sec, necessario){
   });
 
   var rend = out.somaBase;
-
   var valido = rend > 0;
   out.valido = valido;
 
@@ -326,7 +488,6 @@ function calcAll(){
   SECTIONS.forEach(function(s){ r[s.key]=calcSection(state[s.key], needs[s.key]); });
   return r;
 }
-window.__cosmos = {parseNum:parseNum, calcSection:calcSection, calcAll:calcAll, getState:function(){return state}};
 
 /* ---------- INTERFACE ---------- */
 function buildSections(){
@@ -346,7 +507,7 @@ function buildSections(){
         '<div class="metric"><span>SOMA BASE</span><strong data-r="sb">0 G</strong></div>'+
         '<div class="metric"><span>SOMA AJUSTADA</span><strong data-r="sa">—</strong></div>'+
       '</div>'+
-      '<div class="tablewrap"><table><thead><tr><th>INGREDIENTE</th><th class="c-base">BASE (G)</th><th class="c-adj">AJUSTADO (G)</th><th class="c-rm"></th></tr></thead><tbody data-r="body"></tbody></table>'+
+      '<div class="tablewrap"><table><thead><tr><th class="c-chk">✓</th><th>INGREDIENTE</th><th class="c-base">BASE (G)</th><th class="c-adj">AJUSTADO (G)</th><th class="c-rm"></th></tr></thead><tbody data-r="body"></tbody></table>'+
       '<div class="empty" data-r="empty">NENHUM INGREDIENTE. TOQUE EM "ADICIONAR INGREDIENTE".</div></div>'+
       '<div class="actions"><button class="primary" data-r="add">+ ADICIONAR INGREDIENTE</button></div>';
     host.appendChild(p);
@@ -354,21 +515,39 @@ function buildSections(){
     refs[s.key]={yield:p.querySelector('#y-'+s.key),fator:q('fator'),warn:q('warn'),zero:q('zero'),need:q('need'),
       sb:q('sb'),sa:q('sa'),body:q('body'),empty:q('empty'),add:q('add'),ex:q('ex'),cells:[]};
     refs[s.key].add.addEventListener('click',function(){
-      state[s.key].items.push({name:'',qty:''});touched(true);renderRows(s.key);update();
-      var inp=refs[s.key].body.querySelectorAll('tr:last-child input')[0]; if(inp) inp.focus();
+      var newIngId = 'ing_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+      state[s.key].items.push({id: newIngId, name:'', qty:'', checked:false});
+      touched(true);renderRows(s.key);update();
+      var inp=refs[s.key].body.querySelectorAll('tr:last-child input[type="text"]')[0]; if(inp) inp.focus();
     });
   });
 }
+
 function renderRows(key){
   var R=refs[key], list=state[key].items;
   R.body.innerHTML=''; R.cells=[];
   list.forEach(function(item,i){
+    if(!item.id) item.id = 'ing_' + i + '_' + Math.random().toString(36).substr(2,5);
     var tr=document.createElement('tr');
+    if(item.checked) tr.className = 'checked-row';
+
+    var tdChk=document.createElement('td'); tdChk.className='c-chk';
+    var chk=document.createElement('input'); chk.type='checkbox'; chk.className='chk-box';
+    chk.checked = !!item.checked;
+    chk.setAttribute('aria-label', 'MARCAR INGREDIENTE');
+    chk.addEventListener('change', function(e){
+      item.checked = e.target.checked;
+      tr.classList.toggle('checked-row', item.checked);
+      touched();
+    });
+    tdChk.appendChild(chk);
+
     var td1=document.createElement('td'); td1.className='c-nm';
     var name=document.createElement('input'); name.type='text'; name.value=item.name; name.placeholder='NOME DO INGREDIENTE';
     name.setAttribute('aria-label','NOME DO INGREDIENTE'); name.autocomplete='off';
     name.addEventListener('input',function(e){item.name=e.target.value;touched();});
     td1.appendChild(name);
+
     var td2=document.createElement('td'); td2.className='c-base'; td2.setAttribute('data-label','BASE (G)');
     var qty=document.createElement('input'); qty.type='text'; qty.inputMode='decimal'; qty.value=item.qty; qty.placeholder='0';
     qty.setAttribute('aria-label','QUANTIDADE BASE EM GRAMAS'); qty.autocomplete='off';
@@ -378,18 +557,22 @@ function renderRows(key){
       update();
     });
     td2.appendChild(qty);
+
     var td3=document.createElement('td'); td3.className='c-adj'; td3.setAttribute('data-label','AJUSTADO (G)');
     var v=document.createElement('span'); v.className='v'; td3.appendChild(v);
     R.cells.push(v);
+
     var td4=document.createElement('td'); td4.className='c-rm';
     var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.textContent='×';
     rm.setAttribute('aria-label','REMOVER INGREDIENTE'); rm.title='REMOVER INGREDIENTE';
     rm.addEventListener('click',function(){state[key].items.splice(i,1);touched(true);renderRows(key);update();});
     td4.appendChild(rm);
-    tr.append(td1,td2,td3,td4); R.body.appendChild(tr);
+
+    tr.append(tdChk,td1,td2,td3,td4); R.body.appendChild(tr);
   });
   R.empty.classList.toggle('show',list.length===0);
 }
+
 function update(){
   var r=calcAll();
   $('needMassa').textContent=fmtG(r.needs.massa);
@@ -409,17 +592,49 @@ function update(){
     R.sa.textContent=c.valido?fmtG(c.somaAj):'—';
     R.yield.value = c.somaBase > 0 ? fmt(c.somaBase) : '';
     state[s.key].yield = R.yield.value;
-    c.ajustados.forEach(function(v,i){ if(R.cells[i]) R.cells[i].textContent=(v===null)?'—':fmtG(v); });
+    c.ajustados.forEach(function(val,i){ if(R.cells[i]) R.cells[i].textContent=(val===null)?'—':fmtG(val); });
   });
 }
+
 function bindTop(){
   var map={cookie:'cookie',units:'units',wMassa:'wMassa',wBase:'wBase',wComp:'wComp'};
   Object.keys(map).forEach(function(k){
     $(k).addEventListener('input',function(e){state[k]=e.target.value;touched();update();});
   });
+  $('categoria').addEventListener('change',function(e){
+    state.categoria = e.target.value;
+    touched();
+  });
+  $('btnAddCat').addEventListener('click', function(){
+    var nova = prompt('DIGITE O NOME DA NOVA CATEGORIA:');
+    if(nova){
+      var uc = nova.trim().toUpperCase();
+      if(uc){
+        addCategoria(uc);
+        $('categoria').value = uc;
+        state.categoria = uc;
+        touched();
+      }
+    }
+  });
+  $('filterCat').addEventListener('change',function(){
+    refreshSelect();
+  });
+  $('fichaSel').addEventListener('change',function(){
+    var selKey = $('fichaSel').value;
+    if(selKey){
+      abrirFichaPorChave(selKey);
+    }
+  });
 }
+
 function fillAll(){
-  ['cookie','units','wMassa','wBase','wComp'].forEach(function(k){$(k).value=state[k];});
+  $('cookie').value = state.cookie || '';
+  atualizarSelectCategorias(state.categoria || 'COOKIE');
+  $('units').value = state.units || '';
+  $('wMassa').value = state.wMassa || '';
+  $('wBase').value = state.wBase || '';
+  $('wComp').value = state.wComp || '';
   SECTIONS.forEach(function(s){refs[s.key].yield.value=state[s.key].yield;renderRows(s.key);});
   update();
 }
@@ -429,56 +644,139 @@ var storageOk=true;
 function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){storageOk=false;return null}}
 function lsSet(k,v){try{window.localStorage.setItem(k,v);return true}catch(e){storageOk=false;return false}}
 function clone(o){return JSON.parse(JSON.stringify(o))}
+
 function normalize(d){
   if(!d||typeof d!=='object') return null;
   var out=emBranco();
   out.example=!!d.example;
   out.id=d.id!==undefined?d.id:null;
-  ['cookie','units','wMassa','wBase','wComp'].forEach(function(k){out[k]=(d[k]==null)?'':String(d[k]);});
+  out.localId=d.localId || ('local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5));
+  out.cookie=(d.cookie==null)?'':String(d.cookie);
+  out.categoria=(d.categoria==null)?'COOKIE':String(d.categoria).toUpperCase();
+  ['units','wMassa','wBase','wComp'].forEach(function(k){out[k]=(d[k]==null)?'':String(d[k]);});
   SECTIONS.forEach(function(s){
     var sec=d[s.key]; if(!sec||typeof sec!=='object') return;
     out[s.key].yield=(sec.yield==null)?'':String(sec.yield);
-    if(Array.isArray(sec.items)) out[s.key].items=sec.items.map(function(it){
-      return {name:(it&&it.name!=null)?String(it.name):'',qty:(it&&it.qty!=null)?String(it.qty):''};});
+    if(Array.isArray(sec.items)) out[s.key].items=sec.items.map(function(it, idx){
+      return {
+        id:(it&&it.id!=null)?String(it.id):('ing_'+s.key+'_'+idx+'_'+Math.random().toString(36).substr(2,5)),
+        name:(it&&it.name!=null)?String(it.name):'',
+        qty:(it&&it.qty!=null)?String(it.qty):'',
+        checked:!!(it&&it.checked)
+      };
+    });
   });
   return out;
 }
+
 var autoTimer=null;
 function touched(structural){
   if(state.example){state.example=false;update();}
   clearTimeout(autoTimer);
   autoTimer=setTimeout(autosave,250);
 }
-function autosave(){ lsSet(KEY_ATUAL,JSON.stringify(state)); }
+
+function autosave(){ 
+  var keys = getStorageKeys();
+  lsSet(keys.atual,JSON.stringify(state)); 
+  
+  var f = getFichas();
+  var foundKey = null;
+  Object.keys(f).forEach(function(k){
+    var item = f[k];
+    if((state.id && item.id === state.id) || (state.localId && item.localId === state.localId)){
+      foundKey = k;
+    }
+  });
+  if(foundKey){
+    f[foundKey] = clone(state);
+    lsSet(keys.fichas, JSON.stringify(f));
+  }
+}
+
 function getFichas(){
-  var raw=lsGet(KEY_FICHAS); if(!raw) return {};
+  var keys = getStorageKeys();
+  var raw = lsGet(keys.fichas); 
+  if(!raw) return {};
   try{var o=JSON.parse(raw);return (o&&typeof o==='object'&&!Array.isArray(o))?o:{};}catch(e){return {};}
 }
+
 function refreshSelect(selectedKey){
-  var f=getFichas(), keys=Object.keys(f), sel=$('fichaSel');
-  sel.innerHTML='';
-  if(!keys.length){var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA SALVA';sel.appendChild(o);return;}
+  var f = getFichas(), keys = Object.keys(f), sel = $('fichaSel');
+  var filterCat = $('filterCat');
+  var currentFilter = filterCat ? filterCat.value : 'TODAS';
   
-  keys.sort(function(a, b) {
+  sel.innerHTML='';
+  
+  var filteredKeys = keys.filter(function(k){
+    var rec = f[k];
+    if(!rec) return false;
+    if(currentFilter && currentFilter !== 'TODAS'){
+      var cat = (rec.categoria || 'COOKIE').toUpperCase();
+      if(cat !== currentFilter) return false;
+    }
+    return true;
+  });
+
+  filteredKeys.sort(function(a, b) {
     var nameA = (f[a].cookie || '').toUpperCase();
     var nameB = (f[b].cookie || '').toUpperCase();
     return nameA.localeCompare(nameB);
   });
 
-  keys.forEach(function(k){
+  if(!filteredKeys.length){
+    var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA ENCONTRADA';sel.appendChild(o);
+    return;
+  }
+
+  filteredKeys.forEach(function(k){
     var o=document.createElement('option');
     o.value=k;
     var labelName = (f[k].cookie || 'SEM NOME').toUpperCase();
-    o.textContent = labelName;
+    var catName = (f[k].categoria || 'COOKIE').toUpperCase();
+    o.textContent = labelName + ' (' + catName + ')';
     sel.appendChild(o);
   });
 
-  if(selectedKey && f.hasOwnProperty(selectedKey)){
-    sel.value = selectedKey;
-  } else if(keys.length > 0){
-    sel.value = keys[0];
+  var currentOpenKey = null;
+  Object.keys(f).forEach(function(k){
+    var item = f[k];
+    if(item && ((state.id && item.id === state.id) || (state.localId && item.localId === state.localId))){
+      currentOpenKey = k;
+    }
+  });
+
+  var targetKey = null;
+  if(selectedKey && f.hasOwnProperty(selectedKey) && filteredKeys.indexOf(selectedKey) > -1){
+    targetKey = selectedKey;
+  } else if(currentOpenKey && filteredKeys.indexOf(currentOpenKey) > -1){
+    targetKey = currentOpenKey;
+  }
+
+  if(targetKey){
+    sel.value = targetKey;
+  } else {
+    // Se a ficha atual não pertence à categoria filtrada, não selecione outra automaticamente.
+    // Exibimos um aviso claro no topo do seletor para representar corretamente a realidade.
+    var o=document.createElement('option');
+    o.value='';
+    o.disabled = true;
+    o.selected = true;
+    o.textContent = '— FICHA ATUAL FORA DO FILTRO —';
+    sel.insertBefore(o, sel.firstChild);
   }
 }
+
+function abrirFichaPorChave(selKey){
+  var f = getFichas();
+  var d = normalize(f[selKey]); 
+  if(!d) return;
+  state = d; 
+  fillAll(); 
+  autosave(); 
+  say('FICHA ABERTA: '+(state.cookie||selKey)+'.');
+}
+
 function say(msg){$('status').textContent=msg;}
 function hora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 
@@ -523,14 +821,25 @@ function setUserSession(user) {
     authBadge.textContent = 'OFFLINE';
     cloudTag.textContent = 'LOCAL';
   }
+  
+  var keys = getStorageKeys();
+  var salvo = lsGet(keys.atual);
+  if(salvo){ 
+    try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} 
+  } else {
+    state = exemplo();
+  }
+  fillAll(); 
+  refreshSelect();
 }
 
-async function saveFichaToCloud(nome, copia) {
+async function saveFichaToCloud(copia) {
   if (!supabaseClient || !currentUser) return { error: null, id: null };
   try {
     const payload = {
       user_id: currentUser.id,
-      nome_sabor: nome,
+      nome_sabor: copia.cookie,
+      categoria: copia.categoria || 'COOKIE',
       unidades: parseNum(copia.units),
       gramas_massa_por_unidade: parseNum(copia.wMassa),
       gramas_recheio_base_por_unidade: parseNum(copia.wBase),
@@ -558,7 +867,7 @@ async function saveFichaToCloud(nome, copia) {
     const { data, error } = await query;
     
     if (error || !data || data.length === 0) {
-      return { error: error || new Error('Registro não encontrado na nuvem ou sem permissão (RLS).'), id: null };
+      return { error: error || new Error('Registro não encontrado na nuvem ou sem permissão.'), id: null };
     }
     return { error: null, id: data[0].id };
   } catch (err) {
@@ -572,35 +881,62 @@ async function loadCloudFichas() {
   try {
     const { data, error } = await supabaseClient
       .from('cosmos_receitas')
-      .select('*');
+      .select('*')
+      .eq('user_id', currentUser.id);
+
     if (error) {
       say('ERRO AO CARREGAR NUVEM: ' + error.message);
       return;
     }
     if (data && data.length > 0) {
       let f = getFichas();
+      var catsToRegister = [];
+      
       data.forEach(row => {
         var recId = row.id;
-        var nomeSabor = row.nome_sabor;
-        if (recId) {
-          var cloudKey = 'cloud_' + recId;
-          var cloudMapped = {
-            example: false,
-            id: recId,
-            cookie: nomeSabor || '',
-            units: row.unidades != null ? String(row.unidades) : '',
-            wMassa: row.gramas_massa_por_unidade != null ? String(row.gramas_massa_por_unidade) : '',
-            wBase: row.gramas_recheio_base_por_unidade != null ? String(row.gramas_recheio_base_por_unidade) : '',
-            wComp: row.gramas_recheio_complementar_por_unidade != null ? String(row.gramas_recheio_complementar_por_unidade) : '',
-            massa: row.massa || {yield:'', items:[]},
-            base: row.recheio_base || {yield:'', items:[]},
-            comp: row.recheio_complementar || {yield:'', items:[]}
-          };
+        var cloudKey = 'cloud_' + recId;
+        var cloudMapped = {
+          example: false,
+          id: recId,
+          localId: 'local_cloud_' + recId,
+          cookie: row.nome_sabor || '',
+          categoria: row.categoria || 'COOKIE',
+          units: row.unidades != null ? String(row.unidades) : '',
+          wMassa: row.gramas_massa_por_unidade != null ? String(row.gramas_massa_por_unidade) : '',
+          wBase: row.gramas_recheio_base_por_unidade != null ? String(row.gramas_recheio_base_por_unidade) : '',
+          wComp: row.gramas_recheio_complementar_por_unidade != null ? String(row.gramas_recheio_complementar_por_unidade) : '',
+          massa: row.massa || {yield:'', items:[]},
+          base: row.recheio_base || {yield:'', items:[]},
+          comp: row.recheio_complementar || {yield:'', items:[]}
+        };
+        
+        if(cloudMapped.categoria) {
+          catsToRegister.push(cloudMapped.categoria);
+        }
 
+        var existingKey = null;
+        Object.keys(f).forEach(function(k){
+          var item = f[k];
+          if(item && !item.id && String(item.cookie).trim().toUpperCase() === String(cloudMapped.cookie).trim().toUpperCase()){
+            existingKey = k;
+          }
+        });
+
+        if(existingKey) {
+          f[existingKey].id = recId;
+          f[cloudKey] = f[existingKey];
+          delete f[existingKey];
+        } else {
           f[cloudKey] = normalize(cloudMapped);
         }
       });
-      lsSet(KEY_FICHAS, JSON.stringify(f));
+
+      catsToRegister.forEach(function(c){
+        addCategoria(c);
+      });
+
+      var keys = getStorageKeys();
+      lsSet(keys.fichas, JSON.stringify(f));
       refreshSelect($('fichaSel').value);
       say('FICHAS SINCRONIZADAS COM SUCESSO!');
     } else {
@@ -611,33 +947,87 @@ async function loadCloudFichas() {
   }
 }
 
-/* ---------- EVENTOS DE FICHAS ---------- */
+async function syncPendingLocalFichas(){
+  if (!supabaseClient || !currentUser) return;
+  var f = getFichas();
+  var keys = Object.keys(f);
+  var syncedCount = 0;
+  
+  for(var i=0; i<keys.length; i++){
+    var k = keys[i];
+    var rec = f[k];
+    if(rec && !rec.id && !rec.example){
+      var cloudRes = await saveFichaToCloud(rec);
+      if(!cloudRes.error && cloudRes.id){
+        rec.id = cloudRes.id;
+        var newKey = 'cloud_' + cloudRes.id;
+        delete f[k];
+        f[newKey] = rec;
+        syncedCount++;
+        
+        if((state.localId && rec.localId === state.localId) || (!state.id && String(state.cookie).trim().toUpperCase() === String(rec.cookie).trim().toUpperCase())){
+          state.id = cloudRes.id;
+        }
+      }
+    }
+  }
+  var storageKeys = getStorageKeys();
+  lsSet(storageKeys.fichas, JSON.stringify(f));
+  lsSet(storageKeys.atual, JSON.stringify(state));
+  if(syncedCount > 0){
+    refreshSelect($('fichaSel').value);
+  }
+}
+
+/* ---------- OPERAÇÕES DOS BOTÕES DE FICHAS ---------- */
 async function saveFicha(){
   var nome=String(state.cookie||'').trim().toUpperCase();
-  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
+  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR LA FICHA.');$('cookie').focus();return;}
+  
+  state.categoria = $('categoria').value || 'COOKIE';
+  addCategoria(state.categoria);
+
   var f=getFichas();
+  var targetKey = null;
+
+  Object.keys(f).forEach(function(k){
+    var item = f[k];
+    if((state.id && item.id === state.id) || (state.localId && item.localId === state.localId)){
+      targetKey = k;
+    }
+  });
+
+  if(!targetKey){
+    targetKey = state.id ? ('cloud_' + state.id) : ('local_' + state.localId);
+  }
+
+  var copia = clone(state); 
+  copia.example = false;
+  f[targetKey] = copia;
   
-  var targetKey = state.id ? ('cloud_' + state.id) : ('local_' + Date.now());
-  
-  var copia=clone(state); copia.example=false;
-  f[targetKey]=copia;
-  
-  if(lsSet(KEY_FICHAS,JSON.stringify(f))&&lsSet(KEY_ATUAL,JSON.stringify(state))){
-    state.example=false; update(); refreshSelect(targetKey);
+  var keys = getStorageKeys();
+  if(lsSet(keys.fichas, JSON.stringify(f)) && lsSet(keys.atual, JSON.stringify(state))){
+    state.example=false; 
+    update(); 
+    refreshSelect(targetKey);
     
     if (supabaseClient && currentUser) {
       say('SALVANDO NA NUVEM...');
-      const cloudRes = await saveFichaToCloud(nome, copia);
+      const cloudRes = await saveFichaToCloud(copia);
       if (cloudRes.error) {
         say('SALVO LOCALMENTE (ERRO NA NUVEM: ' + cloudRes.error.message + ')');
       } else {
-        if (cloudRes.id && (!state.id || state.id !== cloudRes.id)) {
-          copia.id = cloudRes.id;
+        if (cloudRes.id) {
           state.id = cloudRes.id;
-          delete f[targetKey];
+          copia.id = cloudRes.id;
+          
           var newCloudKey = 'cloud_' + cloudRes.id;
+          if(targetKey !== newCloudKey){
+            delete f[targetKey];
+          }
           f[newCloudKey] = copia;
-          lsSet(KEY_FICHAS, JSON.stringify(f));
+          lsSet(keys.fichas, JSON.stringify(f));
+          lsSet(keys.atual, JSON.stringify(state));
           refreshSelect(newCloudKey);
         }
         say('FICHA SALVA COM SUCESSO · '+hora()+' · LOCAL & NUVEM.');
@@ -650,22 +1040,67 @@ async function saveFicha(){
   }
 }
 
-function openFicha(){
-  var selKey=$('fichaSel').value; if(!selKey){say('NENHUMA FICHA SELECIONADA.');return;}
-  var f=getFichas();
-  var d=normalize(f[selKey]); if(!d){say('FICHA NÃO ENCONTRADA.');return;}
-  state=d; fillAll(); autosave(); say('FICHA ABERTA: '+(state.cookie||selKey)+'.');
+function duplicarFicha(){
+  var nomeOriginal = state.cookie || 'RECEITA';
+  var novaCopia = clone(state);
+  novaCopia.example = false;
+  novaCopia.id = null;
+  novaCopia.localId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  novaCopia.cookie = (nomeOriginal + ' (CÓPIA)').toUpperCase();
+
+  ['massa','base','comp'].forEach(function(secKey){
+    if(novaCopia[secKey] && Array.isArray(novaCopia[secKey].items)){
+      novaCopia[secKey].items.forEach(function(it, idx){
+        it.checked = false;
+        it.id = 'ing_' + secKey + '_' + idx + '_' + Math.random().toString(36).substr(2,5);
+      });
+    }
+  });
+
+  state = novaCopia;
+  fillAll();
+  autosave();
+
+  var f = getFichas();
+  f['local_' + state.localId] = clone(state);
+  var keys = getStorageKeys();
+  lsSet(keys.fichas, JSON.stringify(f));
+  refreshSelect('local_' + state.localId);
+
+  say('FICHA DUPLICADA COM SUCESSO. EDITE O NOME E CLIQUE EM SALVAR.');
+  $('cookie').focus();
+  $('cookie').select();
 }
 
 async function delFicha(){
-  var selKey=$('fichaSel').value; if(!selKey){say('NENHUMA FICHA SELECIONADA.');return;}
-  var f=getFichas();
-  var rec = f[selKey];
-  if(!rec){say('FICHA NÃO ENCONTRADA.');return;}
+  var f = getFichas();
+  var targetKey = null;
 
-  if(!window.confirm('EXCLUIR A FICHA "'+(rec.cookie||selKey)+'"?')) return;
+  // Garantir que a exclusão apague estritamente a ficha ativa no formulário (state)
+  Object.keys(f).forEach(function(k){
+    var item = f[k];
+    if(item && ((state.id && item.id === state.id) || (state.localId && item.localId === state.localId))){
+      targetKey = k;
+    }
+  });
 
-  if (supabaseClient && currentUser && rec.id && selKey.indexOf('cloud_') === 0) {
+  // Fallback para o valor selecionado no seletor caso não encontre por state
+  if(!targetKey){
+    targetKey = $('fichaSel').value;
+  }
+
+  if(!targetKey || !f[targetKey]){
+    say('NENHUMA FICHA VÁLIDA SELECIONADA PARA EXCLUSÃO.');
+    return;
+  }
+
+  var rec = f[targetKey];
+
+  if(!window.confirm('EXCLUIR A FICHA "'+(rec.cookie||targetKey)+'"?')) return;
+
+  var isCurrentOpen = (state.id && rec.id === state.id) || (state.localId && rec.localId === state.localId);
+
+  if (supabaseClient && currentUser && rec.id && targetKey.indexOf('cloud_') === 0) {
     say('EXCLUINDO DA NUVEM...');
     const { data, error } = await supabaseClient
       .from('cosmos_receitas')
@@ -679,25 +1114,39 @@ async function delFicha(){
     }
   }
 
-  delete f[selKey];
-  lsSet(KEY_FICHAS,JSON.stringify(f));
-  refreshSelect();
+  delete f[targetKey];
+  var keys = getStorageKeys();
+  lsSet(keys.fichas,JSON.stringify(f));
   
-  if (supabaseClient && currentUser && rec.id && selKey.indexOf('cloud_') === 0) {
-    say('FICHA EXCLUÍDA COM SUCESSO DA NUVEM E DO NAVEGADOR.');
+  if (isCurrentOpen) {
+    novaFichaSemConfirmar();
   } else {
-    say('FICHA EXCLUÍDA DO NAVEGADOR (LOCAL).');
+    refreshSelect();
   }
+  
+  say('FICHA EXCLUÍDA COM SUCESSO.');
 }
 
 function novaFicha(){
   if(!window.confirm('LIMPAR A TELA E COMEÇAR UMA FICHA EM BRANCO? AS FICHAS JÁ SALVAS NÃO SÃO APAGADAS.')) return;
-  state=emBranco(); fillAll(); autosave(); say('FICHA EM BRANCO. PREENCHA OS DADOS E TOQUE EM "SALVAR FICHA".');
+  novaFichaSemConfirmar();
+}
+
+function novaFichaSemConfirmar(){
+  state = emBranco(); 
+  fillAll(); 
+  autosave(); 
+  refreshSelect();
+  say('FICHA EM BRANCO. PREENCHA OS DADOS E TOQUE EM "SALVAR".');
 }
 
 function restaurar(){
   if(!window.confirm('RESTAURAR OS DADOS DE EXEMPLO? AS ALTERAÇÕES ATUAIS NA TELA SERÃO SUBSTITUÍDAS.')) return;
-  state=exemplo(); fillAll(); autosave(); say('DADOS DE EXEMPLO RESTAURADOS.');
+  state = exemplo(); 
+  fillAll(); 
+  autosave(); 
+  refreshSelect();
+  say('DADOS DE EXEMPLO RESTAURADOS.');
 }
 
 /* ---------- BOTÕES DE AUTH ---------- */
@@ -759,21 +1208,103 @@ $('btnLogout').addEventListener('click', async () => {
   }
 });
 
-$('btnSyncCloud').addEventListener('click', () => {
+$('btnSyncCloud').addEventListener('click', async () => {
+  await syncPendingLocalFichas();
   loadCloudFichas();
 });
 
+/* ---------- CRONÔMETRO FLUTUANTE EM ESTRELA RETRÔ ---------- */
+var TIMER_KEY = 'cosmos.calculadora.timer.v1';
+var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
+
+function loadTimerState(){
+  var raw = lsGet(TIMER_KEY);
+  if(raw){
+    try{
+      var parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === 'object'){
+        timerState.running = !!parsed.running;
+        timerState.startTime = Number(parsed.startTime) || 0;
+        timerState.elapsedBefore = Number(parsed.elapsedBefore) || 0;
+      }
+    }catch(e){}
+  }
+}
+
+function saveTimerState(){
+  lsSet(TIMER_KEY, JSON.stringify(timerState));
+}
+
+function getElapsedMs(){
+  if(!timerState.running) return timerState.elapsedBefore;
+  return timerState.elapsedBefore + (Date.now() - timerState.startTime);
+}
+
+function formatTime(ms){
+  var totalSec = Math.floor(ms / 1000);
+  var hrs = Math.floor(totalSec / 3600);
+  var mins = Math.floor((totalSec % 3600) / 60);
+  var secs = totalSec % 60;
+  return String(hrs).padStart(2, '0') + ':' + ('0' + mins).slice(-2) + ':' + ('0' + secs).slice(-2);
+}
+
+function updateTimerDisplay(){
+  $('timerDisplay').textContent = formatTime(getElapsedMs());
+}
+
+setInterval(function(){
+  if(timerState.running){
+    updateTimerDisplay();
+  }
+}, 500);
+
+$('btnTimerStart').addEventListener('click', function(){
+  if(!timerState.running){
+    timerState.running = true;
+    timerState.startTime = Date.now();
+    saveTimerState();
+  }
+});
+
+$('btnTimerPause').addEventListener('click', function(){
+  if(timerState.running){
+    timerState.elapsedBefore += (Date.now() - timerState.startTime);
+    timerState.running = false;
+    saveTimerState();
+    updateTimerDisplay();
+  }
+});
+
+$('btnTimerReset').addEventListener('click', function(){
+  timerState.running = false;
+  timerState.startTime = 0;
+  timerState.elapsedBefore = 0;
+  saveTimerState();
+  updateTimerDisplay();
+});
+
 /* ---------- INÍCIO ---------- */
-buildSections(); bindTop();
-var salvo=lsGet(KEY_ATUAL);
-if(salvo){ try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} }
-fillAll(); refreshSelect();
+buildSections(); 
+bindTop();
+
+loadTimerState();
+updateTimerDisplay();
+
+var keys = getStorageKeys();
+var salvo=lsGet(keys.atual);
+if(salvo){ 
+  try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} 
+} else {
+  state = exemplo();
+}
+fillAll(); 
+refreshSelect();
 checkAuthUser();
 
 if(!storageOk) say('ATENÇÃO: ARMAZENAMENTO LOCAL INDISPONÍVEL NESTE NAVEGADOR.');
 
 $('save').addEventListener('click', saveFicha);
-$('open').addEventListener('click', openFicha);
+$('duplicar').addEventListener('click', duplicarFicha);
 $('del').addEventListener('click', delFicha);
 $('newF').addEventListener('click', novaFicha);
 $('reset').addEventListener('click', restaurar);
