@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff;--pink:#e06d8a;--pink-light:#f9ecef}
@@ -62,7 +63,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
 .fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* CRONÔMETRO APARELHO RETRÔ */
+/* CRONÔMETRO APARELHO RETRÔ (image_3.PNG) */
 .cosmos-device-timer {
   position: fixed;
   bottom: 20px;
@@ -82,17 +83,16 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   left: 27.5%;
   width: 45.5%;
   height: 19.5%;
-  background: #a6d7f4;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 4px;
 }
 .cosmos-lcd-digits {
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 900;
-  font-size: 15px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 14.5px;
   color: #122a4a;
   letter-spacing: 0.5px;
   text-align: center;
@@ -164,7 +164,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   .top{align-items:flex-start}.tag{font-size:9px}
   .fichas{grid-template-columns:1fr}
   .cosmos-device-timer{bottom:10px;right:10px;width:170px;}
-  .cosmos-lcd-digits{font-size:12px;}
+  .cosmos-lcd-digits{font-size:11.5px;}
   .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block}
   .tablewrap thead{display:none}
   .tablewrap tr{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
@@ -254,10 +254,10 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 
   <div id="sections"></div>
 
-  <!-- CRONÔMETRO APARELHO RETRÔ -->
+  <!-- CRONÔMETRO APARELHO RETRÔ (image_3.PNG) -->
   <div class="cosmos-device-timer" id="floatingTimer">
     <div style="position: relative; width: 100%;">
-      <img src="image_2.PNG" alt="Cronômetro Cosmos">
+      <img src="image_3.PNG" alt="Cronômetro Cosmos">
       <div class="cosmos-lcd-screen">
         <div class="cosmos-lcd-digits" id="timerDisplay">00:00:00</div>
       </div>
@@ -1219,7 +1219,7 @@ $('btnSyncCloud').addEventListener('click', async () => {
   loadCloudFichas();
 });
 
-/* ---------- CRONÔMETRO APARELHO RETRÔ ---------- */
+/* ---------- CRONÔMETRO COM TIMESTAMPS E LOCALSTORAGE (image_3.PNG) ---------- */
 var TIMER_KEY = 'cosmos.calculadora.timer.v1';
 var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
 
