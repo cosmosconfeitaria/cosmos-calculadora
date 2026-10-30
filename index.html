@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -143,1176 +142,250 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .footer-cosmos .line-tagline{
   font-size:10px;
   font-weight:800;
-  letter-spacing:.14em;
-  color:var(--ink);
-}
-.footer-cosmos .line-est{
-  font-size:9px;
-  font-weight:700;
   letter-spacing:.12em;
   color:var(--muted);
-}
-
-@media(max-width:560px){
-  .wrap{padding:14px}.panel{padding:14px}
-  .grid{grid-template-columns:1fr}
-  .metrics{grid-template-columns:1fr 1fr}.metrics .metric:last-child{grid-column:1/-1}
-  .top{align-items:flex-start}.tag{font-size:9px}
-  .fichas{grid-template-columns:1fr}
-  .floating-star-timer{bottom:10px;right:10px;}
-  .timer-image-wrap{width:130px;height:130px;}
-  .star-timer-screen{font-size:10px;}
-  .star-timer-controls button{padding:4px 6px;font-size:7px;}
-  .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block}
-  .tablewrap thead{display:none}
-  .tablewrap tr{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
-  .tablewrap td{border:0;padding:0;width:auto!important;text-align:left!important}
-  .tablewrap td.c-chk{grid-row:1/2;grid-column:1/2;align-self:center}
-  .tablewrap td.c-nm{grid-row:1/2;grid-column:2/4;padding-right:44px}
-  .tablewrap td.c-rm{position:absolute;top:12px;right:0}
-  .tablewrap td[data-label]::before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;font-weight:800}
-  .tablewrap td.c-adj .v{display:block;background:var(--cream);border-radius:10px;padding:13px 10px;font-size:15px}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
+  <div class="top">
     <div class="brand">COSMOS COOKIE LAB</div>
-    <div class="tag" id="cloudTag">LOCAL</div>
-  </header>
-  <h1>CALCULADORA<br>DE RECEITAS</h1>
-  <p class="intro">INFORME O COOKIE, A CATEGORIA, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
+    <div class="tag">CALCULADORA DE RECEITAS</div>
+  </div>
 
-  <!-- PAINEL DE AUTENTICAÇÃO E NUVEM (SUPABASE) -->
-  <section class="panel" id="authPanel">
-    <div class="section-title">00 / CONTA & NUVEM (SUPABASE)<span class="badge" id="authBadge">OFFLINE</span></div>
-    <div id="loggedOutView">
-      <p class="intro" style="margin-bottom:12px;">FAÇA LOGIN COM SEU E-MAIL E SENHA PARA SALVAR E SINCRONIZAR SUAS FICHAS NA NUVEM.</p>
-      <div class="grid">
-        <div><label for="authEmail">E-MAIL</label><input id="authEmail" type="email" autocomplete="email" placeholder="SEU@EMAIL.COM"></div>
-        <div><label for="authPassword">SENHA</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
-      </div>
-      <div class="actions">
-        <button class="primary" id="btnLogin">ENTRAR</button>
-        <button class="secondary" id="btnSignup">CADASTRAR</button>
-      </div>
-    </div>
-    <div id="loggedInView" style="display:none;">
-      <p class="intro" id="userEmailDisplay" style="margin-bottom:12px; font-weight:800; color:var(--blue);"></p>
-      <div class="actions">
-        <button class="secondary" id="btnLogout">SAIR (LOGOUT)</button>
-        <button class="primary" id="btnSyncCloud">SINCRONIZAR COM A NUVEM</button>
-      </div>
-    </div>
-    <div class="status" id="authStatus" role="status" aria-live="polite"></div>
-  </section>
+  <h1>Calculadora de Receitas</h1>
+  <p class="intro">Gerencie seus ingredientes, dimensione rendimentos e calcule custos com precisão profissional.</p>
 
-  <!-- LISTA DE FICHAS: FILTROS E SELEÇÃO -->
-  <section class="panel">
-    <div class="section-title">FICHAS DE PRODUÇÃO</div>
-    <div class="fichas">
-      <div><label for="filterCat">FILTRAR POR CATEGORIA</label><select id="filterCat" aria-label="FILTRAR POR CATEGORIA"></select></div>
-      <div><label for="fichaSel">SELECIONAR FICHA</label><select id="fichaSel" aria-label="SELECIONAR FICHA"></select></div>
-    </div>
-    <div class="actions">
-      <button class="primary" id="save">SALVAR</button>
-      <button class="secondary" id="duplicar">DUPLICAR</button>
-      <button class="secondary" id="del">EXCLUIR</button>
-      <button class="secondary" id="newF">NOVA FICHA</button>
-      <button class="secondary" id="reset">RESTAURAR EXEMPLO</button>
-    </div>
-    <div class="status" id="status" role="status" aria-live="polite"></div>
-  </section>
-
-  <section class="panel">
-    <div class="section-title">01 / DADOS DE PRODUÇÃO<span class="badge" id="exBadge">DADOS DE EXEMPLO</span></div>
+  <div class="panel">
+    <div class="section-title">Parâmetros da Receita</div>
     <div class="grid">
-      <div class="full"><label for="cookie">NOME DO COOKIE</label><input id="cookie" type="text" autocomplete="off" placeholder="EX.: BOSCO"></div>
       <div>
-        <label for="categoria">CATEGORIA</label>
-        <div style="display:flex; gap:6px;">
-          <select id="categoria" aria-label="CATEGORIA" style="flex:1;"></select>
-          <button class="secondary" id="btnAddCat" type="button" title="CRIAR NOVA CATEGORIA" style="padding:10px 12px; font-weight:900;">+</button>
-        </div>
+        <label for="baseYield">Rendimento Base</label>
+        <input type="number" id="baseYield" value="1" step="any">
       </div>
-      <div><label for="units">QUANTIDADE DE UNIDADES QUE QUERO PRODUZIR</label><input id="units" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-      <div><label for="wMassa">PESO DA MASSA POR COOKIE (G)</label><input id="wMassa" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-      <div><label for="wBase">PESO DO RECHEIO BASE POR COOKIE (G)</label><input id="wBase" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-      <div class="full"><label for="wComp">PESO DO RECHEIO COMPLEMENTAR POR COOKIE (G)</label><input id="wComp" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-    </div>
-    <div class="metrics m-top">
-      <div class="metric"><span>MASSA NECESSÁRIA</span><strong id="needMassa">0 G</strong></div>
-      <div class="metric"><span>RECHEIO BASE NECESSÁRIO</span><strong id="needBase">0 G</strong></div>
-      <div class="metric"><span>RECHEIO COMPLEMENTAR NECESSÁRIO</span><strong id="needComp">0 G</strong></div>
-    </div>
-    <p class="note" id="totalNote"></p>
-    <p class="note">OS PESOS SÃO DEFINIDOS POR VOCÊ PARA CADA SABOR; A SOMA NÃO PRECISA SER 100 G. COLOQUE 0 G EM UMA PREPARAÇÃO QUE O COOKIE NÃO USA. USE VÍRGULA OU PONTO PARA DECIMAIS.</p>
-  </section>
-
-  <div id="sections"></div>
-
-  <!-- CRONÔMETRO FLUTUANTE COM A IMAGEM DO TIMER COSMOS -->
-  <div class="floating-star-timer" id="floatingTimer">
-    <div class="timer-image-wrap">
-      <img src="image_2.png" alt="Timer Cosmos">
-      <div class="star-timer-screen" id="timerDisplay">00:00:00</div>
-    </div>
-    <div class="star-timer-controls">
-      <button class="primary" id="btnTimerStart">INICIAR</button>
-      <button class="secondary" id="btnTimerPause">PAUSAR</button>
-      <button class="secondary" id="btnTimerReset">ZERAR</button>
+      <div>
+        <label for="targetYield">Rendimento Desejado</label>
+        <input type="number" id="targetYield" value="1" step="any">
+      </div>
     </div>
   </div>
 
-  <footer class="footer-cosmos">
-    <div class="line-brand">★ COSMOS ★</div>
-    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
-    <div class="line-est">EST. 2024</div>
-  </footer>
+  <div class="panel">
+    <div class="section-title">Ingredientes</div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="c-chk">✓</th>
+            <th>Ingrediente</th>
+            <th class="c-base">Base</th>
+            <th class="c-adj">Ajustado</th>
+            <th class="c-rm"></th>
+          </tr>
+        </thead>
+        <tbody id="ingredientsBody">
+          <!-- Linhas de ingredientes geradas dinamicamente -->
+        </tbody>
+      </table>
+      <div id="emptyMessage" class="empty">Nenhum ingrediente adicionado.</div>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="addIngredientBtn">+ Adicionar Ingrediente</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">Métricas</div>
+    <div class="metrics">
+      <div class="metric">
+        <span>Peso Total Base</span>
+        <strong id="totalBaseWeight">0 g</strong>
+      </div>
+      <div class="metric">
+        <span>Peso Total Ajustado</span>
+        <strong id="totalAdjWeight">0 g</strong>
+      </div>
+      <div class="metric">
+        <span>Fator de Conversão</span>
+        <strong id="conversionFactor">1.00x</strong>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- CRONÔMETRO FLUTUANTE COM A IMAGEM DO TIMER COSMOS (TRANSPARENTE) -->
+<div class="floating-star-timer">
+  <div class="timer-image-wrap">
+    <img src="image_2.PNG" alt="Timer Cosmos">
+    <div id="starTimerScreen" class="star-timer-screen">00:00</div>
+  </div>
+  <div class="star-timer-controls">
+    <button class="secondary" id="starTimerToggle">INICIAR</button>
+    <button class="secondary" id="starTimerReset">ZERAR</button>
+  </div>
+</div>
+
+<footer class="footer-cosmos">
+  <div class="line-brand">COSMOS COOKIE LAB</div>
+  <div class="line-tagline">CALCULADORA DE RECEITAS PROFISSIONAL</div>
+</footer>
+
 <script>
-(function(){
-'use strict';
+  // Lógica da Calculadora e Cronômetro
+  document.addEventListener('DOMContentLoaded', () => {
+    const baseYieldInput = document.getElementById('baseYield');
+    const targetYieldInput = document.getElementById('targetYield');
+    const ingredientsBody = document.getElementById('ingredientsBody');
+    const addIngredientBtn = document.getElementById('addIngredientBtn');
+    const totalBaseWeightEl = document.getElementById('totalBaseWeight');
+    const totalAdjWeightEl = document.getElementById('totalAdjWeight');
+    const conversionFactorEl = document.getElementById('conversionFactor');
+    const emptyMessage = document.getElementById('emptyMessage');
 
-/* ---------- CONFIGURAÇÃO SUPABASE ---------- */
-var SUPABASE_URL = 'https://gjotzkvhvdqhnaoxcgxv.supabase.co';
-var SUPABASE_KEY = 'sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
-var supabaseClient = null;
-var currentUser = null;
-var isAuthInitialized = false;
+    let ingredients = [
+      { name: 'Farinha de Trigo', base: 500, checked: false },
+      { name: 'Açúcar Demerara', base: 250, checked: false },
+      { name: 'Manteiga Sem Sal', base: 200, checked: false }
+    ];
 
-try {
-  if (window.supabase) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch(e) {
-  console.error("Erro ao iniciar Supabase:", e);
-}
+    function render() {
+      ingredientsBody.innerHTML = '';
+      const baseY = parseFloat(baseYieldInput.value) || 1;
+      const targetY = parseFloat(targetYieldInput.value) || 1;
+      const factor = targetY / baseY;
 
-/* ---------- CONFIGURAÇÃO DAS TRÊS PREPARAÇÕES (independentes) ---------- */
-var SECTIONS = [
-  {key:'massa', num:'02', title:'MASSA',                weightId:'wMassa'},
-  {key:'base',  num:'03', title:'RECHEIO BASE',         weightId:'wBase'},
-  {key:'comp',  num:'04', title:'RECHEIO COMPLEMENTAR', weightId:'wComp'}
-];
+      conversionFactorEl.textContent = factor.toFixed(2) + 'x';
 
-var DEFAULT_CATEGORIES = ['COOKIE', 'DOT COOKIE', 'BROOKIE', 'MINI COOKIES', 'OUTRO'];
+      let totalBase = 0;
+      let totalAdj = 0;
 
-// Chaves dinâmicas baseadas no usuário autenticado
-function getStorageKeys() {
-  var userPrefix = currentUser ? ('user_' + currentUser.id) : 'user_guest';
-  return {
-    atual: 'cosmos.calculadora.atual.v3.' + userPrefix,
-    fichas: 'cosmos.calculadora.fichas.v3.' + userPrefix,
-    categorias: 'cosmos.calculadora.categorias.v3.' + userPrefix
-  };
-}
-
-/* ---------- DADOS DE EXEMPLO (BOSCO RED VELVET) ---------- */
-function exemplo(){
-  return {
-    example:true,
-    id:null,
-    localId:'local_exemplo_bosco',
-    cookie:'BOSCO',
-    categoria:'COOKIE',
-    units:'30', wMassa:'71', wBase:'21', wComp:'11',
-    massa:{yield:'723', items:[
-      {id:'m1', name:'MANTEIGA',qty:'105', checked:false},
-      {id:'m2', name:'AÇÚCAR REFINADO',qty:'60', checked:false},
-      {id:'m3', name:'AÇÚCAR MASCAVO',qty:'60', checked:false},
-      {id:'m4', name:'OVOS',qty:'50', checked:false},
-      {id:'m5', name:'BAUNILHA',qty:'5', checked:false},
-      {id:'m6', name:'CORANTE',qty:'5', checked:false},
-      {id:'m7', name:'FARINHA DE TRIGO',qty:'210', checked:false},
-      {id:'m8', name:'AMIDO DE MILHO',qty:'30', checked:false},
-      {id:'m9', name:'CACAU EM PÓ',qty:'10', checked:false},
-      {id:'m10', name:'LEITE EM PÓ',qty:'30', checked:false},
-      {id:'m11', name:'BICARBONATO',qty:'4', checked:false},
-      {id:'m12', name:'SAL',qty:'4', checked:false},
-      {id:'m13', name:'CHOCOLATE BRANCO',qty:'150', checked:false}
-    ]},
-    base:{yield:'630', items:[
-      {id:'b1', name:'GANACHE BASE',qty:'630', checked:false}
-    ]},
-    comp:{yield:'330', items:[
-      {id:'c1', name:'GELEIA COMPLEMENTAR',qty:'330', checked:false}
-    ]}
-  };
-}
-
-function emBranco(){
-  var ingredientesPadraoMassa = [
-    'MANTEIGA SEM SAL',
-    'AÇÚCAR MASCAVO',
-    'AÇÚCAR REFINADO',
-    'OVO',
-    'BAUNILHA',
-    'FARINHA DE TRIGO',
-    'LEITE EM PÓ',
-    'AMIDO DE MILHO',
-    'CACAU EM PÓ',
-    'CACAU BLACK',
-    'FERMENTO EM PÓ',
-    'BICARBONATO DE SÓDIO',
-    'SAL',
-    'CHOCOLATE'
-  ].map(function(nome, idx){ return {id: 'm_def_'+idx+'_'+Math.random().toString(36).substr(2,5), name: nome, qty: '', checked: false}; });
-
-  return {
-    example: false,
-    id: null,
-    localId: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
-    cookie: '',
-    categoria: 'COOKIE',
-    units: '',
-    wMassa: '',
-    wBase: '',
-    wComp: '',
-    massa: { yield: '', items: ingredientesPadraoMassa },
-    base: { yield: '', items: [] },
-    comp: { yield: '', items: [] }
-  };
-}
-
-var state = exemplo();
-var refs = {};   
-var $ = function(id){return document.getElementById(id)};
-
-/* ---------- GERENCIAMENTO DE CATEGORIAS ---------- */
-function getCategorias(){
-  var keys = getStorageKeys();
-  var raw = lsGet(keys.categorias);
-  var cats = DEFAULT_CATEGORIES.slice();
-  if(raw){
-    try{
-      var parsed = JSON.parse(raw);
-      if(Array.isArray(parsed)){
-        parsed.forEach(function(c){
-          var uc = String(c||'').trim().toUpperCase();
-          if(uc && cats.indexOf(uc) === -1) cats.push(uc);
-        });
-      }
-    }catch(e){}
-  }
-  return cats;
-}
-
-function addCategoria(novaCat){
-  var uc = String(novaCat||'').trim().toUpperCase();
-  if(!uc) return;
-  var cats = getCategorias();
-  if(cats.indexOf(uc) === -1){
-    cats.push(uc);
-    var keys = getStorageKeys();
-    lsSet(keys.categorias, JSON.stringify(cats));
-  }
-  atualizarSelectCategorias(uc);
-}
-
-function atualizarSelectCategorias(selecionada){
-  var cats = getCategorias();
-  var selCat = $('categoria');
-  var filterCat = $('filterCat');
-  
-  if(!selCat || !filterCat) return;
-
-  var curSel = selecionada || selCat.value || 'COOKIE';
-  var curFilter = filterCat.value || 'TODAS';
-
-  selCat.innerHTML = '';
-  cats.forEach(function(c){
-    var o = document.createElement('option');
-    o.value = c;
-    o.textContent = c;
-    selCat.appendChild(o);
-  });
-  if(cats.indexOf(curSel) > -1) selCat.value = curSel;
-
-  filterCat.innerHTML = '<option value="TODAS">TODAS AS CATEGORIAS</option>';
-  cats.forEach(function(c){
-    var o = document.createElement('option');
-    o.value = c;
-    o.textContent = c;
-    filterCat.appendChild(o);
-  });
-  if(curFilter === 'TODAS' || cats.indexOf(curFilter) > -1){
-    filterCat.value = curFilter;
-  } else {
-    filterCat.value = 'TODAS';
-  }
-}
-
-/* ---------- NÚMEROS ---------- */
-function parseNum(v){
-  if(v===null||v===undefined) return NaN;
-  var s=String(v).trim().replace(/\s/g,'');
-  if(s==='') return NaN;
-  if(s.indexOf(',')>-1){ s=s.replace(/\./g,'').replace(',','.'); }
-  else if(/^\d{1,3}(\.\d{3})+$/.test(s)){ s=s.replace(/\./g,''); }
-  if(!/^-?\d*\.?\d+$/.test(s) && !/^-?\d+\.$/.test(s)) return NaN;
-  var n=parseFloat(s);
-  return isFinite(n)?n:NaN;
-}
-function nz(v){ var n=parseNum(v); return (isNaN(n)||n<0)?0:n; }   
-var nf  = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
-var nfF = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:4});
-function fmt(n){ return nf.format(Math.round(n*100)/100); }
-function fmtG(n){ return fmt(n)+' G'; }
-
-/* ---------- CÁLCULO (NÚCLEO) ---------- */
-function calcSection(sec, necessario){
-  var out = {valido:false, necessario:necessario, fator:null, ajustados:[], somaBase:0, somaAj:0};
-  
-  sec.items.forEach(function(it){
-    out.somaBase += nz(it.qty);
-  });
-
-  var rend = out.somaBase;
-  var valido = rend > 0;
-  out.valido = valido;
-
-  sec.items.forEach(function(it){
-    var q = nz(it.qty);
-    if(valido){
-      var aj = q * necessario / rend;
-      out.ajustados.push(aj); 
-      out.somaAj += aj;
-    } else {
-      out.ajustados.push(null);
-    }
-  });
-
-  if(valido) out.fator = necessario / rend;
-  return out;
-}
-
-function calcAll(){
-  var u = nz(state.units);
-  var needs = {massa:u*nz(state.wMassa), base:u*nz(state.wBase), comp:u*nz(state.wComp)};
-  var r = {needs:needs};
-  SECTIONS.forEach(function(s){ r[s.key]=calcSection(state[s.key], needs[s.key]); });
-  return r;
-}
-
-/* ---------- INTERFACE ---------- */
-function buildSections(){
-  var host=$('sections'); host.innerHTML='';
-  SECTIONS.forEach(function(s){
-    var p=document.createElement('section'); p.className='panel';
-    p.innerHTML =
-      '<div class="section-title">'+s.num+' / '+s.title+'<span class="badge" data-r="ex">EXEMPLO</span></div>'+
-      '<div class="grid">'+
-        '<div><label for="y-'+s.key+'">RENDIMENTO TOTAL DA RECEITA-BASE (G)</label><input id="y-'+s.key+'" type="text" inputmode="decimal" autocomplete="off" placeholder="EX.: 723" readonly></div>'+
-        '<div><label>FATOR DE AJUSTE</label><input data-r="fator" value="—" readonly aria-label="FATOR DE AJUSTE"></div>'+
-      '</div>'+
-      '<div class="warn" data-r="warn" role="alert">INFORME UM RENDIMENTO-BASE VÁLIDO (MAIOR QUE ZERO) PARA CALCULAR ESTA PREPARAÇÃO.</div>'+
-      '<div class="info" data-r="zero">PESO DE 0 G POR COOKIE: ESTA PREPARAÇÃO NÃO É USADA E TODAS AS QUANTIDADES AJUSTADAS FICAM EM ZERO.</div>'+
-      '<div class="metrics m-top">'+
-        '<div class="metric"><span>NECESSÁRIO</span><strong data-r="need">0 G</strong></div>'+
-        '<div class="metric"><span>SOMA BASE</span><strong data-r="sb">0 G</strong></div>'+
-        '<div class="metric"><span>SOMA AJUSTADA</span><strong data-r="sa">—</strong></div>'+
-      '</div>'+
-      '<div class="tablewrap"><table><thead><tr><th class="c-chk">✓</th><th>INGREDIENTE</th><th class="c-base">BASE (G)</th><th class="c-adj">AJUSTADO (G)</th><th class="c-rm"></th></tr></thead><tbody data-r="body"></tbody></table>'+
-      '<div class="empty" data-r="empty">NENHUM INGREDIENTE. TOQUE EM "ADICIONAR INGREDIENTE".</div></div>'+
-      '<div class="actions"><button class="primary" data-r="add">+ ADICIONAR INGREDIENTE</button></div>';
-    host.appendChild(p);
-    var q=function(n){return p.querySelector('[data-r="'+n+'"]')};
-    refs[s.key]={yield:p.querySelector('#y-'+s.key),fator:q('fator'),warn:q('warn'),zero:q('zero'),need:q('need'),
-      sb:q('sb'),sa:q('sa'),body:q('body'),empty:q('empty'),add:q('add'),ex:q('ex'),cells:[]};
-    refs[s.key].add.addEventListener('click',function(){
-      var newIngId = 'ing_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-      state[s.key].items.push({id: newIngId, name:'', qty:'', checked:false});
-      touched(true);renderRows(s.key);update();
-      var inp=refs[s.key].body.querySelectorAll('tr:last-child input[type="text"]')[0]; if(inp) inp.focus();
-    });
-  });
-}
-
-function renderRows(key){
-  var R=refs[key], list=state[key].items;
-  R.body.innerHTML=''; R.cells=[];
-  list.forEach(function(item,i){
-    if(!item.id) item.id = 'ing_' + i + '_' + Math.random().toString(36).substr(2,5);
-    var tr=document.createElement('tr');
-    if(item.checked) tr.className = 'checked-row';
-
-    var tdChk=document.createElement('td'); tdChk.className='c-chk';
-    var chk=document.createElement('input'); chk.type='checkbox'; chk.className='chk-box';
-    chk.checked = !!item.checked;
-    chk.setAttribute('aria-label', 'MARCAR INGREDIENTE');
-    chk.addEventListener('change', function(e){
-      item.checked = e.target.checked;
-      tr.classList.toggle('checked-row', item.checked);
-      touched();
-    });
-    tdChk.appendChild(chk);
-
-    var td1=document.createElement('td'); td1.className='c-nm';
-    var name=document.createElement('input'); name.type='text'; name.value=item.name; name.placeholder='NOME DO INGREDIENTE';
-    name.setAttribute('aria-label','NOME DO INGREDIENTE'); name.autocomplete='off';
-    name.addEventListener('input',function(e){item.name=e.target.value;touched();});
-    td1.appendChild(name);
-
-    var td2=document.createElement('td'); td2.className='c-base'; td2.setAttribute('data-label','BASE (G)');
-    var qty=document.createElement('input'); qty.type='text'; qty.inputMode='decimal'; qty.value=item.qty; qty.placeholder='0';
-    qty.setAttribute('aria-label','QUANTIDADE BASE EM GRAMAS'); qty.autocomplete='off';
-    qty.addEventListener('input',function(e){
-      item.qty=e.target.value;
-      touched();
-      update();
-    });
-    td2.appendChild(qty);
-
-    var td3=document.createElement('td'); td3.className='c-adj'; td3.setAttribute('data-label','AJUSTADO (G)');
-    var v=document.createElement('span'); v.className='v'; td3.appendChild(v);
-    R.cells.push(v);
-
-    var td4=document.createElement('td'); td4.className='c-rm';
-    var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.textContent='×';
-    rm.setAttribute('aria-label','REMOVER INGREDIENTE'); rm.title='REMOVER INGREDIENTE';
-    rm.addEventListener('click',function(){state[key].items.splice(i,1);touched(true);renderRows(key);update();});
-    td4.appendChild(rm);
-
-    tr.append(tdChk,td1,td2,td3,td4); R.body.appendChild(tr);
-  });
-  R.empty.classList.toggle('show',list.length===0);
-}
-
-function update(){
-  var r=calcAll();
-  $('needMassa').textContent=fmtG(r.needs.massa);
-  $('needBase').textContent=fmtG(r.needs.base);
-  $('needComp').textContent=fmtG(r.needs.comp);
-  var tot=nz(state.wMassa)+nz(state.wBase)+nz(state.wComp);
-  $('totalNote').textContent='PESO TOTAL POR COOKIE: '+fmtG(tot)+' (MASSA + RECHEIO BASE + RECHEIO COMPLEMENTAR).';
-  $('exBadge').hidden=!state.example;
-  SECTIONS.forEach(function(s){
-    var c=r[s.key], R=refs[s.key];
-    R.ex.hidden=!state.example;
-    R.fator.value=c.valido?(nfF.format(c.fator)+'×'):'—';
-    R.warn.classList.toggle('show',!c.valido);
-    R.zero.classList.toggle('show',c.valido && c.necessario===0);
-    R.need.textContent=fmtG(c.necessario);
-    R.sb.textContent=fmtG(c.somaBase);
-    R.sa.textContent=c.valido?fmtG(c.somaAj):'—';
-    R.yield.value = c.somaBase > 0 ? fmt(c.somaBase) : '';
-    state[s.key].yield = R.yield.value;
-    c.ajustados.forEach(function(val,i){ if(R.cells[i]) R.cells[i].textContent=(val===null)?'—':fmtG(val); });
-  });
-}
-
-function bindTop(){
-  var map={cookie:'cookie',units:'units',wMassa:'wMassa',wBase:'wBase',wComp:'wComp'};
-  Object.keys(map).forEach(function(k){
-    $(k).addEventListener('input',function(e){state[k]=e.target.value;touched();update();});
-  });
-  $('categoria').addEventListener('change',function(e){
-    state.categoria = e.target.value;
-    touched();
-  });
-  $('btnAddCat').addEventListener('click', function(){
-    var nova = prompt('DIGITE O NOME DA NOVA CATEGORIA:');
-    if(nova){
-      var uc = nova.trim().toUpperCase();
-      if(uc){
-        addCategoria(uc);
-        $('categoria').value = uc;
-        state.categoria = uc;
-        touched();
-      }
-    }
-  });
-  $('filterCat').addEventListener('change',function(){
-    refreshSelect();
-  });
-  $('fichaSel').addEventListener('change',function(){
-    var selKey = $('fichaSel').value;
-    if(selKey){
-      abrirFichaPorChave(selKey);
-    }
-  });
-}
-
-function fillAll(){
-  $('cookie').value = state.cookie || '';
-  atualizarSelectCategorias(state.categoria || 'COOKIE');
-  $('units').value = state.units || '';
-  $('wMassa').value = state.wMassa || '';
-  $('wBase').value = state.wBase || '';
-  $('wComp').value = state.wComp || '';
-  SECTIONS.forEach(function(s){refs[s.key].yield.value=state[s.key].yield;renderRows(s.key);});
-  update();
-}
-
-/* ---------- PERSISTÊNCIA & SUPABASE ---------- */
-var storageOk=true;
-function lsGet(k){try{return window.localStorage.getItem(k)}catch(e){storageOk=false;return null}}
-function lsSet(k,v){try{window.localStorage.setItem(k,v);return true}catch(e){storageOk=false;return false}}
-function clone(o){return JSON.parse(JSON.stringify(o))}
-
-function normalize(d){
-  if(!d||typeof d!=='object') return null;
-  var out=emBranco();
-  out.example=!!d.example;
-  out.id=d.id!==undefined?d.id:null;
-  out.localId=d.localId || ('local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5));
-  out.cookie=(d.cookie==null)?'':String(d.cookie);
-  out.categoria=(d.categoria==null)?'COOKIE':String(d.categoria).toUpperCase();
-  ['units','wMassa','wBase','wComp'].forEach(function(k){out[k]=(d[k]==null)?'':String(d[k]);});
-  SECTIONS.forEach(function(s){
-    var sec=d[s.key]; if(!sec||typeof sec!=='object') return;
-    out[s.key].yield=(sec.yield==null)?'':String(sec.yield);
-    if(Array.isArray(sec.items)) out[s.key].items=sec.items.map(function(it, idx){
-      return {
-        id:(it&&it.id!=null)?String(it.id):('ing_'+s.key+'_'+idx+'_'+Math.random().toString(36).substr(2,5)),
-        name:(it&&it.name!=null)?String(it.name):'',
-        qty:(it&&it.qty!=null)?String(it.qty):'',
-        checked:!!(it&&it.checked)
-      };
-    });
-  });
-  return out;
-}
-
-var autoTimer=null;
-function touched(structural){
-  if(state.example){state.example=false;update();}
-  clearTimeout(autoTimer);
-  autoTimer=setTimeout(autosave,250);
-}
-
-function autosave(){ 
-  var keys = getStorageKeys();
-  lsSet(keys.atual,JSON.stringify(state)); 
-  
-  var f = getFichas();
-  var foundKey = null;
-  Object.keys(f).forEach(function(k){
-    var item = f[k];
-    if((state.id && item.id === state.id) || (state.localId && item.localId === state.localId)){
-      foundKey = k;
-    }
-  });
-  if(foundKey){
-    f[foundKey] = clone(state);
-    lsSet(keys.fichas, JSON.stringify(f));
-  }
-}
-
-function getFichas(){
-  var keys = getStorageKeys();
-  var raw = lsGet(keys.fichas); 
-  if(!raw) return {};
-  try{var o=JSON.parse(raw);return (o&&typeof o==='object'&&!Array.isArray(o))?o:{};}catch(e){return {};}
-}
-
-function refreshSelect(selectedKey){
-  var f = getFichas(), keys = Object.keys(f), sel = $('fichaSel');
-  var filterCat = $('filterCat');
-  var currentFilter = filterCat ? filterCat.value : 'TODAS';
-  
-  sel.innerHTML='';
-  
-  var filteredKeys = keys.filter(function(k){
-    var rec = f[k];
-    if(!rec) return false;
-    if(currentFilter && currentFilter !== 'TODAS'){
-      var cat = (rec.categoria || 'COOKIE').toUpperCase();
-      if(cat !== currentFilter) return false;
-    }
-    return true;
-  });
-
-  filteredKeys.sort(function(a, b) {
-    var nameA = (f[a].cookie || '').toUpperCase();
-    var nameB = (f[b].cookie || '').toUpperCase();
-    return nameA.localeCompare(nameB);
-  });
-
-  if(!filteredKeys.length){
-    var o=document.createElement('option');o.value='';o.textContent='NENHUMA FICHA ENCONTRADA';sel.appendChild(o);
-    return;
-  }
-
-  filteredKeys.forEach(function(k){
-    var o=document.createElement('option');
-    o.value=k;
-    var labelName = (f[k].cookie || 'SEM NOME').toUpperCase();
-    var catName = (f[k].categoria || 'COOKIE').toUpperCase();
-    o.textContent = labelName + ' (' + catName + ')';
-    sel.appendChild(o);
-  });
-
-  var currentOpenKey = null;
-  Object.keys(f).forEach(function(k){
-    var item = f[k];
-    if(item && ((state.id && item.id === state.id) || (state.localId && item.localId === state.localId))){
-      currentOpenKey = k;
-    }
-  });
-
-  var targetKey = null;
-  if(selectedKey && f.hasOwnProperty(selectedKey) && filteredKeys.indexOf(selectedKey) > -1){
-    targetKey = selectedKey;
-  } else if(currentOpenKey && filteredKeys.indexOf(currentOpenKey) > -1){
-    targetKey = currentOpenKey;
-  }
-
-  if(targetKey){
-    sel.value = targetKey;
-  } else {
-    var o=document.createElement('option');
-    o.value='';
-    o.disabled = true;
-    o.selected = true;
-    o.textContent = '— FICHA ATUAL FORA DO FILTRO —';
-    sel.insertBefore(o, sel.firstChild);
-  }
-}
-
-function abrirFichaPorChave(selKey){
-  var f = getFichas();
-  var d = normalize(f[selKey]); 
-  if(!d) return;
-  state = d; 
-  fillAll(); 
-  autosave(); 
-  say('FICHA ABERTA: '+(state.cookie||selKey)+'.');
-}
-
-function say(msg){$('status').textContent=msg;}
-function hora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
-
-/* ---------- OPERAÇÕES NUVEM (SUPABASE) ---------- */
-async function checkAuthUser() {
-  if (!supabaseClient) return;
-  try {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    setUserSession(session?.user || null);
-    
-    if (!isAuthInitialized) {
-      isAuthInitialized = true;
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        const prevUser = currentUser;
-        setUserSession(session?.user || null);
-        if (session?.user && (!prevUser || prevUser.id !== session.user.id)) {
-          loadCloudFichas();
-        }
-      });
-    }
-  } catch(e) {
-    console.error("Erro auth session:", e);
-  }
-}
-
-function setUserSession(user) {
-  currentUser = user;
-  const loggedOut = $('loggedOutView');
-  const loggedIn = $('loggedInView');
-  const authBadge = $('authBadge');
-  const cloudTag = $('cloudTag');
-  
-  if (user) {
-    loggedOut.style.display = 'none';
-    loggedIn.style.display = 'block';
-    $('userEmailDisplay').textContent = 'CONECTADO: ' + user.email.toUpperCase();
-    authBadge.textContent = 'ONLINE';
-    cloudTag.textContent = 'NUVEM ATIVA';
-  } else {
-    loggedOut.style.display = 'block';
-    loggedIn.style.display = 'none';
-    authBadge.textContent = 'OFFLINE';
-    cloudTag.textContent = 'LOCAL';
-  }
-  
-  var keys = getStorageKeys();
-  var salvo = lsGet(keys.atual);
-  if(salvo){ 
-    try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} 
-  } else {
-    state = exemplo();
-  }
-  fillAll(); 
-  refreshSelect();
-}
-
-async function saveFichaToCloud(copia) {
-  if (!supabaseClient || !currentUser) return { error: null, id: null };
-  try {
-    const payload = {
-      user_id: currentUser.id,
-      nome_sabor: copia.cookie,
-      categoria: copia.categoria || 'COOKIE',
-      unidades: parseNum(copia.units),
-      gramas_massa_por_unidade: parseNum(copia.wMassa),
-      gramas_recheio_base_por_unidade: parseNum(copia.wBase),
-      gramas_recheio_complementar_por_unidade: parseNum(copia.wComp),
-      massa: copia.massa,
-      recheio_base: copia.base,
-      recheio_complementar: copia.comp
-    };
-
-    let query;
-    if (copia.id) {
-      query = supabaseClient
-        .from('cosmos_receitas')
-        .update(payload)
-        .eq('id', copia.id)
-        .eq('user_id', currentUser.id)
-        .select('id');
-    } else {
-      query = supabaseClient
-        .from('cosmos_receitas')
-        .insert([payload])
-        .select('id');
-    }
-
-    const { data, error } = await query;
-    
-    if (error || !data || data.length === 0) {
-      return { error: error || new Error('Registro não encontrado na nuvem ou sem permissão.'), id: null };
-    }
-    return { error: null, id: data[0].id };
-  } catch (err) {
-    return { error: err, id: null };
-  }
-}
-
-async function loadCloudFichas() {
-  if (!supabaseClient || !currentUser) return;
-  say('SINCRONIZANDO FICHAS DA NUVEM...');
-  try {
-    const { data, error } = await supabaseClient
-      .from('cosmos_receitas')
-      .select('*')
-      .eq('user_id', currentUser.id);
-
-    if (error) {
-      say('ERRO AO CARREGAR NUVEM: ' + error.message);
-      return;
-    }
-    if (data && data.length > 0) {
-      let f = getFichas();
-      var catsToRegister = [];
-      
-      data.forEach(row => {
-        var recId = row.id;
-        var cloudKey = 'cloud_' + recId;
-        var cloudMapped = {
-          example: false,
-          id: recId,
-          localId: 'local_cloud_' + recId,
-          cookie: row.nome_sabor || '',
-          categoria: row.categoria || 'COOKIE',
-          units: row.unidades != null ? String(row.unidades) : '',
-          wMassa: row.gramas_massa_por_unidade != null ? String(row.gramas_massa_por_unidade) : '',
-          wBase: row.gramas_recheio_base_por_unidade != null ? String(row.gramas_recheio_base_por_unidade) : '',
-          wComp: row.gramas_recheio_complementar_por_unidade != null ? String(row.gramas_recheio_complementar_por_unidade) : '',
-          massa: row.massa || {yield:'', items:[]},
-          base: row.recheio_base || {yield:'', items:[]},
-          comp: row.recheio_complementar || {yield:'', items:[]}
-        };
-        
-        if(cloudMapped.categoria) {
-          catsToRegister.push(cloudMapped.categoria);
-        }
-
-        var existingKey = null;
-        Object.keys(f).forEach(function(k){
-          var item = f[k];
-          if(item && !item.id && String(item.cookie).trim().toUpperCase() === String(cloudMapped.cookie).trim().toUpperCase()){
-            existingKey = k;
-          }
-        });
-
-        if(existingKey) {
-          f[existingKey].id = recId;
-          f[cloudKey] = f[existingKey];
-          delete f[existingKey];
-        } else {
-          f[cloudKey] = normalize(cloudMapped);
-        }
-      });
-
-      catsToRegister.forEach(function(c){
-        addCategoria(c);
-      });
-
-      var keys = getStorageKeys();
-      lsSet(keys.fichas, JSON.stringify(f));
-      refreshSelect($('fichaSel').value);
-      say('FICHAS SINCRONIZADAS COM SUCESSO!');
-    } else {
-      say('NENHUMA FICHA NA NUVEM ENCONTRADA.');
-    }
-  } catch (err) {
-    say('ERRO DE CONEXÃO COM A NUVEM.');
-  }
-}
-
-async function syncPendingLocalFichas(){
-  if (!supabaseClient || !currentUser) return;
-  var f = getFichas();
-  var keys = Object.keys(f);
-  var syncedCount = 0;
-  
-  for(var i=0; i<keys.length; i++){
-    var k = keys[i];
-    var rec = f[k];
-    if(rec && !rec.id && !rec.example){
-      var cloudRes = await saveFichaToCloud(rec);
-      if(!cloudRes.error && cloudRes.id){
-        rec.id = cloudRes.id;
-        var newKey = 'cloud_' + cloudRes.id;
-        delete f[k];
-        f[newKey] = rec;
-        syncedCount++;
-        
-        if((state.localId && rec.localId === state.localId) || (!state.id && String(state.cookie).trim().toUpperCase() === String(rec.cookie).trim().toUpperCase())){
-          state.id = cloudRes.id;
-        }
-      }
-    }
-  }
-  var storageKeys = getStorageKeys();
-  lsSet(storageKeys.fichas, JSON.stringify(f));
-  lsSet(storageKeys.atual, JSON.stringify(state));
-  if(syncedCount > 0){
-    refreshSelect($('fichaSel').value);
-  }
-}
-
-/* ---------- OPERAÇÕES DOS BOTÕES DE FICHAS ---------- */
-async function saveFicha(){
-  var nome=String(state.cookie||'').trim().toUpperCase();
-  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
-  
-  state.categoria = $('categoria').value || 'COOKIE';
-  addCategoria(state.categoria);
-
-  var f=getFichas();
-  var targetKey = null;
-
-  Object.keys(f).forEach(function(k){
-    var item = f[k];
-    if((state.id && item.id === state.id) || (state.localId && item.localId === state.localId)){
-      targetKey = k;
-    }
-  });
-
-  if(!targetKey){
-    targetKey = state.id ? ('cloud_' + state.id) : ('local_' + state.localId);
-  }
-
-  var copia = clone(state); 
-  copia.example = false;
-  f[targetKey] = copia;
-  
-  var keys = getStorageKeys();
-  if(lsSet(keys.fichas, JSON.stringify(f)) && lsSet(keys.atual, JSON.stringify(state))){
-    state.example=false; 
-    update(); 
-    refreshSelect(targetKey);
-    
-    if (supabaseClient && currentUser) {
-      say('SALVANDO NA NUVEM...');
-      const cloudRes = await saveFichaToCloud(copia);
-      if (cloudRes.error) {
-        say('SALVO LOCALMENTE (ERRO NA NUVEM: ' + cloudRes.error.message + ')');
+      if (ingredients.length === 0) {
+        emptyMessage.classList.add('show');
       } else {
-        if (cloudRes.id) {
-          state.id = cloudRes.id;
-          copia.id = cloudRes.id;
-          
-          var newCloudKey = 'cloud_' + cloudRes.id;
-          if(targetKey !== newCloudKey){
-            delete f[targetKey];
-          }
-          f[newCloudKey] = copia;
-          lsSet(keys.fichas, JSON.stringify(f));
-          lsSet(keys.atual, JSON.stringify(state));
-          refreshSelect(newCloudKey);
+        emptyMessage.classList.remove('show');
+        ingredients.forEach((ing, index) => {
+          const adjVal = ing.base * factor;
+          totalBase += ing.base;
+          totalAdj += adjVal;
+
+          const tr = document.createElement('tr');
+          if (ing.checked) tr.classList.add('checked-row');
+
+          tr.innerHTML = `
+            <td class="c-chk">
+              <input type="checkbox" class="chk-box" ${ing.checked ? 'checked' : ''} data-index="${index}">
+            </td>
+            <td>
+              <input type="text" value="${ing.name}" data-field="name" data-index="${index}">
+            </td>
+            <td class="c-base">
+              <input type="number" value="${ing.base}" step="any" data-field="base" data-index="${index}">
+            </td>
+            <td class="c-adj">
+              <span class="v">${adjVal.toFixed(1)} g</span>
+            </td>
+            <td class="c-rm">
+              <button class="x" data-index="${index}">×</button>
+            </td>
+          `;
+          ingredientsBody.appendChild(tr);
+        });
+      }
+
+      totalBaseWeightEl.textContent = totalBase.toFixed(1) + ' g';
+      totalAdjWeightEl.textContent = totalAdj.toFixed(1) + ' g';
+    }
+
+    baseYieldInput.addEventListener('input', render);
+    targetYieldInput.addEventListener('input', render);
+
+    addIngredientBtn.addEventListener('click', () => {
+      ingredients.push({ name: 'Novo Ingrediente', base: 100, checked: false });
+      render();
+    });
+
+    ingredientsBody.addEventListener('input', (e) => {
+      const index = e.target.getAttribute('data-index');
+      const field = e.target.getAttribute('data-field');
+      if (index !== null && field !== null) {
+        if (field === 'name') {
+          ingredients[index].name = e.target.value;
+        } else if (field === 'base') {
+          ingredients[index].base = parseFloat(e.target.value) || 0;
+          render();
         }
-        say('FICHA SALVA COM SUCESSO · '+hora()+' · LOCAL & NUVEM.');
       }
-    } else {
-      say('FICHA SALVA COM SUCESSO · '+hora()+' · LOCAL.');
-    }
-  } else {
-    say('NÃO FOI POSSÍVEL SALVAR NO NAVEGADOR.');
-  }
-}
+    });
 
-function duplicarFicha(){
-  var nomeOriginal = state.cookie || 'RECEITA';
-  var novaCopia = clone(state);
-  novaCopia.example = false;
-  novaCopia.id = null;
-  novaCopia.localId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-  novaCopia.cookie = (nomeOriginal + ' (CÓPIA)').toUpperCase();
-
-  ['massa','base','comp'].forEach(function(secKey){
-    if(novaCopia[secKey] && Array.isArray(novaCopia[secKey].items)){
-      novaCopia[secKey].items.forEach(function(it, idx){
-        it.checked = false;
-        it.id = 'ing_' + secKey + '_' + idx + '_' + Math.random().toString(36).substr(2,5);
-      });
-    }
-  });
-
-  state = novaCopia;
-  fillAll();
-  autosave();
-
-  var f = getFichas();
-  f['local_' + state.localId] = clone(state);
-  var keys = getStorageKeys();
-  lsSet(keys.fichas, JSON.stringify(f));
-  refreshSelect('local_' + state.localId);
-
-  say('FICHA DUPLICADA COM SUCESSO. EDITE O NOME E CLIQUE EM SALVAR.');
-  $('cookie').focus();
-  $('cookie').select();
-}
-
-async function delFicha(){
-  var f = getFichas();
-  var targetKey = null;
-
-  Object.keys(f).forEach(function(k){
-    var item = f[k];
-    if(item && ((state.id && item.id === state.id) || (state.localId && item.localId === state.localId))){
-      targetKey = k;
-    }
-  });
-
-  if(!targetKey){
-    targetKey = $('fichaSel').value;
-  }
-
-  if(!targetKey || !f[targetKey]){
-    say('NENHUMA FICHA VÁLIDA SELECIONADA PARA EXCLUSÃO.');
-    return;
-  }
-
-  var rec = f[targetKey];
-
-  if(!window.confirm('EXCLUIR A FICHA "'+(rec.cookie||targetKey)+'"?')) return;
-
-  var isCurrentOpen = (state.id && rec.id === state.id) || (state.localId && rec.localId === state.localId);
-
-  if (supabaseClient && currentUser && rec.id && targetKey.indexOf('cloud_') === 0) {
-    say('EXCLUINDO DA NUVEM...');
-    const { data, error } = await supabaseClient
-      .from('cosmos_receitas')
-      .delete()
-      .match({ id: rec.id, user_id: currentUser.id })
-      .select('id');
-
-    if (error || !data || data.length === 0) {
-      say('FALHA AO EXCLUIR DA NUVEM: ' + (error ? error.message : 'REGISTRO NÃO ENCONTRADO') + '. A FICHA FOI PRESERVADA.');
-      return;
-    }
-  }
-
-  delete f[targetKey];
-  var keys = getStorageKeys();
-  lsSet(keys.fichas,JSON.stringify(f));
-  
-  if (isCurrentOpen) {
-    novaFichaSemConfirmar();
-  } else {
-    refreshSelect();
-  }
-  
-  say('FICHA EXCLUÍDA COM SUCESSO.');
-}
-
-function novaFicha(){
-  if(!window.confirm('LIMPAR A TELA E COMEÇAR UMA FICHA EM BRANCO? AS FICHAS JÁ SALVAS NÃO SÃO APAGADAS.')) return;
-  novaFichaSemConfirmar();
-}
-
-function novaFichaSemConfirmar(){
-  state = emBranco(); 
-  fillAll(); 
-  autosave(); 
-  refreshSelect();
-  say('FICHA EM BRANCO. PREENCHA OS DADOS E TOQUE EM "SALVAR".');
-}
-
-function restaurar(){
-  if(!window.confirm('RESTAURAR OS DADOS DE EXEMPLO? AS ALTERAÇÕES ATUAIS NA TELA SERÃO SUBSTITUÍDAS.')) return;
-  state = exemplo(); 
-  fillAll(); 
-  autosave(); 
-  refreshSelect();
-  say('DADOS DE EXEMPLO RESTAURADOS.');
-}
-
-/* ---------- BOTÕES DE AUTH ---------- */
-$('btnLogin').addEventListener('click', async () => {
-  if (!supabaseClient) {
-    $('authStatus').textContent = 'CLIENTE SUPABASE NÃO DISPONÍVEL.';
-    return;
-  }
-  const email = $('authEmail').value.trim();
-  const password = $('authPassword').value;
-  if (!email || !password) {
-    $('authStatus').textContent = 'INFORME E-MAIL E SENHA.';
-    return;
-  }
-  $('authStatus').textContent = 'ENTRANDO...';
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) {
-    $('authStatus').textContent = 'ERRO AO ENTRAR: ' + error.message;
-  } else {
-    $('authStatus').textContent = 'LOGIN REALIZADO COM SUCESSO!';
-    setUserSession(data?.user || null);
-    loadCloudFichas();
-  }
-});
-
-$('btnSignup').addEventListener('click', async () => {
-  if (!supabaseClient) {
-    $('authStatus').textContent = 'CLIENTE SUPABASE NÃO DISPONÍVEL.';
-    return;
-  }
-  const email = $('authEmail').value.trim();
-  const password = $('authPassword').value;
-  if (!email || !password) {
-    $('authStatus').textContent = 'INFORME E-MAIL E SENHA PARA CADASTRO.';
-    return;
-  }
-  $('authStatus').textContent = 'CADASTRANDO...';
-  const { data, error } = await supabaseClient.auth.signUp({ email, password });
-  if (error) {
-    $('authStatus').textContent = 'ERRO NO CADASTRO: ' + error.message;
-  } else {
-    $('authStatus').textContent = 'CADASTRO REALIZADO! VERIFIQUE SEU E-MAIL.';
-  }
-});
-
-$('btnLogout').addEventListener('click', async () => {
-  if (!supabaseClient) return;
-  try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) {
-      $('authStatus').textContent = 'ERRO AO SAIR: ' + error.message;
-      return;
-    }
-    setUserSession(null);
-    $('authStatus').textContent = 'DESCONECTADO DA NUVEM.';
-  } catch (err) {
-    console.error('Erro logout:', err);
-    $('authStatus').textContent = 'ERRO AO DESCONECTAR DA NUVEM.';
-  }
-});
-
-$('btnSyncCloud').addEventListener('click', async () => {
-  await syncPendingLocalFichas();
-  loadCloudFichas();
-});
-
-/* ---------- CRONÔMETRO FLUTUANTE ---------- */
-var TIMER_KEY = 'cosmos.calculadora.timer.v1';
-var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
-
-function loadTimerState(){
-  var raw = lsGet(TIMER_KEY);
-  if(raw){
-    try{
-      var parsed = JSON.parse(raw);
-      if(parsed && typeof parsed === 'object'){
-        timerState.running = !!parsed.running;
-        timerState.startTime = Number(parsed.startTime) || 0;
-        timerState.elapsedBefore = Number(parsed.elapsedBefore) || 0;
+    ingredientsBody.addEventListener('change', (e) => {
+      if (e.target.classList.contains('chk-box')) {
+        const index = e.target.getAttribute('data-index');
+        ingredients[index].checked = e.target.checked;
+        render();
       }
-    }catch(e){}
-  }
-}
+    });
 
-function saveTimerState(){
-  lsSet(TIMER_KEY, JSON.stringify(timerState));
-}
+    ingredientsBody.addEventListener('click', (e) => {
+      if (e.target.classList.contains('x')) {
+        const index = e.target.getAttribute('data-index');
+        ingredients.splice(index, 1);
+        render();
+      }
+    });
 
-function getElapsedMs(){
-  if(!timerState.running) return timerState.elapsedBefore;
-  return timerState.elapsedBefore + (Date.now() - timerState.startTime);
-}
+    render();
 
-function formatTime(ms){
-  var totalSec = Math.floor(ms / 1000);
-  var hrs = Math.floor(totalSec / 3600);
-  var mins = Math.floor((totalSec % 3600) / 60);
-  var secs = totalSec % 60;
-  return String(hrs).padStart(2, '0') + ':' + ('0' + mins).slice(-2) + ':' + ('0' + secs).slice(-2);
-}
+    // Cronômetro Flutuante
+    let timerInterval = null;
+    let secondsLeft = 0;
+    let isRunning = false;
 
-function updateTimerDisplay(){
-  $('timerDisplay').textContent = formatTime(getElapsedMs());
-}
+    const screen = document.getElementById('starTimerScreen');
+    const toggleBtn = document.getElementById('starTimerToggle');
+    const resetBtn = document.getElementById('starTimerReset');
 
-setInterval(function(){
-  if(timerState.running){
+    function updateTimerDisplay() {
+      const m = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+      const s = (secondsLeft % 60).toString().padStart(2, '0');
+      screen.textContent = `${m}:${s}`;
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      if (!isRunning) {
+        if (secondsLeft === 0) {
+          secondsLeft = 600; // 10 minutos padrão ou ajustável
+        }
+        isRunning = true;
+        toggleBtn.textContent = 'PAUSAR';
+        timerInterval = setInterval(() => {
+          if (secondsLeft > 0) {
+            secondsLeft--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isRunning = false;
+            toggleBtn.textContent = 'INICIAR';
+            alert('Tempo esgotado!');
+          }
+        }, 1000);
+      } else {
+        clearInterval(timerInterval);
+        isRunning = false;
+        toggleBtn.textContent = 'RETOMAR';
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      isRunning = false;
+      secondsLeft = 0;
+      updateTimerDisplay();
+      toggleBtn.textContent = 'INICIAR';
+    });
+
     updateTimerDisplay();
-  }
-}, 500);
-
-$('btnTimerStart').addEventListener('click', function(){
-  if(!timerState.running){
-    timerState.running = true;
-    timerState.startTime = Date.now();
-    saveTimerState();
-  }
-});
-
-$('btnTimerPause').addEventListener('click', function(){
-  if(timerState.running){
-    timerState.elapsedBefore += (Date.now() - timerState.startTime);
-    timerState.running = false;
-    saveTimerState();
-    updateTimerDisplay();
-  }
-});
-
-$('btnTimerReset').addEventListener('click', function(){
-  timerState.running = false;
-  timerState.startTime = 0;
-  timerState.elapsedBefore = 0;
-  saveTimerState();
-  updateTimerDisplay();
-});
-
-/* ---------- INÍCIO ---------- */
-buildSections(); 
-bindTop();
-
-loadTimerState();
-updateTimerDisplay();
-
-var keys = getStorageKeys();
-var salvo=lsGet(keys.atual);
-if(salvo){ 
-  try{var d=normalize(JSON.parse(salvo)); if(d) state=d;}catch(e){} 
-} else {
-  state = exemplo();
-}
-fillAll(); 
-refreshSelect();
-checkAuthUser();
-
-if(!storageOk) say('ATENÇÃO: ARMAZENAMENTO LOCAL INDISPONÍVEL NESTE NAVEGADOR.');
-
-$('save').addEventListener('click', saveFicha);
-$('duplicar').addEventListener('click', duplicarFicha);
-$('del').addEventListener('click', delFicha);
-$('newF').addEventListener('click', novaFicha);
-$('reset').addEventListener('click', restaurar);
-})();
+  });
 </script>
 </body>
 </html>
