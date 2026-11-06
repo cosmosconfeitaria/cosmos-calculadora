@@ -40,10 +40,13 @@ td input{padding:10px 8px;font-size:14px}
 th.c-chk,td.c-chk{width:36px;text-align:center;padding-right:0}
 th.c-base,td.c-base{width:20%}
 th.c-adj,td.c-adj{width:20%}
-th.c-rm,td.c-rm{width:46px;padding-right:0}
+th.c-rm,td.c-rm{width:96px;padding-right:0;text-align:right}
 td.c-adj{text-align:right;font-weight:900;color:var(--blue);white-space:nowrap}
 th.c-adj{text-align:right}
-.x{width:34px;height:34px;padding:0;border-radius:50%;background:var(--cream);border:1px solid var(--line);font-size:18px;line-height:1;color:var(--ink)}
+.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.x,.btn-order{width:28px;height:28px;padding:0;border-radius:50%;background:var(--cream);border:1px solid var(--line);font-size:14px;line-height:1;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn-order:disabled{opacity:0.3;cursor:not-allowed;border-color:#e0deda;color:#a5a29d}
+.x{font-size:16px}
 .chk-box{width:20px;height:20px;accent-color:var(--pink);cursor:pointer;vertical-align:middle}
 tr.checked-row td{background:var(--pink-light)!important;color:#9b2c1a}
 tr.checked-row td input{background:transparent!important;color:#9b2c1a;text-decoration:line-through}
@@ -171,7 +174,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   .tablewrap tr{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid #eee;position:relative}
   .tablewrap td{border:0;padding:0;width:auto!important;text-align:left!important}
   .tablewrap td.c-chk{grid-row:1/2;grid-column:1/2;align-self:center}
-  .tablewrap td.c-nm{grid-row:1/2;grid-column:2/4;padding-right:44px}
+  .tablewrap td.c-nm{grid-row:1/2;grid-column:2/4;padding-right:100px}
   .tablewrap td.c-rm{position:absolute;top:12px;right:0}
   .tablewrap td[data-label]::before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;font-weight:800}
   .tablewrap td.c-adj .v{display:block;background:var(--cream);border-radius:10px;padding:13px 10px;font-size:15px}
@@ -534,6 +537,16 @@ function buildSections(){
   });
 }
 
+function moveItem(key, fromIndex, toIndex){
+  var list = state[key].items;
+  if(toIndex < 0 || toIndex >= list.length) return;
+  var item = list.splice(fromIndex, 1)[0];
+  list.splice(toIndex, 0, item);
+  touched(true);
+  renderRows(key);
+  update();
+}
+
 function renderRows(key){
   var R=refs[key], list=state[key].items;
   R.body.innerHTML=''; R.cells=[];
@@ -574,10 +587,24 @@ function renderRows(key){
     R.cells.push(v);
 
     var td4=document.createElement('td'); td4.className='c-rm';
+    var rowActions=document.createElement('div'); rowActions.className='row-actions';
+
+    var btnUp=document.createElement('button'); btnUp.className='btn-order'; btnUp.type='button'; btnUp.textContent='↑';
+    btnUp.setAttribute('aria-label','MOVER PARA CIMA'); btnUp.title='MOVER PARA CIMA';
+    if(i === 0) btnUp.disabled = true;
+    btnUp.addEventListener('click',function(){ moveItem(key, i, i - 1); });
+
+    var btnDown=document.createElement('button'); btnDown.className='btn-order'; btnDown.type='button'; btnDown.textContent='↓';
+    btnDown.setAttribute('aria-label','MOVER PARA BAIXO'); btnDown.title='MOVER PARA BAIXO';
+    if(i === list.length - 1) btnDown.disabled = true;
+    btnDown.addEventListener('click',function(){ moveItem(key, i, i + 1); });
+
     var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.textContent='×';
     rm.setAttribute('aria-label','REMOVER INGREDIENTE'); rm.title='REMOVER INGREDIENTE';
     rm.addEventListener('click',function(){state[key].items.splice(i,1);touched(true);renderRows(key);update();});
-    td4.appendChild(rm);
+
+    rowActions.append(btnUp, btnDown, rm);
+    td4.appendChild(rowActions);
 
     tr.append(tdChk,td1,td2,td3,td4); R.body.appendChild(tr);
   });
@@ -991,7 +1018,7 @@ async function syncPendingLocalFichas(){
 /* ---------- OPERAÇÕES DOS BOTÕES DE FICHAS ---------- */
 async function saveFicha(){
   var nome=String(state.cookie||'').trim().toUpperCase();
-  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR LA FICHA.');$('cookie').focus();return;}
+  if(!nome){say('INFORME O NOME DO COOKIE ANTES DE SALVAR A FICHA.');$('cookie').focus();return;}
   
   state.categoria = $('categoria').value || 'COOKIE';
   addCategoria(state.categoria);
