@@ -99,6 +99,7 @@ async function refresh(){
  showSession(data.session?.user||null);
 }
 $('accountLogin').addEventListener('click',async()=>{
+ if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
  if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
  $('accountStatus').textContent='ENTRANDO...';
@@ -107,6 +108,7 @@ $('accountLogin').addEventListener('click',async()=>{
  if(!error)await refresh();
 });
 $('accountSignup').addEventListener('click',async()=>{
+ if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
  if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
  if(password.length<6){$('accountStatus').textContent='A SENHA PRECISA TER PELO MENOS 6 CARACTERES.';return}
@@ -116,6 +118,7 @@ $('accountSignup').addEventListener('click',async()=>{
  await refresh();
 });
 $('accountLogout').addEventListener('click',async()=>{
+ if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  $('accountStatus').textContent='SAINDO...';
  const {error}=await client.auth.signOut();
  $('accountStatus').textContent=error?'ERRO AO SAIR: '+error.message:'VOCÊ SAIU DA CONTA.';
