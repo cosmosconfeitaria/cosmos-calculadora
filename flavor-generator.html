@@ -191,7 +191,8 @@ function generate(){
    const value=choices[Math.floor(Math.random()*choices.length)];
    return [part[0],value];
   })};
-  candidate.name=makeTitle(candidate.parts);\n  candidate.id=base.type+'-'+base.category+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
+  candidate.name=makeTitle(candidate.parts);
+  candidate.id=base.type+'-'+base.category+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
   if(candidate.id!==lastGeneratedKey)break;
  }
  lastGeneratedKey=candidate.id;
