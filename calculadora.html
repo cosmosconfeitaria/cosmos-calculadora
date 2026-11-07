@@ -1270,24 +1270,8 @@ $('btnLogin').addEventListener('click', async () => {
   }
 });
 
-$('btnSignup').addEventListener('click', async () => {
-  if (!supabaseClient) {
-    $('authStatus').textContent = 'CLIENTE SUPABASE NÃO DISPONÍVEL.';
-    return;
-  }
-  const email = $('authEmail').value.trim();
-  const password = $('authPassword').value;
-  if (!email || !password) {
-    $('authStatus').textContent = 'INFORME E-MAIL E SENHA PARA CADASTRO.';
-    return;
-  }
-  $('authStatus').textContent = 'CADASTRANDO...';
-  const { data, error } = await supabaseClient.auth.signUp({ email, password });
-  if (error) {
-    $('authStatus').textContent = 'ERRO NO CADASTRO: ' + error.message;
-  } else {
-    $('authStatus').textContent = 'CADASTRO REALIZADO! VERIFIQUE SEU E-MAIL.';
-  }
+$('btnSignup').addEventListener('click', () => {
+  $('authStatus').textContent = 'CADASTROS DESATIVADOS. USE O LOGIN COSMOS NA PÁGINA INICIAL.';
 });
 
 $('btnLogout').addEventListener('click', async () => {
