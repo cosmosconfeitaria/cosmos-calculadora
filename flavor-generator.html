@@ -6,139 +6,189 @@
 <title>COSMOS COOKIE LAB · FLAVOR GENERATOR</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--muted:#77736e;--line:#d8d5d0;--pink:#F3B9EB}
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--muted:#77736e;--line:#d8d5d0}
 *{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;text-transform:uppercase;min-height:100vh}
-.wrap{width:min(850px,100%);margin:auto;padding:22px 18px 36px}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;min-height:100vh}
+.wrap{width:min(900px,100%);margin:auto;padding:22px 18px 36px}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
 .brand{font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--blue)}
 .back{font-size:10px;color:var(--blue);text-decoration:none;font-weight:800;letter-spacing:.1em}
 .eyebrow{font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 10px}
 h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:0;color:var(--blue);font-weight:900}
-.sub{font-size:11px;line-height:1.6;color:var(--muted);max-width:500px;margin:14px 0 26px}
+.sub{font-size:12px;line-height:1.6;color:var(--muted);max-width:580px;margin:14px 0 26px}
 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;box-shadow:0 5px 0 #dedbd6}
-.label{font-size:9px;letter-spacing:.15em;font-weight:900;color:var(--muted);margin-bottom:12px}
+.label{font-size:10px;letter-spacing:.13em;font-weight:900;color:var(--muted);margin-bottom:12px}
 .filters{display:flex;flex-wrap:wrap;gap:9px}
-.filter{border:1px solid #b9b6b0;background:linear-gradient(180deg,#fff 0%,#e8e7e4 48%,#d0cfcc 100%);color:var(--blue);padding:11px 16px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.1em;box-shadow:inset 0 1px 0 #fff,0 3px 0 #aaa8a3;cursor:pointer}
+.filter,.action{border:1px solid #b9b6b0;background:linear-gradient(180deg,#fff 0%,#e8e7e4 48%,#d0cfcc 100%);color:var(--blue);padding:11px 15px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.04em;box-shadow:inset 0 1px 0 #fff,0 3px 0 #aaa8a3;cursor:pointer}
 .filter.active{background:linear-gradient(180deg,#dce8fb,#aebfdb);box-shadow:inset 0 1px 0 #fff,0 1px 0 #929eaf;transform:translateY(2px)}
-.result{min-height:210px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
-.result .tag{font-size:9px;letter-spacing:.14em;color:var(--muted);margin-bottom:12px}
-.result h2{font-size:clamp(24px,5vw,38px);line-height:1.05;color:var(--blue);margin:0 0 12px;letter-spacing:-.035em}
-.result p{font-size:12px;line-height:1.6;margin:0;max-width:560px}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.type{border:1px solid #b9b6b0;background:linear-gradient(180deg,#fff,#d5d4d1);color:var(--blue);padding:14px 8px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.05em;box-shadow:inset 0 1px 0 #fff,0 3px 0 #aaa8a3;cursor:pointer}
+.type.active{background:linear-gradient(180deg,#dce8fb,#aebfdb);transform:translateY(2px);box-shadow:inset 0 1px 0 #fff,0 1px 0 #929eaf}
+.result{min-height:260px}
+.result .tag{font-size:9px;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+.result h2{font-size:clamp(23px,5vw,36px);line-height:1.05;color:var(--blue);margin:0 0 18px;letter-spacing:-.035em}
+.parts{display:grid;gap:10px;width:100%}
+.part{border-top:1px solid var(--line);padding-top:9px}
+.part strong{display:block;font-size:9px;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.part span{font-size:13px;line-height:1.5}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.action{border:1px solid #aaa8a3;border-radius:999px;padding:13px 18px;font-size:10px;font-weight:900;letter-spacing:.1em;cursor:pointer;color:var(--blue);background:linear-gradient(180deg,#fff 0%,#e6e5e2 48%,#c9c8c5 100%);box-shadow:inset 0 1px 0 #fff,0 4px 0 #a9a7a2}
-.action:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff,0 1px 0 #a9a7a2}
+.action{padding:13px 18px}
+.action:active{transform:translateY(3px)}
 .action.primary{background:linear-gradient(180deg,#d9e6fb,#a9bddf 55%,#8fa7d0)}
+.action:disabled{opacity:.45;cursor:not-allowed}
 .saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
 .saved-head h3{font-size:12px;letter-spacing:.13em;margin:0;color:var(--blue)}
 .saved-count{font-size:10px;color:var(--muted)}
 .saved-list{display:grid;gap:9px}
 .saved-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream)}
 .saved-item strong{font-size:11px;color:var(--blue);display:block;margin-bottom:4px}
-.saved-item small{font-size:9px;color:var(--muted);line-height:1.5}
+.saved-item small{font-size:10px;color:var(--muted);line-height:1.5;display:block}
 .remove{border:0;background:transparent;color:#b33b43;font-size:18px;cursor:pointer;padding:4px}
-.empty{font-size:10px;color:var(--muted);line-height:1.6}
+.empty{font-size:11px;color:var(--muted);line-height:1.6}
 footer{text-align:center;padding:28px 10px 12px;display:grid;gap:6px}
 footer strong{font-size:12px;letter-spacing:.18em;color:var(--blue)}
 footer span{font-size:10px;letter-spacing:.14em;font-weight:800}
 footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
-@media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.filter{flex:1;min-width:calc(50% - 8px)}}
+@media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.filter{flex:1;min-width:calc(50% - 8px)}.types{grid-template-columns:1fr}.type{padding:12px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header><div class="brand">COSMOS COOKIE LAB</div><a class="back" href="index.html">← COSMOS TOOLS</a></header>
-<p class="eyebrow">01 / IDEATION DEVICE</p>
+<p class="eyebrow">01 / CENTRAL DE IDEIAS</p>
 <h1>FLAVOR<br>GENERATOR</h1>
-<p class="sub">A LITTLE RANDOMNESS, A LOT OF GOOD IDEAS. EXPLORE NEW COOKIE AND BROOKIE COMBINATIONS.</p>
+<p class="sub">uma combinação aleatória para tirar uma ideia do papel. escolha o produto e a categoria, depois gere uma nova composição.</p>
+
 <section class="panel">
-<div class="label">CHOOSE YOUR MOOD</div>
+<div class="label">1. ESCOLHA O PRODUTO</div>
+<div class="types" id="types">
+<button class="type active" data-type="DOT">DOT COOKIES</button>
+<button class="type" data-type="BROOKIE">BROOKIE</button>
+<button class="type" data-type="COOKIE">COOKIE</button>
+</div>
+</section>
+
+<section class="panel">
+<div class="label">2. ESCOLHA UMA CATEGORIA</div>
 <div class="filters" id="filters">
-<button class="filter active" data-filter="ALL">ALL IDEAS</button>
-<button class="filter" data-filter="FRUITY">FRUITY</button>
+<button class="filter active" data-filter="TODAS">TODAS</button>
+<button class="filter" data-filter="CHOCOLATUDO">CHOCOLATUDO</button>
+<button class="filter" data-filter="COMERCIAL">COMERCIAL</button>
+<button class="filter" data-filter="HYPADO">HYPADO</button>
+<button class="filter" data-filter="FRUTADO">FRUTADO</button>
+<button class="filter" data-filter="EXÓTICO">EXÓTICO</button>
+<button class="filter" data-filter="MADURO">MADURO</button>
 <button class="filter" data-filter="COMFORT">COMFORT</button>
-<button class="filter" data-filter="UNEXPECTED">UNEXPECTED</button>
+<button class="filter" data-filter="SEM RECHEIO">SEM RECHEIO</button>
+<button class="filter" data-filter="FERRERO">FERRERO</button>
 </div>
 </section>
+
 <section class="panel result" aria-live="polite">
-<div class="tag" id="resultTag">YOUR NEXT COOKIE IDEA</div>
-<h2 id="resultName">READY WHEN YOU ARE.</h2>
-<p id="resultDescription">GENERATE A FLAVOR TO START EXPLORING.</p>
+<div class="tag" id="resultTag">SUA PRÓXIMA IDEIA</div>
+<h2 id="resultName">PRONTO PARA COMEÇAR?</h2>
+<div class="parts" id="resultParts"><p class="empty">gere uma combinação para explorar uma nova ideia.</p></div>
 <div class="actions">
-<button class="action primary" id="generate">GENERATE FLAVOR ↻</button>
-<button class="action" id="save" disabled>SAVE IDEA ☆</button>
+<button class="action primary" id="generate">GERAR COMBINAÇÃO ↻</button>
+<button class="action" id="save" disabled>SALVAR IDEIA ☆</button>
 </div>
 </section>
+
 <section class="panel">
-<div class="saved-head"><h3>SAVED IDEAS</h3><span class="saved-count" id="savedCount">0 SAVED</span></div>
-<div class="saved-list" id="savedList"><p class="empty">YOUR FAVORITES WILL SHOW UP HERE.</p></div>
+<div class="saved-head"><h3>IDEIAS SALVAS</h3><span class="saved-count" id="savedCount">0 salvas</span></div>
+<div class="saved-list" id="savedList"><p class="empty">suas ideias favoritas vão aparecer aqui.</p></div>
 </section>
 <footer><strong>★ COSMOS ★</strong><span>NOT YOUR REGULAR COOKIE</span><small>EST. 2024</small></footer>
 </div>
 <script>
 (function(){
 'use strict';
-const ideas=[
-{mood:'FRUITY',name:'STRAWBERRY SHORTCAKE',desc:'VANILLA COOKIE DOUGH, STRAWBERRY COMPOTE AND WHITE CHOCOLATE. A LITTLE CRUNCH FROM BUTTERY CRUMBLE.',type:'COOKIE'},
-{mood:'FRUITY',name:'LEMON BLUEBERRY PIE',desc:'LEMON-ZESTED DOUGH, BLUEBERRY JAM AND A SOFT VANILLA CHEESECAKE CENTER.',type:'COOKIE'},
-{mood:'FRUITY',name:'PEACHES & CREAM',desc:'BROWN BUTTER DOUGH, PEACH PRESERVES, WHITE CHOCOLATE AND A PINCH OF CINNAMON.',type:'BROOKIE'},
-{mood:'FRUITY',name:'RASPBERRY PISTACHIO',desc:'PISTACHIO DOUGH, TART RASPBERRY FILLING AND ROASTED PISTACHIO PIECES.',type:'COOKIE'},
-{mood:'FRUITY',name:'PASSION FRUIT MERINGUE',desc:'VANILLA COOKIE, BRIGHT PASSION FRUIT GANACHE AND TOASTED MERINGUE NOTES.',type:'BROOKIE'},
-{mood:'FRUITY',name:'CHERRY COLA',desc:'COCOA DOUGH, CHERRY FILLING AND A SUBTLE COLA-SPICE GLAZE. BOLD AND PLAYFUL.',type:'COOKIE'},
-{mood:'COMFORT',name:'CINNAMON ROLL',desc:'BROWN SUGAR COOKIE, CINNAMON SWIRL FILLING AND A CREAM CHEESE TOP NOTE.',type:'COOKIE'},
-{mood:'COMFORT',name:'BANANA BREAD',desc:'BROWN BUTTER DOUGH, BANANA CARAMEL, WALNUTS AND A LITTLE CINNAMON.',type:'BROOKIE'},
-{mood:'COMFORT',name:'S’MORES BROWNIE',desc:'FUDGY BROWNIE BASE, COOKIE TOP, MILK CHOCOLATE AND TOASTED MARSHMALLOW.',type:'BROOKIE'},
-{mood:'COMFORT',name:'HOT CHOCOLATE',desc:'DARK COCOA DOUGH, MILK CHOCOLATE GANACHE AND A MARSHMALLOW CENTER.',type:'COOKIE'},
-{mood:'COMFORT',name:'APPLE CRUMBLE',desc:'VANILLA DOUGH, SOFT SPICED APPLE FILLING AND A BUTTERY CINNAMON CRUMBLE.',type:'COOKIE'},
-{mood:'COMFORT',name:'SALTED CARAMEL PRETZEL',desc:'MILK CHOCOLATE COOKIE, SOFT SALTED CARAMEL AND CRUSHED PRETZEL FOR CRUNCH.',type:'COOKIE'},
-{mood:'UNEXPECTED',name:'MISO WHITE CHOCOLATE',desc:'BROWN BUTTER DOUGH, A TOUCH OF WHITE MISO, WHITE CHOCOLATE AND SESAME BRITTLE.',type:'COOKIE'},
-{mood:'UNEXPECTED',name:'OLIVE OIL & ORANGE',desc:'CITRUS DOUGH WITH OLIVE OIL NOTES, DARK CHOCOLATE AND A FLAKY SALT FINISH.',type:'COOKIE'},
-{mood:'UNEXPECTED',name:'BLACK SESAME STRAWBERRY',desc:'BLACK SESAME DOUGH, STRAWBERRY CENTER AND WHITE CHOCOLATE. NUTTY, FRUITY AND BALANCED.',type:'COOKIE'},
-{mood:'UNEXPECTED',name:'ROSEMARY PEAR',desc:'BROWN BUTTER DOUGH, PEAR COMPOTE AND A VERY GENTLE ROSEMARY AROMA.',type:'COOKIE'},
-{mood:'UNEXPECTED',name:'TAHINI & DARK CHOCOLATE',desc:'TOASTED TAHINI DOUGH, DARK CHOCOLATE CHUNKS AND SESAME BRITTLE.',type:'BROOKIE'},
-{mood:'UNEXPECTED',name:'COFFEE TONIC',desc:'ESPRESSO COOKIE, BITTER ORANGE CARAMEL AND A LIGHT TONIC-INSPIRED CITRUS NOTE.',type:'COOKIE'}
+const ideas = [
+{type:'DOT',category:'CHOCOLATUDO',name:'TRIPLO CACAU',parts:[['MASSA','massa de cacau intenso'],['RECHEIO','ganache de chocolate meio amargo'],['MIÇANGAS NO TOPO','marrom + bege + dourado']]},
+{type:'DOT',category:'COMERCIAL',name:'BAUNILHA & MORANGO',parts:[['MASSA','massa amanteigada de baunilha'],['RECHEIO','brigadeiro branco com geleia de morango'],['MIÇANGAS NO TOPO','rosa + branco']]},
+{type:'DOT',category:'HYPADO',name:'PISTACHE DREAM',parts:[['MASSA','massa de pistache'],['RECHEIO','creme de pistache com kadayif crocante'],['MIÇANGAS NO TOPO','verde + branco + dourado']]},
+{type:'DOT',category:'FRUTADO',name:'TROPICAL POP',parts:[['MASSA','massa de baunilha com raspas de limão'],['RECHEIO','ganache de maracujá'],['MIÇANGAS NO TOPO','amarelo + branco']]},
+{type:'DOT',category:'EXÓTICO',name:'Gergelim & Yuzu',parts:[['MASSA','massa de gergelim preto'],['RECHEIO','ganache cítrica de yuzu ou limão-siciliano'],['MIÇANGAS NO TOPO','preto + amarelo + branco']]},
+{type:'DOT',category:'MADURO',name:'CAFÉ & LARANJA',parts:[['MASSA','massa de café e chocolate amargo'],['RECHEIO','caramelo de laranja'],['MIÇANGAS NO TOPO','cobre + marrom']]},
+{type:'DOT',category:'COMFORT',name:'CINNAMON SUGAR',parts:[['MASSA','massa de açúcar mascavo e canela'],['RECHEIO','doce de leite cremoso'],['MIÇANGAS NO TOPO','branco + caramelo']]},
+{type:'DOT',category:'SEM RECHEIO',name:'CONFETTI CRUNCH',parts:[['MASSA','massa amanteigada com baunilha'],['RECHEIO','sem recheio'],['MIÇANGAS NO TOPO','rosa + azul + amarelo']]},
+{type:'DOT',category:'FERRERO',name:'KINDER BUENO',parts:[['MASSA','massa clara com avelã torrada'],['RECHEIO','creme de avelã e chocolate branco'],['MIÇANGAS NO TOPO','branco + marrom + dourado']]},
+
+{type:'BROOKIE',category:'CHOCOLATUDO',name:'DARK MATTER',parts:[['COOKIE','cookie de cacau black'],['BROWNIE','brownie intenso de chocolate  meio amargo'],['RECHEIO','ganache de chocolate  intenso'],['TOPPING','lascas de chocolate e nibs de cacau']]},
+{type:'BROOKIE',category:'COMERCIAL',name:'NINHO COM MORANGO',parts:[['COOKIE','cookie de baunilha'],['BROWNIE','brownie tradicional'],['RECHEIO','brigadeiro de leite em pó com geleia de morango'],['TOPPING','farelo de leite em pó e morango liofilizado']]},
+{type:'BROOKIE',category:'HYPADO',name:'PISTACHE KADAYIF',parts:[['COOKIE','cookie de pistache'],['BROWNIE','brownie de chocolate ao leite'],['RECHEIO','creme de pistache com kadayif'],['TOPPING','pistache picado e fios de chocolate']]},
+{type:'BROOKIE',category:'FRUTADO',name:'BANANA CARAMELIZADA',parts:[['COOKIE','cookie de canela'],['BROWNIE','brownie de chocolate branco'],['RECHEIO','caramelo de banana'],['TOPPING','banana desidratada e farofa crocante']]},
+{type:'BROOKIE',category:'EXÓTICO',name:'MISSÔ & GERGELIM',parts:[['COOKIE','cookie de chocolate branco e missô'],['BROWNIE','brownie de gergelim preto'],['RECHEIO','caramelo de missô'],['TOPPING','gergelim tostado e flor de sal']]},
+{type:'BROOKIE',category:'MADURO',name:'CAFÉ, NOZES & AMARGO',parts:[['COOKIE','cookie de café'],['BROWNIE','brownie 70%'],['RECHEIO','ganache de chocolate amargo'],['TOPPING','nozes tostadas e cacau']]},
+{type:'BROOKIE',category:'COMFORT',name:'S’MORES',parts:[['COOKIE','cookie tradicional com baunilha'],['BROWNIE','brownie fudgy'],['RECHEIO','creme de marshmallow'],['TOPPING','marshmallow tostado e biscoito triturado']]},
+{type:'BROOKIE',category:'SEM RECHEIO',name:'COOKIE & BROWNIE CLÁSSICO',parts:[['COOKIE','cookie de chocolate ao leite'],['BROWNIE','brownie tradicional'],['RECHEIO','sem recheio'],['TOPPING','gotas de chocolate e flor de sal']]},
+{type:'BROOKIE',category:'FERRERO',name:'ROCHER',parts:[['COOKIE','cookie de avelã e chocolate'],['BROWNIE','brownie de chocolate ao leite'],['RECHEIO','creme de avelã com wafer crocante'],['TOPPING','avelã tostada e chocolate ao leite']]},
+
+{type:'COOKIE',category:'CHOCOLATUDO',name:'CHOCO OVERLOAD',parts:[['MASSA','massa de cacau com pedaços de chocolate meio amargo'],['RECHEIO','ganache de chocolate  intenso'],['RECHEIO COMPLEMENTAR','opcional: caramelo de cacau'],['TOPPING','empanar em cacau ou finalizar com raspas de chocolate']]},
+{type:'COOKIE',category:'COMERCIAL',name:'RED VELVET',parts:[['MASSA','massa red velvet amanteigada'],['RECHEIO','ganache de cream cheese'],['RECHEIO COMPLEMENTAR','opcional: geleia de frutas vermelhas'],['TOPPING','farelo de red velvet antes de assar']]},
+{type:'COOKIE',category:'HYPADO',name:'DUBAI PISTACHE',parts:[['MASSA','massa de baunilha com pistache'],['RECHEIO','creme de pistache com kadayif crocante'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate ao leite'],['TOPPING','pistache picado e fios de chocolate depois de assar']]},
+{type:'COOKIE',category:'FRUTADO',name:'LIMÃO & FRAMBOESA',parts:[['MASSA','massa de limão-siciliano'],['RECHEIO','ganache de limão'],['RECHEIO COMPLEMENTAR','opcional: geleia de framboesa'],['TOPPING','açúcar cítrico ou framboesa liofilizada depois de assar']]},
+{type:'COOKIE',category:'EXÓTICO',name:'GOIABA, QUEIJO & PIMENTA ROSA',parts:[['MASSA','massa amanteigada com toque de queijo'],['RECHEIO','goiabada cremosa'],['RECHEIO COMPLEMENTAR','opcional: cream cheese'],['TOPPING','pimenta rosa levemente triturada antes de assar']]},
+{type:'COOKIE',category:'MADURO',name:'FIGO, MEL & NOZES',parts:[['MASSA','massa de manteiga noisette'],['RECHEIO','geleia de figo'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate amargo'],['TOPPING','nozes tostadas e um fio de mel depois de assar']]},
+{type:'COOKIE',category:'COMFORT',name:'BANANA BREAD',parts:[['MASSA','massa de banana e canela'],['RECHEIO','doce de leite'],['RECHEIO COMPLEMENTAR','opcional: creme de cream cheese'],['TOPPING','farofa amanteigada antes de assar']]},
+{type:'COOKIE',category:'SEM RECHEIO',name:'BROWN BUTTER CHUNK',parts:[['MASSA','massa de manteiga noisette com chocolate em pedaços'],['RECHEIO','sem recheio'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','flor de sal depois de assar']]},
+{type:'COOKIE',category:'FERRERO',name:'RAFFAELLO',parts:[['MASSA','massa de coco e baunilha'],['RECHEIO','ganache de chocolate branco com amêndoas'],['RECHEIO COMPLEMENTAR','opcional: creme de coco'],['TOPPING','coco em flocos e amêndoa triturada antes de assar']]}
 ];
 const $=id=>document.getElementById(id);
-let filter='ALL',current=null;
-const KEY='cosmos.flavor-generator.saved.v1';
+let type='DOT',filter='TODAS',current=null;
+const KEY='cosmos.flavor-generator.saved.v2';
 function getSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
 function setSaved(list){localStorage.setItem(KEY,JSON.stringify(list));renderSaved()}
+function ideaText(idea){return idea.parts.map(p=>p[0]+': '+p[1]).join(' · ')}
+function renderIdea(idea){
+ $('resultTag').textContent=idea.category+' / '+({DOT:'DOT COOKIES',BROOKIE:'BROOKIE',COOKIE:'COOKIE'}[idea.type]);
+ $('resultName').textContent=idea.name;
+ $('resultParts').innerHTML='';
+ idea.parts.forEach(part=>{
+  const row=document.createElement('div');row.className='part';
+  const label=document.createElement('strong');label.textContent=part[0];
+  const value=document.createElement('span');value.textContent=part[1];
+  row.append(label,value);$('resultParts').append(row);
+ });
+ $('save').disabled=false;
+ $('save').textContent=getSaved().some(x=>x.id===idea.id)?'IDEIA SALVA ✓':'SALVAR IDEIA ☆';
+}
+function generate(){
+ const pool=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter));
+ if(!pool.length)return;
+ const saved=new Set(getSaved().map(x=>x.id));
+ const fresh=pool.filter(x=>!saved.has(x.id));
+ const choices=fresh.length?fresh:pool;
+ const picked=choices[Math.floor(Math.random()*choices.length)];
+ current={...picked,id:picked.type+'-'+picked.category+'-'+picked.name};
+ renderIdea(current);
+}
 function renderSaved(){
- const list=getSaved();$('savedCount').textContent=list.length+' SAVED';
+ const list=getSaved();$('savedCount').textContent=list.length+' salvas';
  $('savedList').innerHTML='';
- if(!list.length){$('savedList').innerHTML='<p class="empty">YOUR FAVORITES WILL SHOW UP HERE.</p>';return}
+ if(!list.length){$('savedList').innerHTML='<p class="empty">suas ideias favoritas vão aparecer aqui.</p>';return}
  list.forEach((idea,i)=>{
   const item=document.createElement('div');item.className='saved-item';
   const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=idea.name;
-  const small=document.createElement('small');small.textContent=idea.type+' · '+idea.mood+' · '+idea.desc;
-  info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','REMOVE '+idea.name);
+  const small=document.createElement('small');small.textContent=idea.type+' · '+idea.category+' · '+ideaText(idea);
+  info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','remover '+idea.name);
   remove.addEventListener('click',()=>{const next=getSaved();next.splice(i,1);setSaved(next)});
   item.append(info,remove);$('savedList').append(item);
  });
 }
-function generate(){
- const pool=ideas.filter(x=>filter==='ALL'||x.mood===filter);
- const savedNames=new Set(getSaved().map(x=>x.name));
- const fresh=pool.filter(x=>!savedNames.has(x.name));
- const choices=fresh.length?fresh:pool;
- current=choices[Math.floor(Math.random()*choices.length)];
- $('resultTag').textContent=current.mood+' / '+current.type;
- $('resultName').textContent=current.name;
- $('resultDescription').textContent=current.desc;
- $('save').disabled=false;
- $('save').textContent=getSaved().some(x=>x.name===current.name)?'SAVED ✓':'SAVE IDEA ☆';
-}
+$('types').addEventListener('click',e=>{
+ const btn=e.target.closest('[data-type]');if(!btn)return;
+ type=btn.dataset.type;document.querySelectorAll('.type').forEach(b=>b.classList.toggle('active',b===btn));generate();
+});
 $('filters').addEventListener('click',e=>{
  const btn=e.target.closest('[data-filter]');if(!btn)return;
- filter=btn.dataset.filter;
- document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));
- generate();
+ filter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));generate();
 });
 $('generate').addEventListener('click',generate);
 $('save').addEventListener('click',()=>{
  if(!current)return;
- const list=getSaved();if(!list.some(x=>x.name===current.name)){list.unshift(current);setSaved(list)}
- $('save').textContent='SAVED ✓';
+ const list=getSaved();if(!list.some(x=>x.id===current.id)){list.unshift(current);setSaved(list)}
+ $('save').textContent='IDEIA SALVA ✓';
 });
 renderSaved();
 })();
