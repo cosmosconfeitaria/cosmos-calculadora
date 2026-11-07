@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · FLAVOR GENERATOR</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--muted:#77736e;--line:#d8d5d0}
 *{box-sizing:border-box}
@@ -120,7 +121,7 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 </section>
 
 <section class="panel">
-<div class="saved-head"><h3>IDEIAS SALVAS</h3><span class="saved-count" id="savedCount">0 salvas</span></div>
+<div class="saved-head"><h3>IDEIAS SALVAS</h3><span class="saved-count" id="savedCount">0 salvas</span></div><p class="empty" id="cloudSavedStatus" style="display:block;margin:0 0 12px"></p>
 <div class="saved-filters"><select id="savedCategory" aria-label="FILTRAR IDEIAS POR CATEGORIA"><option value="TODAS">TODAS AS CATEGORIAS</option><option>CHOCOLATUDO</option><option>COMERCIAL</option><option>HYPADO</option><option>FRUTADO</option><option>EXÓTICO</option><option>MADURO</option><option>COMFORT</option><option>SEM RECHEIO</option><option>FERRERO</option></select><select id="savedType" aria-label="FILTRAR IDEIAS POR PRODUTO"><option value="TODOS">TODOS OS PRODUTOS</option><option value="DOT">DOT COOKIES</option><option value="BROOKIE">BROOKIE</option><option value="COOKIE">COOKIE</option><option value="ICE">ICE COOKIE</option></select><select id="savedOccasion" aria-label="FILTRAR IDEIAS POR OCASIÃO"><option value="TODAS">TODAS AS OCASIÕES</option><option>NATAL</option><option>PÁSCOA</option><option>HALLOWEEN</option><option>SÃO JOÃO</option><option>DIA DOS NAMORADOS</option><option>DIA DAS MÃES</option><option>CARNAVAL</option><option>ANO NOVO</option><option>DIA DAS CRIANÇAS</option></select></div>
 <div class="saved-list" id="savedList"><p class="empty">suas ideias favoritas vão aparecer aqui.</p></div>
 </section>
@@ -310,8 +311,76 @@ const keyOptions=['abacaxi','amendoim','amora','avelã','banana','batata chips',
 keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
 let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null;
 const KEY='cosmos.flavor-generator.saved.v2';
-function getSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
-function setSaved(list){localStorage.setItem(KEY,JSON.stringify(list));renderSaved()}
+const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const supabaseClient=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+let currentUser=null,cloudSyncBusy=false;
+function storageKey(){return currentUser?KEY+'.user_'+currentUser.id:KEY}
+function getSaved(){try{return JSON.parse(localStorage.getItem(storageKey())||'[]')}catch(e){return[]}}
+function setSaved(list){localStorage.setItem(storageKey(),JSON.stringify(list));renderSaved()}
+function setCloudStatus(message){const el=$('cloudSavedStatus');if(el)el.textContent=message||''}
+function mergeIdeas(a,b){
+ const map=new Map();
+ [...a,...b].forEach(idea=>{if(idea&&idea.id)map.set(idea.id,idea)});
+ return [...map.values()];
+}
+async function saveIdeaToCloud(idea){
+ if(!supabaseClient||!currentUser)return;
+ const {error}=await supabaseClient.from('cosmos_ideias_favoritas').upsert({
+  user_id:currentUser.id,idea_id:idea.id,ideia:idea
+ },{onConflict:'user_id,idea_id'});
+ if(error)throw error;
+}
+async function removeIdeaFromCloud(ideaId){
+ if(!supabaseClient||!currentUser)return;
+ const {error}=await supabaseClient.from('cosmos_ideias_favoritas').delete()
+  .eq('user_id',currentUser.id).eq('idea_id',ideaId);
+ if(error)throw error;
+}
+async function syncSavedIdeas(){
+ if(!supabaseClient||!currentUser||cloudSyncBusy)return;
+ cloudSyncBusy=true;
+ try{
+  const {data,error}=await supabaseClient.from('cosmos_ideias_favoritas')
+   .select('idea_id,ideia').eq('user_id',currentUser.id);
+  if(error)throw error;
+  const local=getSaved();
+  const remote=(data||[]).map(row=>row.ideia).filter(Boolean);
+  const merged=mergeIdeas(local,remote);
+  localStorage.setItem(storageKey(),JSON.stringify(merged));
+  for(const idea of merged)await saveIdeaToCloud(idea);
+  renderSaved();
+  setCloudStatus('IDEIAS SINCRONIZADAS NA NUVEM.');
+ }catch(error){
+  console.error('Erro ao sincronizar ideias:',error);
+  setCloudStatus('SALVO NESTE DISPOSITIVO. PARA ATIVAR A NUVEM, FALTA CONFIGURAR A TABELA DE IDEIAS NO SUPABASE.');
+ }finally{cloudSyncBusy=false}
+}
+async function applyUserSession(user){
+ if(user&&(!currentUser||currentUser.id!==user.id)){
+  const guest=JSON.parse(localStorage.getItem(KEY)||'[]');
+  currentUser=user;
+  const accountIdeas=getSaved();
+  const merged=mergeIdeas(accountIdeas,guest);
+  localStorage.setItem(storageKey(),JSON.stringify(merged));
+  localStorage.removeItem(KEY);
+  renderSaved();
+  await syncSavedIdeas();
+ }else if(!user&&currentUser){
+  currentUser=null;
+  renderSaved();
+  setCloudStatus('MODO LOCAL. ENTRE NA CONTA PELA PÁGINA INICIAL PARA SINCRONIZAR.');
+ }else{
+  currentUser=user||null;
+  renderSaved();
+  if(currentUser)await syncSavedIdeas();
+  else setCloudStatus('ENTRE NA CONTA PELA PÁGINA INICIAL PARA SALVAR SUAS IDEIAS NA NUVEM.');
+ }
+}
+if(supabaseClient){
+ supabaseClient.auth.getSession().then(({data})=>applyUserSession(data.session?.user||null));
+ supabaseClient.auth.onAuthStateChange((_event,session)=>{applyUserSession(session?.user||null)});
+}else setCloudStatus('NÃO FOI POSSÍVEL CONECTAR À NUVEM.');
 function ideaText(idea){return idea.parts.map(p=>p[0]+': '+p[1]).join(' · ')}
 function typeLabel(t){return ({COOKIE:'COOKIE',DOT:'DOT COOKIES',BROOKIE:'BROOKIE',ICE:'ICE COOKIE'})[t]||t}
 function renderIdea(idea){
@@ -372,7 +441,10 @@ function renderSaved(){
   const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=idea.name;
   const small=document.createElement('small');small.textContent=typeLabel(idea.type)+' · '+idea.category+(occasionFilter!=='TODAS'&&idea.occasion===occasionFilter?' · '+idea.occasion:'')+' · '+ideaText(idea);
   info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','remover '+idea.name);
-  remove.addEventListener('click',()=>setSaved(getSaved().filter(x=>x.id!==idea.id)));
+  remove.addEventListener('click',async()=>{
+  setSaved(getSaved().filter(x=>x.id!==idea.id));
+  if(currentUser){try{await removeIdeaFromCloud(idea.id);setCloudStatus('IDEIA REMOVIDA DA NUVEM.')}catch(error){setCloudStatus('IDEIA REMOVIDA DESTE DISPOSITIVO, MAS NÃO DA NUVEM.');}}
+ });
   item.append(info,remove);$('savedList').append(item);
  });
 }
