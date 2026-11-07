@@ -173,6 +173,12 @@ const componentOptions = {
  ]
 };
 let lastGeneratedKey = '';
+function makeTitle(parts){
+ const clean=value=>value.replace(/^massa de /i,'').replace(/^massa /i,'').replace(/^cookie de /i,'').replace(/^brownie de /i,'').replace(/^ganache de /i,'').replace(/^creme de /i,'').replace(/^geleia de /i,'').replace(/^doce de leite$/i,'doce de leite').replace(/ depois de assar/ig,'').replace(/ antes de assar/ig,'').trim();
+ const main=parts.slice(0,2).map(p=>clean(p[1])).filter(v=>v&&!/^sem recheio|^não se aplica/i.test(v));
+ if(main.length>=2)return main[0].split(' ').slice(0,3).join(' ')+' & '+main[1].split(' ').slice(0,3).join(' ');
+ return main[0]||'NOVA COMBINAÇÃO';
+}
 function generate(){
  const pool=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter));
  if(!pool.length)return;
@@ -185,7 +191,7 @@ function generate(){
    const value=choices[Math.floor(Math.random()*choices.length)];
    return [part[0],value];
   })};
-  candidate.id=base.type+'-'+base.category+'-'+base.name+'-'+candidate.parts.map(p=>p[1]).join('|');
+  candidate.name=makeTitle(candidate.parts);\n  candidate.id=base.type+'-'+base.category+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
   if(candidate.id!==lastGeneratedKey)break;
  }
  lastGeneratedKey=candidate.id;
