@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#F6F4F1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <title>COSMOS TOOLS · COSMOS COOKIE LAB</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -53,7 +54,7 @@ footer .est{font-size:9px;letter-spacing:.13em;color:var(--muted)}
 <input id="accountPassword" type="password" autocomplete="current-password" placeholder="SUA SENHA">
 <div class="account-actions">
 <button type="button" id="accountLogin">ENTRAR</button>
-<button type="button" id="accountSignup">CRIAR CONTA</button>
+
 </div>
 </div>
 <div id="accountLoggedIn" hidden>
@@ -65,7 +66,7 @@ footer .est{font-size:9px;letter-spacing:.13em;color:var(--muted)}
 </div></div>
 <h1>COSMOS<br>TOOLS</h1>
 <p class="subtitle">IDEAS IN THE MAKING.</p>
-<nav class="tools" aria-label="COSMOS TOOLS">
+<nav class="tools" id="toolsNav" aria-label="COSMOS TOOLS" hidden>
 <a class="tool-link" href="flavor-generator.html">FLAVOR GENERATOR</a>
 <a class="tool-link" href="calculadora.html">RECIPE CALCULATOR</a>
 </nav>
@@ -81,16 +82,19 @@ footer .est{font-size:9px;letter-spacing:.13em;color:var(--muted)}
 'use strict';
 const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
 const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const ALLOWED_EMAIL='cosmosconfeitaria@gmail.com';
 const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const $=id=>document.getElementById(id);
 const panel=$('accountPanel'),toggle=$('accountToggle');
 toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden});
 function showSession(user){
- $('accountLoggedOut').hidden=!!user;
- $('accountLoggedIn').hidden=!user;
- $('accountToggle').textContent=user?'MINHA CONTA':'LOGIN';
- $('accountHeading').textContent=user?'CONTA CONECTADA':'CONTA COSMOS';
- $('accountUser').textContent=user?(user.email||'CONECTADO'):'';
+ const authorized=!!user&&String(user.email||'').toLowerCase()===ALLOWED_EMAIL;
+ $('toolsNav').hidden=!authorized;
+ $('accountLoggedOut').hidden=authorized;
+ $('accountLoggedIn').hidden=!authorized;
+ $('accountToggle').textContent=authorized?'MINHA CONTA':'LOGIN';
+ $('accountHeading').textContent=authorized?'CONTA CONECTADA':'CONTA COSMOS';
+ $('accountUser').textContent=authorized?(user.email||'CONECTADO'):'';
 }
 async function refresh(){
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
@@ -102,20 +106,11 @@ $('accountLogin').addEventListener('click',async()=>{
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
  if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
+ if(email.toLowerCase()!==ALLOWED_EMAIL){$('accountStatus').textContent='ESTA CONTA NÃO TEM AUTORIZAÇÃO DE ACESSO.';return}
  $('accountStatus').textContent='ENTRANDO...';
  const {error}=await client.auth.signInWithPassword({email,password});
  $('accountStatus').textContent=error?'NÃO FOI POSSÍVEL ENTRAR: '+error.message:'LOGIN REALIZADO. SUAS FERRAMENTAS VÃO USAR A NUVEM.';
  if(!error)await refresh();
-});
-$('accountSignup').addEventListener('click',async()=>{
- if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
- const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
- if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
- if(password.length<6){$('accountStatus').textContent='A SENHA PRECISA TER PELO MENOS 6 CARACTERES.';return}
- $('accountStatus').textContent='CRIANDO CONTA...';
- const {data,error}=await client.auth.signUp({email,password});
- $('accountStatus').textContent=error?'NÃO FOI POSSÍVEL CRIAR A CONTA: '+error.message:(data.session?'CONTA CRIADA E CONECTADA.':'CONTA CRIADA. VERIFIQUE SEU E-MAIL PARA CONFIRMAR.');
- await refresh();
 });
 $('accountLogout').addEventListener('click',async()=>{
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
