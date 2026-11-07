@@ -148,6 +148,7 @@ const ideas = [
 {type:'COOKIE',category:'FRUTADO',name:'LIMÃO & FRAMBOESA',parts:[['MASSA','massa de limão-siciliano'],['RECHEIO','ganache fluida de chocolate branco com limão-siciliano'],['RECHEIO COMPLEMENTAR','opcional: geleia de framboesa'],['TOPPING','açúcar cítrico ou framboesa liofilizada depois de assar']]},
 {type:'COOKIE',category:'FRUTADO',name:'PIÑA COLADA',occasion:'TODAS',parts:[['MASSA','massa de coco saborizada com leite de coco e suco de abacaxi'],['RECHEIO','compota de abacaxi'],['RECHEIO COMPLEMENTAR','creme de coco'],['TOPPING','coco ralado para empanar']]},
 {type:'COOKIE',category:'HYPADO',name:'CHIPS & CHOCOLATE',parts:[['MASSA','massa de manteiga noisette com baunilha'],['RECHEIO','ganache cremosa de chocolate blend'],['RECHEIO COMPLEMENTAR','opcional: caramelo salgado'],['TOPPING','batata chips triturada e pedaços crocantes para finalizar']]},
+{type:'COOKIE',category:'HYPADO',name:'LOTUS CRUNCH',parts:[['MASSA','massa de baunilha com manteiga noisette'],['RECHEIO','creme fluido de chocolate branco com pasta de Lotus Biscoff'],['RECHEIO COMPLEMENTAR','creme de Lotus com pedaços de biscoito'],['TOPPING','farofa de biscoito Lotus para finalizar']]},
 {type:'COOKIE',category:'COMERCIAL',name:'NINHO & NUTELLA',parts:[['MASSA','massa saborizada com leite em pó'],['RECHEIO','Nutella cremosa'],['RECHEIO COMPLEMENTAR','brigadeiro de leite em pó'],['TOPPING','farofa de leite em pó']]},
 {type:'COOKIE',category:'COMFORT',name:'PAÇOCA JUNINA',occasion:'SÃO JOÃO',parts:[['MASSA','massa de baunilha com amendoim torrado'],['RECHEIO','creme fluido de chocolate branco com pasta de paçoca'],['RECHEIO COMPLEMENTAR','doce de leite cremoso'],['TOPPING','farofa de paçoca para empanar']]},
 {type:'COOKIE',category:'COMFORT',name:'MILHO & DOCE DE LEITE',occasion:'SÃO JOÃO',parts:[['MASSA','massa saborizada com milho e manteiga noisette'],['RECHEIO','creme fluido de chocolate branco com milho-verde'],['RECHEIO COMPLEMENTAR','doce de leite cremoso'],['TOPPING','farofa de paçoca ou milho crocante']]},
@@ -193,12 +194,16 @@ function chocolateFor(idea){
 }
 function buildParts(idea){
  const parts=idea.parts.map(p=>[p[0],p[1]]);
- // chocolate é um componente próprio: gotas ou pedaços misturados à massa/base.
- // a ordem fica sempre junto da massa, antes do recheio.
- const insertAt=idea.type==='BROOKIE'
-  ? Math.max(0,parts.findIndex(p=>p[0]==='BROWNIE')+1)
-  : Math.max(0,parts.findIndex(p=>p[0]==='MASSA')+1);
- parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
+ // o componente CHOCOLATE aparece nos cookies e brookies, separado da massa e do recheio.
+ // DOT mantém a estrutura própria: massa, recheio e miçangas no topo.
+ if(idea.type==='COOKIE'){
+  const insertAt=Math.max(0,parts.findIndex(p=>p[0]==='MASSA')+1);
+  parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
+ }
+ if(idea.type==='BROOKIE'){
+  const insertAt=Math.max(0,parts.findIndex(p=>p[0]==='COOKIE')+1);
+  parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
+ }
  return parts;
 }
 let lastGeneratedKey = '';
