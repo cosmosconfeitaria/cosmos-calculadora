@@ -176,7 +176,7 @@ function renderIdea(idea){
 }
 function chocolateFor(idea){
  const text=idea.parts.map(p=>p[1]).join(' ').toLowerCase();
- if(/abacaxi|coco|limão|limao|maracujá|maracuja|morango|framboesa|frutas vermelhas|yuzu/.test(text)) return 'chocolate branco em gotas ou pedaços (combinação mais adequada)';
+ if(/chocolate branco/.test(text)||/abacaxi|coco/.test(text)) return 'chocolate branco em gotas ou pedaços (combinação mais adequada)';
  if(/pistache|kadayif|avelã|avela|nutella|kinder|rocher|ferrero/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
  if(/cacau|chocolate amargo|70%|café/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
  return 'chocolate blend em gotas ou pedaços (primeira opção)';
@@ -247,7 +247,7 @@ $('filters').addEventListener('click',e=>{
 $('occasions').addEventListener('click',e=>{
  const btn=e.target.closest('[data-occasion]');if(!btn)return;
  occasion=btn.dataset.occasion;document.querySelectorAll('#occasions .filter').forEach(b=>b.classList.toggle('active',b===btn));
- if(current){current.occasion=occasion;current.id=current.type+'-'+current.category+'-'+occasion+'-'+current.name+'-'+current.parts.map(p=>p[1]).join('|');renderIdea(current)}
+ generate();
 });
 ['savedCategory','savedType','savedOccasion'].forEach(id=>$(id).addEventListener('change',renderSaved));
 $('generate').addEventListener('click',generate);
