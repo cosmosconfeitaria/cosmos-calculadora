@@ -231,7 +231,7 @@ add('COOKIE','CHOCOLATUDO','RED VELVET HEART','massa red velvet',B,'ganache crem
 add('DOT','FRUTADO','DOT CEREJA & CHOCOLATE','massa de baunilha',B,'creme de chocolate branco com cereja','compota de cereja','miçangas vermelhas','DIA DOS NAMORADOS',['dia dos namorados','cereja','chocolate']);
 add('BROOKIE','CHOCOLATUDO','BROOKIE MORANGO TRUFADO','massa de cookie red velvet',B,'ganache de chocolate blend','brownie de chocolate','geleia de morango e raspas de chocolate','DIA DOS NAMORADOS',['dia dos namorados','morango','chocolate']);
 add('ICE','FRUTADO','ICE COOKIE MORANGO & ROSAS','massa de baunilha',W,'sorvete de morango','calda de frutas vermelhas com toque de água de rosas','', 'DIA DOS NAMORADOS',['dia dos namorados','morango','sorvete']);
-add('COOKIE','FRUTADO','PIÑA COLADA DE DIA DAS MÃES','massa de coco com leite de coco e suco de abacaxi',W,'compota de abacaxi','brigadeiro de coco cremoso','coco em flocos para empanar','DIA DAS MÃES',['dia das mães','abacaxi','coco']);
+add('COOKIE','FRUTADO','ABACAXI & COCO','massa de coco com leite de coco e suco de abacaxi',W,'compota de abacaxi','brigadeiro de coco cremoso','coco em flocos para empanar','DIA DAS MÃES',['dia das mães','abacaxi','coco']);
 add('COOKIE','FRUTADO','MORANGO & NINHO DELICADO','massa saborizada com leite em pó',W,'creme de chocolate branco com leite em pó','geleia de morango','leite em pó peneirado','DIA DAS MÃES',['dia das mães','morango','leite ninho']);
 add('DOT','FRUTADO','DOT FLOR DE LARANJEIRA','massa de baunilha com água de flor de laranjeira',W,'creme de chocolate branco com laranja','compota de damasco','miçangas brancas e douradas','DIA DAS MÃES',['dia das mães','laranja','damasco']);
 add('BROOKIE','COMFORT','BROOKIE COCO & ABACAXI','massa de cookie de coco',W,'brigadeiro de coco cremoso','brownie de chocolate branco com abacaxi','coco tostado','DIA DAS MÃES',['dia das mães','coco','abacaxi']);
@@ -307,7 +307,7 @@ add('COOKIE','COMERCIAL','LOTUS & CHOCOLATE BRANCO','massa de baunilha com espec
 add('COOKIE','CHOCOLATUDO','CHOCOLATE & MARSHMALLOW','massa de cacau 50%',B,'ganache de chocolate blend','brigadeiro de chocolate','marshmallow tostado',null,['chocolate','marshmallow']);
 add('COOKIE','FRUTADO','MARACUJÁ & COCO','massa de coco',W,'creme de chocolate branco com maracujá','curd de maracujá','coco tostado',null,['maracujá','coco']);
 
-const keyOptions=['abacaxi','amendoim','amora','avelã','banana','batata chips','cacau','café','caramelo','cereja','champanhe','chocolate','coco','doce de leite','figo','framboesa','frutas vermelhas','goiaba','iogurte','kadayif','kinder','laranja','leite ninho','limão','lotus','m&m','maracujá','marshmallow','morango','nutella','oreo','pistache','queijo','red velvet','sorvete'];
+const keyOptions=['abacaxi','amêndoas','amendoim','amora','avelã','banana','batata chips','cacau','café','canela','caramelo','cereja','champanhe','chocolate','chocolate branco','chocolate ao leite','coco','doce de leite','figo','framboesa','frutas vermelhas','gengibre','gergelim','goiaba','iogurte','kadayif','kinder','laranja','leite ninho','limão','lotus','m&m','maracujá','marshmallow','mel','missô','morango','nutella','oreo','pistache','pretzel','queijo','red velvet','sorvete'];
 keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
 let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null;
 const KEY='cosmos.flavor-generator.saved.v2';
