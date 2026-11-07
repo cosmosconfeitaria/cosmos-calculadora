@@ -159,6 +159,10 @@ if(client)client.auth.onAuthStateChange((_event,session)=>{
   showSession(session?.user||null);
  });
 });
+if(new URLSearchParams(window.location.search).get('auth')==='required'){
+ panel.hidden=false;
+ $('accountStatus').textContent='FAÇA LOGIN PARA ACESSAR AS FERRAMENTAS.';
+}
 refresh();
 })();
 </script>
