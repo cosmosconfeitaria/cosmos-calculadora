@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · FLAVOR GENERATOR</title>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 body.auth-pending .wrap{visibility:hidden}
@@ -59,6 +59,31 @@ footer strong{font-size:12px;letter-spacing:.18em;color:var(--blue)}
 footer span{font-size:10px;letter-spacing:.14em;font-weight:800}
 footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 @media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.types{grid-template-columns:repeat(2,minmax(0,1fr))}.type{padding:12px 8px}.saved-filters{grid-template-columns:1fr 1fr}}
+
+/* IDENTIDADE COSMOS */
+:root{--ink:#2D2D2D;--muted:#6f6c68;--line:#d4d1cc}
+html{min-height:100%;background:var(--blue)}
+body{position:relative;isolation:isolate;background:var(--blue);color:var(--blue);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px}
+body:before,body:after{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background-repeat:repeat;animation:cosmos-stars 110s linear infinite}
+body:before{opacity:.75;background-image:radial-gradient(1px 1px at 13px 19px,#fff 98%,transparent),radial-gradient(1px 1px at 77px 53px,#dce8ff 98%,transparent),radial-gradient(1px 1px at 141px 117px,#fff 98%,transparent),radial-gradient(1px 1px at 193px 31px,#c8dcff 98%,transparent);background-size:257px 211px}
+body:after{opacity:.35;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent);background-size:293px 239px;animation-direction:reverse;animation-duration:150s}
+@keyframes cosmos-stars{to{transform:translate3d(6%,5%,0)}}
+.wrap{position:relative;width:min(900px,calc(100% - 42px));margin:24px auto;padding:22px 24px 30px;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30}
+header{border-bottom:1px solid #d4d1cc}
+.brand,.eyebrow,.label,.saved-head h3,footer strong{font-weight:400;letter-spacing:-.35px}
+h1{font-weight:400;letter-spacing:-1.5px}
+.sub{font-weight:400;color:#55514d}
+.panel{background:#fff;border:1px solid #d4d1cc;border-radius:10px;box-shadow:0 4px 0 #d8d5d0}
+.filter,.action,.type{font-weight:400;letter-spacing:-.25px;border-radius:8px}
+.result h2{font-weight:400;letter-spacing:-1px}
+.alternative strong,.saved-item strong,.part strong{font-weight:400}
+.key-select,.saved-filters select{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400}
+footer{padding-top:36px}
+footer strong{font-size:12px;color:var(--blue)}
+footer span{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px;color:var(--blue)}
+footer small{font-family:'Gochi Hand',cursive;font-size:14px;color:#D22222;letter-spacing:0;font-weight:400}
+@media(max-width:520px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:16px 14px 28px}}
+@media(prefers-reduced-motion:reduce){body:before,body:after{animation:none}}
 </style>
 </head>
 <body class="auth-pending">
