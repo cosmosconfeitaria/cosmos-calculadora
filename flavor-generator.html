@@ -416,12 +416,12 @@ function buildCreativeIdeas(){
    const choc=redVelvet?'chocolate branco':chocolate;
    const chocolateLine=[choc,selectedAddins.length?'adições na massa: '+selectedAddins.join(', '):''].filter(Boolean).join(' · ');
    const category=p[0],name=p[1]+(variant===1?' · CRUNCH':variant===2?' · SPECIAL':'');
-   const occasion=p[8]||null,keys=p[9]||[];
+   const occasion=p[7]||null,keys=p[8]||[];
    let parts=[];
    if(type==='COOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['RECHEIO',p[4]],['RECHEIO COMPLEMENTAR',p[5]],['TOPPING',p[6]]];
    if(type==='DOT')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['RECHEIO',p[4]],['RECHEIO COMPLEMENTAR',p[5]],['TOPPING / MIÇANGAS',p[6]]];
-   if(type==='BROOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['BROWNIE',p[5]],['RECHEIO',p[4]],['TOPPING',p[6]]];
-   if(type==='ICE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['SORVETE',p[4]],['COMPLEMENTO DO SORVETE',p[5]]];
+   if(type==='BROOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['BROWNIE','brownie de '+(redVelvet?'chocolate branco':choc==='chocolate blend'?'chocolate intenso':choc==='chocolate ao leite'?'chocolate ao leite':'chocolate blend')],['RECHEIO',p[4]],['COMPLEMENTO',p[5]],['TOPPING',p[6]]];
+   if(type==='ICE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolateLine],['SORVETE','sorvete artesanal inspirado em '+p[1].toLocaleLowerCase('pt-BR')],['COMPLEMENTO DO SORVETE',p[5]]];
    out.push({id:'creative|'+type+'|'+category+'|'+(occasion||'GERAL')+'|'+name, type,category,name:(type==='DOT'?'DOT ':type==='BROOKIE'?'BROOKIE ':type==='ICE'?'ICE COOKIE ':'')+name,parts,occasion:occasion||'TODAS',keys:[...new Set(keys)]});
   });
  });
