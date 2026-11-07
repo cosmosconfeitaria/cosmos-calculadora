@@ -87,12 +87,12 @@ footer small{font-family:'Gochi Hand',cursive;font-size:14px;color:#D22222;lette
 </style>
 <style>
 /* AJUSTES DE IDENTIDADE COSMOS */
-.wrap{width:min(720px,calc(100% - 42px));max-width:720px}
+.wrap{width:min(660px,calc(100% - 42px));max-width:660px}
 .brand{font-size:14px;font-weight:500;letter-spacing:-.35px}
 .logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
 .logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);filter:url(#letter-wiggle);animation:letter-wobble 2.7s ease-in-out infinite;pointer-events:none}
 @keyframes letter-wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
-h1{font-weight:500;letter-spacing:-1.5px}
+h1{display:flex;flex-wrap:wrap;gap:.22em;font-weight:500;letter-spacing:-1.5px}
 .label,.saved-head h3{font-weight:500;letter-spacing:-.2px;color:var(--blue)}
 .eyebrow{font-weight:400;color:var(--muted)}
 .sub{font-weight:400;color:#55514d}
@@ -104,16 +104,26 @@ h1{font-weight:500;letter-spacing:-1.5px}
 .part span{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;color:var(--ink)}
 .key-select,.saved-filters select{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400}
 #alternativesLabel{color:var(--muted);font-weight:400;letter-spacing:.13em}
-#occasionHint,#ingredientHint{font-family:'Gochi Hand',cursive;font-size:13px;font-weight:400;line-height:1.35;letter-spacing:.015em;text-transform:uppercase;-webkit-text-stroke:.16px var(--cream);color:#D22222}
+#occasionHint,#ingredientHint{font-family:'Gochi Hand',cursive;font-size:11px;font-weight:400;line-height:1.35;letter-spacing:.02em;text-transform:uppercase;-webkit-text-stroke:.1px var(--cream);color:#D22222}
 #cloudSavedStatus{display:none!important}
-.key-select,.saved-filters select{border:0!important;border-radius:0!important;color:var(--blue);background-color:#F6F4F1e8!important;background-image:linear-gradient(135deg,#ffffffa8 0%,transparent 32%,#bcb2a51c 48%,transparent 66%),repeating-linear-gradient(0deg,#9b918512 0px,#9b918512 1px,transparent 1px,transparent 5px)!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;padding:12px 10px!important}
-.key-select:focus,.saved-filters select:focus{outline:1px solid var(--blue);outline-offset:-1px}
-.key-select option,.saved-filters select option{background:var(--cream);color:var(--blue)}
+.saved-filters select{border:0!important;border-radius:0!important;color:var(--blue);background-color:#F6F4F1e8!important;background-image:linear-gradient(135deg,#ffffffa8 0%,transparent 32%,#bcb2a51c 48%,transparent 66%),repeating-linear-gradient(0deg,#9b918512 0px,#9b918512 1px,transparent 1px,transparent 5px)!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;padding:12px 10px!important}
+.saved-filters select:focus{outline:1px solid var(--blue);outline-offset:-1px}
+.saved-filters select option{background:var(--cream);color:var(--blue)}
+.key-flavor-select{position:relative;width:100%}
+.key-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;opacity:0!important;pointer-events:none!important}
+.key-select-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--blue);padding:13px 12px;font:800 11px Helvetica,Arial,sans-serif;letter-spacing:.04em;text-align:left;cursor:pointer}
+.key-select-trigger .chevron{font-size:13px;line-height:1;transition:transform .15s ease}
+.key-select-trigger[aria-expanded="true"] .chevron{transform:rotate(180deg)}
+.key-flavor-menu{position:absolute;z-index:50;top:calc(100% + 4px);left:0;width:100%;max-height:245px;overflow-y:auto;overscroll-behavior:contain;background-color:rgba(246,244,241,.94);background-image:radial-gradient(ellipse at 17% 20%,rgba(155,145,130,.075),transparent 38%),radial-gradient(ellipse at 82% 72%,rgba(255,255,255,.58),transparent 42%),linear-gradient(135deg,rgba(255,255,255,.28),rgba(190,180,165,.035) 48%,rgba(255,255,255,.2));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(28,38,55,.16),inset 0 1px 2px rgba(255,255,255,.7);border:0;border-radius:0;padding:5px 0}
+.key-flavor-menu[hidden]{display:none}
+.key-flavor-option{display:block;width:100%;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--blue);padding:8px 13px;text-align:left;font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.015em;cursor:pointer}
+.key-flavor-option:hover,.key-flavor-option[aria-selected="true"]{background:rgba(34,99,210,.09);color:var(--blue)}
+.key-flavor-option:focus-visible{outline:1px solid var(--blue);outline-offset:-2px}
 .label:not(#alternativesLabel){font-size:11.5px}
 #alternativesLabel{font-size:10px}
 .alternative.active{border-color:var(--blue);background:#eef3fc}
 footer{padding:25px 10px 10px;gap:3px}
-footer strong{font-size:23px;line-height:1;font-weight:500;letter-spacing:-.65px;color:var(--blue)}
+footer strong{font-size:26px;line-height:1;font-weight:500;letter-spacing:-.7px;color:var(--blue)}
 footer span{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;line-height:1.15;font-weight:400;letter-spacing:-.25px;color:var(--blue)}
 footer small{font-family:'Gochi Hand',cursive;font-size:9px;line-height:1.1;color:#D22222;letter-spacing:0;font-weight:400}
 @media(max-width:520px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:16px 14px 24px}footer strong{font-size:22px}}
@@ -125,7 +135,7 @@ footer small{font-family:'Gochi Hand',cursive;font-size:9px;line-height:1.1;colo
 <div class="wrap">
 <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
 <p class="eyebrow">01 / CENTRAL DE IDEIAS</p>
-<h1><span class="logo-type" data-text="FLAVOR">FLAVOR</span><span class="logo-type" data-text="GENERATOR">GENERATOR</span></h1>
+<h1><span class="logo-type" data-text="FLAVOR">FLAVOR</span> <span class="logo-type" data-text="GENERATOR">GENERATOR</span></h1>
 <p class="sub">explore combinações de sabores, recheios e texturas. filtre por categoria, ocasião ou ingrediente-chave.</p>
 
 <section class="panel">
@@ -173,9 +183,15 @@ footer small{font-family:'Gochi Hand',cursive;font-size:9px;line-height:1.1;colo
 </section>
 <section class="panel">
 <div class="label">4. ESCOLHA UM INGREDIENTE-CHAVE</div>
-<select id="keyFlavor" class="key-select" aria-label="FILTRAR POR INGREDIENTE-CHAVE">
+<div class="key-flavor-select" id="keyFlavorControl">
+<select id="keyFlavor" class="key-select-native" aria-label="FILTRAR POR INGREDIENTE-CHAVE" tabindex="-1">
 <option value="TODOS">QUALQUER SABOR</option>
 </select>
+<button type="button" id="keyFlavorTrigger" class="key-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+<span id="keyFlavorTriggerText">QUALQUER SABOR</span><span class="chevron" aria-hidden="true">⌄</span>
+</button>
+<div id="keyFlavorMenu" class="key-flavor-menu" role="listbox" aria-label="LISTA DE INGREDIENTES" hidden></div>
+</div>
 <p class="empty" id="ingredientHint" style="margin:10px 0 0">escolha um sabor para encontrar combinações que tenham esse ingrediente, em qualquer tipo de produto.</p>
 </section>
 
@@ -530,6 +546,21 @@ add('COOKIE','COMFORT','CARAMELO & FLOR DE SAL','massa de baunilha',B,'ganache d
 const keyOptions=['abacaxi','abóbora','alpino','ameixa','amêndoas','amendoim','amora','avelã','banana','baunilha','batata chips','cacau','café','canela','caramelo','cereja','champanhe','chocolate','chocolate branco','chocolate ao leite','coco','confeitos','cranberry','creme de queijo','damasco','doce de leite','figo','flor de laranjeira','framboesa','galak','gorgonzola','frutas vermelhas','gengibre','gergelim','goiaba','goiabada','hibisco','iogurte','kadayif','kinder','laranja','lavanda','leite ninho','limão','lotus','lotus biscoff','maçã','manga','maracujá','marshmallow','mascarpone','mel','milho','missô','morango','nozes','nutella','oreo','parmesão','queijo brie','queijo canastra','queijo meia cura','reeses','raffaello','ferrero rocher','pêssego','pimenta rosa','pistache','pretzel','queijo','mascarpone','suspiro','rapadura','red velvet','sorvete','uva verde','cereal','balsâmico'];
 ['abóbora','amêndoas','banana','bergamota','cardamomo','cranberry','damasco','earl grey','erva-doce','figo','gengibre','goiabada','hortelã','lavanda','maçã','manga','mascarpone','milho','noz-pecã','noz-moscada','paçoca','pêssego','pitaya','tamarindo','uva verde','ube','pera','pecan','maltado'].forEach(k=>{if(!keyOptions.includes(k))keyOptions.push(k)});
 keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
+(function setupKeyFlavorMenu(){
+ const select=$('keyFlavor'),trigger=$('keyFlavorTrigger'),triggerText=$('keyFlavorTriggerText'),menu=$('keyFlavorMenu'),control=$('keyFlavorControl');
+ const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+ const sync=()=>{triggerText.textContent=select.options[select.selectedIndex].textContent;menu.querySelectorAll('[role="option"]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.value===select.value)))};
+ Array.from(select.options).forEach(option=>{
+  const item=document.createElement('button');item.type='button';item.className='key-flavor-option';item.setAttribute('role','option');item.dataset.value=option.value;item.textContent=option.textContent;
+  item.addEventListener('click',()=>{select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();close();trigger.focus()});
+  menu.appendChild(item);
+ });
+ trigger.addEventListener('click',()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden){sync();const selected=menu.querySelector('[aria-selected="true"]');if(selected)selected.scrollIntoView({block:'nearest'})}});
+ select.addEventListener('change',sync);
+ document.addEventListener('click',e=>{if(!control.contains(e.target))close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){close();trigger.focus()}});
+ sync();
+})();
 let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null,currentOptions=[];
 const KEY='cosmos.flavor-generator.saved.v2';
 const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
