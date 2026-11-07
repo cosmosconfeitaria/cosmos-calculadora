@@ -292,6 +292,19 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 .star-timer-mark{top:83%;font-size:6px;color:#4b5053}
 @media(max-width:560px){.cosmos-device-timer{width:158px;right:9px;bottom:9px}.star-timer-button{width:31px;height:31px;min-width:31px}.cosmos-lcd-digits{font-size:10px}}
 </style>
+<style>
+/* CONTROLES FUNCIONAIS DO CRONÔMETRO HH:MM */
+.star-timer-controls{left:16%!important;width:68%!important;top:61%!important;gap:3px!important}
+.star-timer-control{width:32%!important;gap:3px!important}
+.star-timer-button.adjust{font-size:17px!important;font-weight:400!important}
+.star-timer-button.start{font-size:7px!important}
+.star-timer-control small{font-size:5.5px!important}
+@media(max-width:560px){
+ .star-timer-controls{left:14%!important;width:72%!important}
+ .star-timer-control{width:32%!important}
+ .star-timer-button.adjust{font-size:15px!important}
+}
+</style>
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -394,11 +407,15 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
     <div class="star-timer-shell">
       <div class="timer-keyring" aria-hidden="true"></div>
       <div class="star-timer-face">
-        <div class="cosmos-lcd-screen"><div class="cosmos-lcd-digits" id="timerDisplay">00:00:00</div></div>
+        <div class="cosmos-lcd-screen"><div class="cosmos-lcd-digits" id="timerDisplay">00:00</div></div>
         <div class="star-timer-controls">
           <div class="star-timer-control">
-            <button class="star-timer-button" id="btnTimerReset" type="button" title="Zerar cronômetro" aria-label="Zerar cronômetro"><span>↺</span></button>
-            <small>RESET</small>
+            <button class="star-timer-button adjust" id="btnTimerHour" type="button" title="Adicionar uma hora" aria-label="Adicionar uma hora"><span>+</span></button>
+            <small>HOUR</small>
+          </div>
+          <div class="star-timer-control">
+            <button class="star-timer-button adjust" id="btnTimerMinute" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"><span>+</span></button>
+            <small>MIN</small>
           </div>
           <div class="star-timer-control">
             <button class="star-timer-button start" id="btnTimerToggle" type="button" title="Iniciar ou pausar cronômetro" aria-label="Iniciar cronômetro"><span id="timerToggleText">START</span></button>
@@ -411,7 +428,7 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
   </div>
 
   <footer class="footer-cosmos">
-    <div class="line-brand">★ <span class="logo-type" data-text="COSMOS">COSMOS</span> ★</div>
+    <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
     <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
     <div class="line-est">EST. 2024</div>
   </footer>
@@ -1441,11 +1458,10 @@ function getElapsedMs(){
 }
 
 function formatTime(ms){
-  var totalSec = Math.floor(ms / 1000);
-  var hrs = Math.floor(totalSec / 3600);
-  var mins = Math.floor((totalSec % 3600) / 60);
-  var secs = totalSec % 60;
-  return String(hrs).padStart(2, '0') + ':' + ('0' + mins).slice(-2) + ':' + ('0' + secs).slice(-2);
+  var totalMin = Math.floor(ms / 60000);
+  var hrs = Math.floor(totalMin / 60);
+  var mins = totalMin % 60;
+  return String(hrs).padStart(2, '0') + ':' + ('0' + mins).slice(-2);
 }
 
 function updateTimerControls(){
@@ -1483,16 +1499,16 @@ if(btnToggle){
   });
 }
 
-var btnReset = $('btnTimerReset');
-if(btnReset){
-  btnReset.addEventListener('click', function(){
-    timerState.running = false;
-    timerState.startTime = 0;
-    timerState.elapsedBefore = 0;
-    saveTimerState();
-    updateTimerDisplay();
-  });
+function adjustTimer(amount){
+  timerState.elapsedBefore = Math.max(0, getElapsedMs() + amount);
+  if(timerState.running) timerState.startTime = Date.now();
+  saveTimerState();
+  updateTimerDisplay();
 }
+var btnHour = $('btnTimerHour');
+if(btnHour) btnHour.addEventListener('click', function(){ adjustTimer(3600000); });
+var btnMinute = $('btnTimerMinute');
+if(btnMinute) btnMinute.addEventListener('click', function(){ adjustTimer(60000); });
 
 /* ---------- INÍCIO ---------- */
 buildSections(); 
