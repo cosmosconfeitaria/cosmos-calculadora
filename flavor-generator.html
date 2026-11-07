@@ -211,7 +211,7 @@ function generate(){
   })};
   candidate.name=makeTitle(candidate.parts);
   candidate.occasion=occasion;
-  candidate.id=base.type+'-'+base.category+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
+  candidate.id=base.type+'-'+base.category+'-'+(occasion||'TODAS')+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
   if(candidate.id!==lastGeneratedKey)break;
  }
  lastGeneratedKey=candidate.id;
@@ -246,7 +246,7 @@ $('filters').addEventListener('click',e=>{
 $('occasions').addEventListener('click',e=>{
  const btn=e.target.closest('[data-occasion]');if(!btn)return;
  occasion=btn.dataset.occasion;document.querySelectorAll('#occasions .filter').forEach(b=>b.classList.toggle('active',b===btn));
- if(current){current.occasion=occasion;renderIdea(current)}
+ if(current){current.occasion=occasion;current.id=current.type+'-'+current.category+'-'+occasion+'-'+current.name+'-'+current.parts.map(p=>p[1]).join('|');renderIdea(current)}
 });
 ['savedCategory','savedType','savedOccasion'].forEach(id=>$(id).addEventListener('change',renderSaved));
 $('generate').addEventListener('click',generate);
