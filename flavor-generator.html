@@ -12,7 +12,7 @@ body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Ari
 .wrap{width:min(900px,100%);margin:auto;padding:22px 18px 36px}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
 .brand{font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--blue)}
-.back{font-size:10px;color:var(--blue);text-decoration:none;font-weight:800;letter-spacing:.1em}
+.back{width:42px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #aaa8a3;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;text-decoration:none}.menu-lines{display:grid;gap:4px;width:17px}.menu-lines i{display:block;height:2px;border-radius:2px;background:var(--blue)}
 .eyebrow{font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 10px}
 h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:0;color:var(--blue);font-weight:900}
 .sub{font-size:12px;line-height:1.6;color:var(--muted);max-width:580px;margin:14px 0 26px}
@@ -21,7 +21,7 @@ h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:
 .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .filter,.action{ text-shadow:none;border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);padding:12px 10px;border-radius:11px;font-size:10px;font-weight:900;letter-spacing:.045em;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
 .filter.active{background:linear-gradient(180deg,#dce8fb,#aebfdb 55%,#9fb3d5);box-shadow:inset 0 2px 1px #fff,0 1px 0 #929eaf;transform:translateY(3px)}
-.types{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .type{text-shadow:none;border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);padding:14px 8px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.05em;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
 .type.active{background:linear-gradient(180deg,#dce8fb,#aebfdb 55%,#9fb3d5);transform:translateY(3px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #929eaf}
 .result{min-height:260px}
@@ -34,12 +34,12 @@ h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
 .action{padding:13px 18px}
 .action:active{transform:translateY(4px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}
-.action.primary{background:linear-gradient(180deg,#d9e6fb,#a9bddf 55%,#8fa7d0)}
+.action.primary{background:linear-gradient(180deg,#f7fbff 0%,#dce8fb 48%,#c7d9f5 100%);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #b5c9e8,0 4px 0 #a5b6d0,0 6px 10px #00000010}
 .action:disabled{opacity:.45;cursor:not-allowed}
 .saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
 .saved-head h3{font-size:12px;letter-spacing:.13em;margin:0;color:var(--blue)}
 .saved-count{font-size:10px;color:var(--muted)}
-.saved-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 0 14px}.saved-filters select{min-width:0;width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 9px;background:#fff;color:var(--blue);font:800 10px Helvetica,Arial,sans-serif;letter-spacing:.04em}.saved-list{display:grid;gap:9px}.saved-item{min-width:0}.saved-item>div{min-width:0;overflow-wrap:anywhere}
+.key-select{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;background:#fff;color:var(--blue);font:800 11px Helvetica,Arial,sans-serif;letter-spacing:.04em}.saved-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 0 14px}.saved-filters select{min-width:0;width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 9px;background:#fff;color:var(--blue);font:800 10px Helvetica,Arial,sans-serif;letter-spacing:.04em}.saved-list{display:grid;gap:9px}.saved-item{min-width:0}.saved-item>div{min-width:0;overflow-wrap:anywhere}
 .saved-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream)}
 .saved-item strong{font-size:11px;color:var(--blue);display:block;margin-bottom:4px}
 .saved-item small{font-size:10px;color:var(--muted);line-height:1.5;display:block}
@@ -54,17 +54,18 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 </head>
 <body>
 <div class="wrap">
-<header><div class="brand">COSMOS COOKIE LAB</div><a class="back" href="index.html">← COSMOS TOOLS</a></header>
+<header><div class="brand">COSMOS COOKIE LAB</div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
 <p class="eyebrow">01 / CENTRAL DE IDEIAS</p>
 <h1>FLAVOR<br>GENERATOR</h1>
-<p class="sub">uma combinação aleatória para tirar uma ideia do papel. escolha o produto e a categoria, depois gere uma nova composição.</p>
+<p class="sub">combinações criadas a partir de sabores que conversam entre si. escolha o produto, refine os filtros ou parta de um ingrediente-chave.</p>
 
 <section class="panel">
 <div class="label">1. ESCOLHA O PRODUTO</div>
 <div class="types" id="types">
-<button class="type active" data-type="DOT">DOT COOKIES</button>
+<button class="type active" data-type="COOKIE">COOKIE</button>
+<button class="type" data-type="DOT">DOT COOKIES</button>
 <button class="type" data-type="BROOKIE">BROOKIE</button>
-<button class="type" data-type="COOKIE">COOKIE</button>
+<button class="type" data-type="ICE">ICE COOKIE</button>
 </div>
 </section>
 
@@ -100,6 +101,13 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 </div>
 <p class="empty" style="margin:12px 0 0">as datas sazonais ajudam a organizar e identificar ideias para cada campanha.</p>
 </section>
+<section class="panel">
+<div class="label">4. ESCOLHA UM INGREDIENTE-CHAVE</div>
+<select id="keyFlavor" class="key-select" aria-label="FILTRAR POR INGREDIENTE-CHAVE">
+<option value="TODOS">QUALQUER SABOR</option>
+</select>
+<p class="empty" style="margin:10px 0 0">escolha um sabor para encontrar combinações que tenham esse ingrediente, em qualquer tipo de produto.</p>
+</section>
 
 <section class="panel result" aria-live="polite">
 <div class="tag" id="resultTag">SUA PRÓXIMA IDEIA</div>
@@ -113,7 +121,7 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 
 <section class="panel">
 <div class="saved-head"><h3>IDEIAS SALVAS</h3><span class="saved-count" id="savedCount">0 salvas</span></div>
-<div class="saved-filters"><select id="savedCategory" aria-label="FILTRAR IDEIAS POR CATEGORIA"><option value="TODAS">TODAS AS CATEGORIAS</option><option>CHOCOLATUDO</option><option>COMERCIAL</option><option>HYPADO</option><option>FRUTADO</option><option>EXÓTICO</option><option>MADURO</option><option>COMFORT</option><option>SEM RECHEIO</option><option>FERRERO</option></select><select id="savedType" aria-label="FILTRAR IDEIAS POR PRODUTO"><option value="TODOS">TODOS OS PRODUTOS</option><option value="DOT">DOT COOKIES</option><option value="BROOKIE">BROOKIE</option><option value="COOKIE">COOKIE</option></select><select id="savedOccasion" aria-label="FILTRAR IDEIAS POR OCASIÃO"><option value="TODAS">TODAS AS OCASIÕES</option><option>NATAL</option><option>PÁSCOA</option><option>HALLOWEEN</option><option>SÃO JOÃO</option><option>DIA DOS NAMORADOS</option><option>DIA DAS MÃES</option><option>CARNAVAL</option><option>ANO NOVO</option><option>DIA DAS CRIANÇAS</option></select></div>
+<div class="saved-filters"><select id="savedCategory" aria-label="FILTRAR IDEIAS POR CATEGORIA"><option value="TODAS">TODAS AS CATEGORIAS</option><option>CHOCOLATUDO</option><option>COMERCIAL</option><option>HYPADO</option><option>FRUTADO</option><option>EXÓTICO</option><option>MADURO</option><option>COMFORT</option><option>SEM RECHEIO</option><option>FERRERO</option></select><select id="savedType" aria-label="FILTRAR IDEIAS POR PRODUTO"><option value="TODOS">TODOS OS PRODUTOS</option><option value="DOT">DOT COOKIES</option><option value="BROOKIE">BROOKIE</option><option value="COOKIE">COOKIE</option><option value="ICE">ICE COOKIE</option></select><select id="savedOccasion" aria-label="FILTRAR IDEIAS POR OCASIÃO"><option value="TODAS">TODAS AS OCASIÕES</option><option>NATAL</option><option>PÁSCOA</option><option>HALLOWEEN</option><option>SÃO JOÃO</option><option>DIA DOS NAMORADOS</option><option>DIA DAS MÃES</option><option>CARNAVAL</option><option>ANO NOVO</option><option>DIA DAS CRIANÇAS</option></select></div>
 <div class="saved-list" id="savedList"><p class="empty">suas ideias favoritas vão aparecer aqui.</p></div>
 </section>
 <footer><strong>★ COSMOS ★</strong><span>NOT YOUR REGULAR COOKIE</span><small>EST. 2024</small></footer>
@@ -121,55 +129,138 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 <script>
 (function(){
 'use strict';
-const ideas = [
-{type:'DOT',category:'CHOCOLATUDO',name:'TRIPLO CACAU',parts:[['MASSA','massa de cacau intenso'],['RECHEIO','ganache cremosa de chocolate blend'],['MIÇANGAS NO TOPO','marrom + bege + dourado']]},
-{type:'DOT',category:'COMERCIAL',name:'BAUNILHA & MORANGO',parts:[['MASSA','massa amanteigada de baunilha'],['RECHEIO','brigadeiro branco com geleia de morango'],['MIÇANGAS NO TOPO','rosa + branco']]},
-{type:'DOT',category:'HYPADO',name:'PISTACHE DREAM',parts:[['MASSA','massa de pistache'],['RECHEIO','creme fluido de chocolate branco com pasta de pistache e kadayif crocante'],['MIÇANGAS NO TOPO','verde + branco + dourado']]},
-{type:'DOT',category:'FRUTADO',name:'TROPICAL POP',parts:[['MASSA','massa de baunilha com raspas de limão'],['RECHEIO','creme fluido de chocolate branco com maracujá'],['MIÇANGAS NO TOPO','amarelo + branco']]},
-{type:'DOT',category:'EXÓTICO',name:'Gergelim & Yuzu',parts:[['MASSA','massa de gergelim preto'],['RECHEIO','ganache cítrica de yuzu ou limão-siciliano'],['MIÇANGAS NO TOPO','preto + amarelo + branco']]},
-{type:'DOT',category:'MADURO',name:'CAFÉ & LARANJA',parts:[['MASSA','massa de café e chocolate amargo'],['RECHEIO','caramelo de laranja'],['MIÇANGAS NO TOPO','cobre + marrom']]},
-{type:'DOT',category:'COMFORT',name:'CINNAMON SUGAR',parts:[['MASSA','massa de açúcar mascavo e canela'],['RECHEIO','doce de leite cremoso'],['MIÇANGAS NO TOPO','branco + caramelo']]},
-{type:'DOT',category:'SEM RECHEIO',name:'CONFETTI CRUNCH',parts:[['MASSA','massa amanteigada com baunilha'],['RECHEIO','sem recheio'],['MIÇANGAS NO TOPO','rosa + azul + amarelo']]},
-{type:'DOT',category:'FERRERO',name:'KINDER BUENO',parts:[['MASSA','massa clara com avelã torrada'],['RECHEIO','creme fluido de chocolate branco com pasta de avelã'],['MIÇANGAS NO TOPO','branco + marrom + dourado']]},
-
-{type:'BROOKIE',category:'CHOCOLATUDO',name:'DARK MATTER',parts:[['COOKIE','cookie de cacau black'],['BROWNIE','brownie intenso de chocolate  meio amargo'],['RECHEIO','ganache cremosa de chocolate blend intenso'],['TOPPING','lascas de chocolate e nibs de cacau']]},
-{type:'BROOKIE',category:'COMERCIAL',name:'NINHO COM MORANGO',parts:[['COOKIE','cookie de baunilha'],['BROWNIE','brownie tradicional'],['RECHEIO','creme fluido de chocolate branco com leite em pó e geleia de morango'],['TOPPING','farelo de leite em pó e morango liofilizado']]},
-{type:'BROOKIE',category:'HYPADO',name:'PISTACHE KADAYIF',parts:[['COOKIE','cookie de pistache'],['BROWNIE','brownie de chocolate ao leite'],['RECHEIO','creme fluido de chocolate branco com pasta de pistache e kadayif'],['TOPPING','pistache picado e fios de chocolate']]},
-{type:'BROOKIE',category:'FRUTADO',name:'BANANA CARAMELIZADA',parts:[['COOKIE','cookie de canela'],['BROWNIE','brownie de chocolate branco'],['RECHEIO','caramelo de banana'],['TOPPING','banana desidratada e farofa crocante']]},
-{type:'BROOKIE',category:'EXÓTICO',name:'MISSÔ & GERGELIM',parts:[['COOKIE','cookie de chocolate branco e missô'],['BROWNIE','brownie de gergelim preto'],['RECHEIO','caramelo de missô'],['TOPPING','gergelim tostado e flor de sal']]},
-{type:'BROOKIE',category:'MADURO',name:'CAFÉ, NOZES & AMARGO',parts:[['COOKIE','cookie de café'],['BROWNIE','brownie 70%'],['RECHEIO','ganache de chocolate amargo'],['TOPPING','nozes tostadas e cacau']]},
-{type:'BROOKIE',category:'COMFORT',name:'S’MORES',parts:[['COOKIE','cookie tradicional com baunilha'],['BROWNIE','brownie fudgy'],['RECHEIO','creme de marshmallow'],['TOPPING','marshmallow tostado e biscoito triturado']]},
-{type:'BROOKIE',category:'SEM RECHEIO',name:'COOKIE & BROWNIE CLÁSSICO',parts:[['COOKIE','cookie de chocolate ao leite'],['BROWNIE','brownie tradicional'],['RECHEIO','sem recheio'],['TOPPING','gotas de chocolate e flor de sal']]},
-{type:'BROOKIE',category:'FERRERO',name:'ROCHER',parts:[['COOKIE','cookie de avelã e chocolate'],['BROWNIE','brownie de chocolate ao leite'],['RECHEIO','creme fluido de chocolate branco com pasta de avelã e wafer crocante'],['TOPPING','avelã tostada e chocolate ao leite']]},
-
-{type:'COOKIE',category:'CHOCOLATUDO',name:'CHOCO OVERLOAD',parts:[['MASSA','massa de cacau com pedaços de chocolate meio amargo'],['RECHEIO','ganache de chocolate  intenso'],['RECHEIO COMPLEMENTAR','opcional: caramelo de cacau'],['TOPPING','empanar em cacau ou finalizar com raspas de chocolate']]},
-{type:'COOKIE',category:'COMERCIAL',name:'RED VELVET',parts:[['MASSA','massa red velvet amanteigada'],['RECHEIO','creme de cream cheese'],['RECHEIO COMPLEMENTAR','opcional: geleia de frutas vermelhas'],['TOPPING','farelo de red velvet antes de assar']]},
-{type:'COOKIE',category:'HYPADO',name:'DUBAI PISTACHE',parts:[['MASSA','massa de baunilha com pistache'],['RECHEIO','creme fluido de chocolate branco com pasta de pistache e kadayif crocante'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate ao leite'],['TOPPING','pistache picado e fios de chocolate depois de assar']]},
-{type:'COOKIE',category:'FRUTADO',name:'LIMÃO & FRAMBOESA',parts:[['MASSA','massa de limão-siciliano'],['RECHEIO','ganache fluida de chocolate branco com limão-siciliano'],['RECHEIO COMPLEMENTAR','opcional: geleia de framboesa'],['TOPPING','açúcar cítrico ou framboesa liofilizada depois de assar']]},
-{type:'COOKIE',category:'FRUTADO',name:'PIÑA COLADA',occasion:'TODAS',parts:[['MASSA','massa de coco saborizada com leite de coco e suco de abacaxi'],['RECHEIO','compota de abacaxi'],['RECHEIO COMPLEMENTAR','brigadeiro de coco bem cremoso, em ponto mais fluido'],['TOPPING','coco ralado para empanar']]},
-{type:'COOKIE',category:'HYPADO',name:'CHIPS & CHOCOLATE',parts:[['MASSA','massa de manteiga noisette com baunilha'],['RECHEIO','ganache cremosa de chocolate blend'],['RECHEIO COMPLEMENTAR','opcional: caramelo salgado'],['TOPPING','batata chips triturada e pedaços crocantes para finalizar']]},
-{type:'COOKIE',category:'HYPADO',name:'LOTUS CRUNCH',parts:[['MASSA','massa de baunilha com manteiga noisette'],['RECHEIO','creme fluido de chocolate branco com pasta de Lotus Biscoff'],['RECHEIO COMPLEMENTAR','creme de Lotus com pedaços de biscoito'],['TOPPING','farofa de biscoito Lotus para finalizar']]},
-{type:'COOKIE',category:'HYPADO',name:'MORANGO CRAVEJADO',parts:[['MASSA','massa de baunilha'],['RECHEIO','creme fluido de chocolate branco com morango'],['RECHEIO COMPLEMENTAR','compota concentrada de morango'],['TOPPING','crocante de caramelo vermelho inspirado no morango cravejado']]},
-{type:'COOKIE',category:'HYPADO',name:'NUTELLA CRUNCH',parts:[['MASSA','massa de baunilha com manteiga noisette'],['RECHEIO','Nutella cremosa'],['RECHEIO COMPLEMENTAR','creme fluido de chocolate branco com pasta de avelã'],['TOPPING','avelã tostada e wafer crocante']]},
-{type:'COOKIE',category:'COMERCIAL',name:'NINHO & NUTELLA',parts:[['MASSA','massa saborizada com leite em pó'],['RECHEIO','Nutella cremosa'],['RECHEIO COMPLEMENTAR','brigadeiro de leite em pó'],['TOPPING','farofa de leite em pó']]},
-{type:'COOKIE',category:'COMFORT',name:'PAÇOCA JUNINA',occasion:'SÃO JOÃO',parts:[['MASSA','massa de baunilha com amendoim torrado'],['RECHEIO','creme fluido de chocolate branco com pasta de paçoca'],['RECHEIO COMPLEMENTAR','doce de leite cremoso'],['TOPPING','farofa de paçoca para empanar']]},
-{type:'COOKIE',category:'COMFORT',name:'MILHO & DOCE DE LEITE',occasion:'SÃO JOÃO',parts:[['MASSA','massa saborizada com milho e manteiga noisette'],['RECHEIO','creme fluido de chocolate branco com milho-verde'],['RECHEIO COMPLEMENTAR','doce de leite cremoso'],['TOPPING','farofa de paçoca ou milho crocante']]},
-{type:'COOKIE',category:'COMFORT',name:'COOKIE PUDIM',parts:[['MASSA','massa de leite em pó saborizada com leite condensado'],['RECHEIO','ganache fluida de chocolate branco sabor pudim'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','caramelo']]},
-{type:'COOKIE',category:'EXÓTICO',name:'GOIABA, QUEIJO & PIMENTA ROSA',parts:[['MASSA','massa amanteigada com toque de queijo'],['RECHEIO','goiabada cremosa'],['RECHEIO COMPLEMENTAR','opcional: cream cheese'],['TOPPING','pimenta rosa levemente triturada antes de assar']]},
-{type:'COOKIE',category:'MADURO',name:'FIGO, MEL & NOZES',parts:[['MASSA','massa de manteiga noisette'],['RECHEIO','geleia de figo'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate amargo'],['TOPPING','nozes tostadas e um fio de mel depois de assar']]},
-{type:'COOKIE',category:'COMFORT',name:'BANANA BREAD',parts:[['MASSA','massa de banana e canela'],['RECHEIO','doce de leite'],['RECHEIO COMPLEMENTAR','opcional: creme de cream cheese'],['TOPPING','farofa amanteigada antes de assar']]},
-{type:'COOKIE',category:'SEM RECHEIO',name:'BROWN BUTTER CHUNK',parts:[['MASSA','massa de manteiga noisette com chocolate em pedaços'],['RECHEIO','sem recheio'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','flor de sal depois de assar']]},
-{type:'COOKIE',category:'COMFORT',name:'PAÇOCA & DOCE DE LEITE',occasion:'SÃO JOÃO',parts:[['MASSA','massa de baunilha com amendoim torrado'],['RECHEIO','doce de leite cremoso'],['RECHEIO COMPLEMENTAR','creme de paçoca'],['TOPPING','farofa de paçoca']]},
-{type:'COOKIE',category:'FERRERO',name:'RAFFAELLO',parts:[['MASSA','massa de coco e baunilha'],['RECHEIO','creme fluido de chocolate branco com pasta de amêndoas'],['RECHEIO COMPLEMENTAR','opcional: creme de coco'],['TOPPING','coco em flocos e amêndoa triturada antes de assar']]}
-];
 const $=id=>document.getElementById(id);
-let type='DOT',filter='TODAS',occasion='TODAS',current=null;
+const categories=['CHOCOLATUDO','COMERCIAL','HYPADO','FRUTADO','EXÓTICO','MADURO','COMFORT','SEM RECHEIO','FERRERO'];
+const occasions=['NATAL','PÁSCOA','HALLOWEEN','SÃO JOÃO','DIA DOS NAMORADOS','DIA DAS MÃES','CARNAVAL','ANO NOVO','DIA DAS CRIANÇAS'];
+const ideas=[];
+function add(type,category,name,mass,chocolate,filling,complement,topping,occasion,keys=[]){
+ let parts=[];
+ if(type==='COOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING',topping||'sem topping adicional']];
+ if(type==='DOT') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING / MIÇANGAS',topping||'miçangas coloridas']];
+ if(type==='BROOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['BROWNIE',complement||'brownie tradicional'],['RECHEIO',filling],['TOPPING',topping||'sem topping adicional']];
+ if(type==='ICE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['SORVETE',filling],['COMPLEMENTO DO SORVETE',complement||'sem complemento adicional']];
+ const id=[type,category,occasion||'GERAL',name].join('|');
+ ideas.push({id,type,category,name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
+}
+const B='chocolate blend em gotas ou pedaços';
+const W='chocolate branco em gotas ou pedaços';
+const M='chocolate ao leite em gotas ou pedaços';
+// COOKIE: sabores gerais, com componentes separados e recheios de textura cremosa.
+add('COOKIE','CHOCOLATUDO','TRIPLO CACAU','massa de cacau 50% com manteiga noisette',B,'ganache cremosa de chocolate blend','caramelo salgado cremoso','pedaços de chocolate blend para finalizar',null,['cacau','chocolate','caramelo']);
+add('COOKIE','CHOCOLATUDO','BROWNIE TRUFFLE','massa de cacau intenso',B,'ganache fluida de chocolate branco com cacau','trufa cremosa de chocolate blend','nibs de cacau',null,['cacau','chocolate']);
+add('COOKIE','CHOCOLATUDO','CHOCOLATE QUENTE','massa de chocolate 50% com baunilha',B,'creme fluido de chocolate branco com cacau','marshmallow cremoso','mini marshmallows tostados',null,['chocolate','cacau','marshmallow']);
+add('COOKIE','COMERCIAL','NINHO & NUTELLA','massa saborizada com leite em pó',B,'Nutella cremosa','creme fluido de chocolate branco com leite em pó','farofa fina de leite em pó',null,['leite ninho','nutella','avelã']);
+add('COOKIE','COMERCIAL','RED VELVET','massa red velvet amanteigada',W,'creme de cream cheese','compota de frutas vermelhas','farelo de red velvet',null,['red velvet','cream cheese','frutas vermelhas']);
+add('COOKIE','COMERCIAL','OREO & NINHO','massa de baunilha com pedaços de Oreo',B,'creme fluido de chocolate branco com leite em pó','creme de Oreo','farelo de Oreo',null,['oreo','leite ninho']);
+add('COOKIE','COMERCIAL','KINDER BUENO','massa de baunilha com avelã tostada',B,'creme fluido de chocolate branco com pasta de avelã','creme de avelã','avelã picada e wafer',null,['kinder','avelã','chocolate']);
+add('COOKIE','HYPADO','CHIPS & CHOCOLATE','massa de manteiga noisette com baunilha',B,'ganache cremosa de chocolate blend','caramelo salgado','empanar completamente em batata chips triturada',null,['batata chips','chocolate','caramelo']);
+add('COOKIE','HYPADO','LOTUS CRUNCH','massa de baunilha com manteiga noisette',W,'creme fluido de chocolate branco com pasta de Lotus Biscoff','creme de Lotus com pedacinhos de biscoito','farofa de Lotus',null,['lotus','biscoff','chocolate branco']);
+add('COOKIE','HYPADO','PISTACHE KADAYIF','massa de baunilha com pasta de pistache',B,'creme fluido de chocolate branco com pasta de pistache','kadayif crocante','pistache picado',null,['pistache','kadayif']);
+add('COOKIE','FRUTADO','LIMÃO & FRAMBOESA','massa saborizada com limão-siciliano',W,'ganache fluida de chocolate branco com limão-siciliano','geleia de framboesa','açúcar cítrico',null,['limão','framboesa','chocolate branco']);
+add('COOKIE','FRUTADO','LIMÃO & MORANGO','massa de limão',W,'creme fluido de chocolate branco com morango','compota de morango','morango liofilizado',null,['limão','morango']);
+add('COOKIE','FRUTADO','LIMÃO & AMORA','massa de limão-siciliano',W,'creme de chocolate branco com amora','geleia de amora','amora liofilizada',null,['limão','amora']);
+add('COOKIE','FRUTADO','LARANJA & CHOCOLATE','massa de laranja com raspas naturais',B,'ganache cremosa de chocolate blend','geleia de laranja','raspas de laranja cristalizadas',null,['laranja','chocolate']);
+add('COOKIE','FRUTADO','MORANGO & IOGURTE','massa de baunilha',W,'creme fluido de chocolate branco com iogurte','compota de morango','morango liofilizado',null,['morango','iogurte']);
+add('COOKIE','FRUTADO','MORANGO & NINHO','massa saborizada com leite em pó',W,'creme fluido de chocolate branco com leite em pó','geleia concentrada de morango','leite em pó peneirado',null,['morango','leite ninho']);
+add('COOKIE','FRUTADO','ABACAXI & COCO','massa de coco com leite de coco e suco de abacaxi',W,'compota de abacaxi','brigadeiro de coco cremoso','coco ralado para empanar',null,['abacaxi','coco']);
+add('COOKIE','FRUTADO','FRUTAS VERMELHAS & CACAU','massa de cacau 50%',B,'ganache cremosa de chocolate blend','compota de frutas vermelhas','frutas vermelhas liofilizadas',null,['frutas vermelhas','cacau','chocolate']);
+add('COOKIE','FRUTADO','MARACUJÁ & COCO','massa de coco saborizada com leite de coco',W,'creme fluido de chocolate branco com maracujá','curd de maracujá','coco em flocos',null,['maracujá','coco']);
+add('COOKIE','FRUTADO','BANANA & DOCE DE LEITE','massa de banana com canela',B,'doce de leite cremoso','banana caramelizada','farofa amanteigada fina',null,['banana','doce de leite']);
+add('COOKIE','EXÓTICO','GOIABA & QUEIJO','massa amanteigada com toque de queijo',W,'goiabada cremosa','creme de cream cheese','farofinha de queijo',null,['goiaba','queijo']);
+add('COOKIE','MADURO','FIGO & NOZES','massa de manteiga noisette',B,'geleia de figo','ganache cremosa de chocolate amargo','nozes tostadas',null,['figo','nozes','manteiga noisette']);
+add('COOKIE','COMFORT','BANANA BREAD','massa de banana com canela e manteiga noisette',B,'doce de leite cremoso','creme de cream cheese','farofa amanteigada',null,['banana','doce de leite','canela']);
+add('COOKIE','SEM RECHEIO','BROWN BUTTER CHUNK','massa de manteiga noisette e baunilha',B,'sem recheio','não se aplica','flor de sal',null,['manteiga noisette','chocolate']);
+add('COOKIE','FERRERO','RAFFAELLO','massa de coco e baunilha',W,'creme fluido de chocolate branco com pasta de amêndoas','creme de coco','coco em flocos e amêndoas',null,['rafaello','coco','amêndoas']);
+add('COOKIE','FERRERO','ROCHER','massa de avelã tostada',B,'creme fluido de chocolate branco com pasta de avelã','creme de avelã','avelã picada e wafer',null,['ferrero','avelã']);
+add('COOKIE','COMFORT','S’MORES','massa de baunilha com manteiga noisette',B,'creme de marshmallow','ganache de chocolate blend','biscoito triturado e marshmallow tostado',null,['marshmallow','chocolate','biscoito']);
+// DOT COOKIES: mesma lógica de sabor, com decoração simples.
+add('DOT','CHOCOLATUDO','DOT TRUFA','massa de cacau 50%',B,'ganache cremosa de chocolate blend','caramelo cremoso','miçangas marrom e dourado',null,['cacau','chocolate']);
+add('DOT','COMERCIAL','DOT MORANGO NINHO','massa de baunilha',W,'creme fluido de chocolate branco com leite em pó e morango','compota de morango','miçangas rosa e brancas',null,['morango','leite ninho']);
+add('DOT','HYPADO','DOT PISTACHE','massa de pistache',W,'creme fluido de chocolate branco com pasta de pistache','creme de pistache','miçangas verdes e douradas',null,['pistache']);
+add('DOT','FRUTADO','DOT LIMÃO FRAMBOESA','massa de limão',W,'creme fluido de chocolate branco com framboesa','geleia de framboesa','miçangas rosa e amarelas',null,['limão','framboesa']);
+add('DOT','FRUTADO','DOT MARACUJÁ','massa de baunilha com maracujá',W,'creme fluido de chocolate branco com maracujá','curd de maracujá','miçangas amarelas',null,['maracujá']);
+add('DOT','COMFORT','DOT DOCE DE LEITE','massa de baunilha com manteiga noisette',B,'doce de leite cremoso','caramelo','miçangas caramelo',null,['doce de leite','caramelo']);
+add('DOT','FERRERO','DOT KINDER','massa de baunilha',B,'creme fluido de chocolate branco com pasta de avelã','creme de avelã','miçangas brancas e marrons',null,['kinder','avelã']);
+// BROOKIE: cookie + brownie + recheio; topping de execução prática.
+add('BROOKIE','CHOCOLATUDO','BROOKIE TRIPLO CHOCOLATE','massa de cookie de cacau',B,'ganache cremosa de chocolate blend','brownie de chocolate 50%','nibs de cacau',null,['cacau','chocolate','brownie']);
+add('BROOKIE','COMERCIAL','BROOKIE NINHO NUTELLA','massa de cookie de baunilha',B,'Nutella cremosa','brownie tradicional','farofa de leite em pó',null,['leite ninho','nutella','brownie']);
+add('BROOKIE','HYPADO','BROOKIE PISTACHE','massa de cookie de pistache',B,'creme fluido de chocolate branco com pasta de pistache','brownie de chocolate blend','pistache picado',null,['pistache','brownie']);
+add('BROOKIE','FRUTADO','BROOKIE MORANGO','massa de cookie de baunilha',W,'creme fluido de chocolate branco com morango','brownie de chocolate branco e compota de morango','morango liofilizado',null,['morango','chocolate branco']);
+add('BROOKIE','FRUTADO','BROOKIE BANOFFEE','massa de cookie de canela',B,'doce de leite cremoso','brownie de banana','farofa de biscoito',null,['banana','doce de leite','canela']);
+add('BROOKIE','EXÓTICO','BROOKIE GOIABADA & QUEIJO','massa de cookie com queijo',B,'goiabada cremosa','brownie de chocolate blend','farofa de queijo',null,['goiaba','queijo']);
+add('BROOKIE','MADURO','BROOKIE CAFÉ & NOZES','massa de cookie de café',B,'ganache de chocolate blend intenso','brownie 70%','nozes tostadas',null,['café','nozes','chocolate']);
+add('BROOKIE','COMFORT','BROOKIE S’MORES','massa de cookie de baunilha',B,'creme de marshmallow','brownie tradicional','marshmallow tostado',null,['marshmallow','chocolate']);
+add('BROOKIE','SEM RECHEIO','BROOKIE CLÁSSICO','massa de cookie com manteiga noisette',B,'sem recheio','brownie tradicional','flor de sal',null,['manteiga noisette','brownie']);
+add('BROOKIE','FERRERO','BROOKIE ROCHER','massa de cookie de avelã',B,'creme fluido de chocolate branco com pasta de avelã','brownie de chocolate blend','avelã e wafer crocante',null,['ferrero','avelã']);
+// ICE COOKIE: cookie assado com chocolate + base de sorvete + complemento incorporado/mesclado.
+add('ICE','CHOCOLATUDO','ICE COOKIE CHOCO FUDGE','massa de cacau 50%',B,'sorvete de chocolate blend','fudge cremoso de chocolate','',null,['chocolate','cacau','sorvete']);
+add('ICE','COMERCIAL','ICE COOKIE NINHO & MORANGO','massa de baunilha',W,'sorvete de leite em pó','compota de morango','',null,['leite ninho','morango','sorvete']);
+add('ICE','HYPADO','ICE COOKIE PISTACHE','massa de baunilha com pistache',B,'sorvete de pistache','creme de pistache e kadayif crocante','',null,['pistache','sorvete']);
+add('ICE','FRUTADO','ICE COOKIE LIMÃO & FRAMBOESA','massa de limão',B,'sorvete de iogurte e limão','calda de framboesa','',null,['limão','framboesa','sorvete']);
+add('ICE','FRUTADO','ICE COOKIE ABACAXI & COCO','massa de coco',W,'sorvete de coco','abacaxi em compota','',null,['abacaxi','coco','sorvete']);
+add('ICE','COMFORT','ICE COOKIE DOCE DE LEITE','massa de baunilha com manteiga noisette',B,'sorvete de doce de leite','mescla de caramelo','',null,['doce de leite','caramelo','sorvete']);
+add('ICE','FERRERO','ICE COOKIE KINDER','massa de baunilha',B,'sorvete de avelã','creme de chocolate branco com avelã','',null,['kinder','avelã','sorvete']);
+// DATAS SAZONAIS: cada ocasião recebe opções temáticas em diferentes formatos.
+add('COOKIE','COMFORT','GINGERBREAD DE NATAL','massa de gingerbread com canela, gengibre e noz-moscada',B,'creme fluido de chocolate branco com especiarias','doce de leite cremoso','açúcar com canela', 'NATAL',['natal','gingerbread','canela']);
+add('COOKIE','COMFORT','CHOCOLATE QUENTE & MARSHMALLOW','massa de chocolate 50%',B,'ganache cremosa de chocolate blend','creme de marshmallow','mini marshmallows tostados','NATAL',['natal','chocolate','marshmallow']);
+add('COOKIE','FRUTADO','CEREJA NEVADA','massa de baunilha',W,'creme fluido de chocolate branco','compota de cereja','açúcar nevado e cereja liofilizada','NATAL',['natal','cereja','chocolate branco']);
+add('COOKIE','HYPADO','CANDY CANE','massa de baunilha com hortelã suave',W,'ganache fluida de chocolate branco','creme de peppermint','farelo de bengalinha doce','NATAL',['natal','menta','chocolate branco']);
+add('DOT','COMFORT','DOT RABANADA','massa de baunilha com canela',B,'creme de leite condensado e canela','doce de leite','açúcar e canela','NATAL',['natal','rabanada','canela']);
+add('BROOKIE','COMFORT','BROOKIE PAVÊ DE NATAL','massa de cookie de baunilha',B,'creme de baunilha','brownie de chocolate blend','farelo de biscoito e raspas de chocolate','NATAL',['natal','pavê','chocolate']);
+add('ICE','FRUTADO','ICE COOKIE CEREJA & CHOCOLATE','massa de baunilha',B,'sorvete de cereja','calda de cereja','', 'NATAL',['natal','cereja','sorvete']);
+add('COOKIE','FERRERO','OVINHOS KINDER','massa de baunilha',B,'creme fluido de chocolate branco com avelã','creme de Kinder','ovinhos de chocolate coloridos','PÁSCOA',['páscoa','kinder','avelã']);
+add('COOKIE','CHOCOLATUDO','BOLO DE CENOURA','massa saborizada com cenoura e especiarias',B,'ganache cremosa de chocolate blend','brigadeiro de chocolate','farofa de bolo de cenoura','PÁSCOA',['páscoa','cenoura','chocolate']);
+add('DOT','COMERCIAL','DOT OVINHOS PASTEL','massa de baunilha',W,'brigadeiro branco cremoso','creme de leite em pó','ovinhos crocantes em tons pastel','PÁSCOA',['páscoa','chocolate branco','leite ninho']);
+add('BROOKIE','CHOCOLATUDO','BROOKIE KINDER OVO','massa de cookie de baunilha',B,'creme de avelã','brownie de chocolate blend','mini ovinhos de chocolate','PÁSCOA',['páscoa','kinder','chocolate']);
+add('ICE','COMERCIAL','ICE COOKIE OVO DE PÁSCOA','massa de baunilha',B,'sorvete de chocolate ao leite','ovinhos crocantes coloridos','', 'PÁSCOA',['páscoa','ovinhos','sorvete']);
+add('COOKIE','EXÓTICO','COOKIE MÚMIA','massa de cacau black',W,'ganache fluida de chocolate branco','creme de baunilha','faixas de chocolate branco e olhinhos de açúcar','HALLOWEEN',['halloween','cacau black','chocolate branco']);
+add('COOKIE','FRUTADO','COOKIE VULCÃO RUBRO','massa red velvet vibrante',B,'geleia espessa de morango','creme de chocolate branco','empanar em cacau black e finalizar com olhos de gelatina','HALLOWEEN',['halloween','morango','red velvet','cacau black']);
+add('DOT','EXÓTICO','DOT RADIOATIVO','massa de baunilha tingida de verde neon',W,'creme fluido de chocolate branco com limão','ganache de limão','miçangas verde neon','HALLOWEEN',['halloween','limão','verde']);
+add('BROOKIE','CHOCOLATUDO','BROOKIE BLACK & BLOOD','massa de cookie cacau black',B,'geleia de frutas vermelhas','brownie de chocolate intenso','fios de chocolate vermelho','HALLOWEEN',['halloween','frutas vermelhas','cacau black']);
+add('ICE','EXÓTICO','ICE COOKIE MONSTRO VERDE','massa de baunilha com cacau black',W,'sorvete de pistache verde','calda verde cítrica','', 'HALLOWEEN',['halloween','pistache','sorvete']);
+add('COOKIE','COMFORT','PAMONHA DOCE','massa saborizada com milho e manteiga noisette',W,'creme de milho-verde','doce de leite cremoso','canela fina','SÃO JOÃO',['são joão','milho','pamonha']);
+add('COOKIE','COMFORT','CURAL COM CANELA','massa de milho-verde',W,'creme fluido de chocolate branco com milho','curau cremoso','canela para finalizar','SÃO JOÃO',['são joão','milho','curau']);
+add('COOKIE','EXÓTICO','BOLO DE MILHO, GOIABADA & QUEIJO','massa de milho com manteiga noisette',B,'goiabada cremosa','creme de queijo','farofinha de queijo','SÃO JOÃO',['são joão','milho','goiaba','queijo']);
+add('COOKIE','COMFORT','PÉ DE MOÇA','massa de baunilha com amendoim torrado',B,'doce de leite cremoso','creme de pé de moça','amendoim caramelizado','SÃO JOÃO',['são joão','amendoim','pé de moça']);
+add('DOT','COMFORT','DOT COCO & AMENDOIM','massa de coco',W,'creme de amendoim','brigadeiro de coco','amendoim triturado','SÃO JOÃO',['são joão','coco','amendoim']);
+add('BROOKIE','COMFORT','BROOKIE QUENTÃO','massa de cookie com especiarias e raspas de laranja',B,'doce de leite com gengibre','brownie de chocolate blend','açúcar com canela','SÃO JOÃO',['são joão','quentão','laranja','canela']);
+add('ICE','COMFORT','ICE COOKIE MILHO & COCO','massa de milho',W,'sorvete de coco','calda de milho-verde','', 'SÃO JOÃO',['são joão','milho','coco','sorvete']);
+add('COOKIE','FRUTADO','MORANGO & CHAMPANHE','massa de baunilha com toque de champanhe',W,'creme fluido de chocolate branco com morango','compota de morango','morango liofilizado','DIA DOS NAMORADOS',['dia dos namorados','morango','champanhe']);
+add('COOKIE','CHOCOLATUDO','RED VELVET HEART','massa red velvet',B,'ganache cremosa de chocolate blend','creme de cream cheese','farelo vermelho em formato de coração','DIA DOS NAMORADOS',['dia dos namorados','red velvet','chocolate']);
+add('DOT','FRUTADO','DOT CEREJA & CHOCOLATE','massa de baunilha',B,'creme fluido de chocolate branco com cereja','compota de cereja','miçangas vermelhas','DIA DOS NAMORADOS',['dia dos namorados','cereja','chocolate']);
+add('BROOKIE','CHOCOLATUDO','BROOKIE MORANGO TRUFADO','massa de cookie red velvet',B,'ganache de chocolate blend','brownie de chocolate','geleia de morango e raspas de chocolate','DIA DOS NAMORADOS',['dia dos namorados','morango','chocolate']);
+add('ICE','FRUTADO','ICE COOKIE MORANGO & ROSAS','massa de baunilha',W,'sorvete de morango','calda de frutas vermelhas com toque de água de rosas','', 'DIA DOS NAMORADOS',['dia dos namorados','morango','sorvete']);
+add('COOKIE','FRUTADO','PIÑA COLADA DE DIA DAS MÃES','massa de coco com leite de coco e suco de abacaxi',W,'compota de abacaxi','brigadeiro de coco cremoso','coco em flocos para empanar','DIA DAS MÃES',['dia das mães','abacaxi','coco']);
+add('COOKIE','FRUTADO','MORANGO & NINHO DELICADO','massa saborizada com leite em pó',W,'creme fluido de chocolate branco com leite em pó','geleia de morango','leite em pó peneirado','DIA DAS MÃES',['dia das mães','morango','leite ninho']);
+add('DOT','FRUTADO','DOT FLOR DE LARANJEIRA','massa de baunilha com água de flor de laranjeira',W,'creme de chocolate branco com laranja','compota de damasco','miçangas brancas e douradas','DIA DAS MÃES',['dia das mães','laranja','damasco']);
+add('BROOKIE','COMFORT','BROOKIE COCO & ABACAXI','massa de cookie de coco',W,'brigadeiro de coco cremoso','brownie de chocolate branco com abacaxi','coco tostado','DIA DAS MÃES',['dia das mães','coco','abacaxi']);
+add('ICE','FRUTADO','ICE COOKIE MORANGO & IOGURTE','massa de baunilha',W,'sorvete de iogurte','calda de morango','', 'DIA DAS MÃES',['dia das mães','morango','iogurte','sorvete']);
+add('COOKIE','EXÓTICO','CONFETE DE CARNAVAL','massa de baunilha',W,'brigadeiro branco cremoso','ganache colorida em tons vibrantes','confeitos coloridos prontos','CARNAVAL',['carnaval','confeitos','chocolate branco']);
+add('DOT','COMERCIAL','DOT FRUTAS TROPICAIS','massa de limão',W,'creme fluido de chocolate branco com maracujá','compota de manga','miçangas coloridas','CARNAVAL',['carnaval','maracujá','manga']);
+add('BROOKIE','HYPADO','BROOKIE NEON','massa de cookie de baunilha',W,'ganache de chocolate branco colorida','brownie de chocolate blend','confeitos coloridos','CARNAVAL',['carnaval','chocolate branco','confeitos']);
+add('ICE','FRUTADO','ICE COOKIE TUTTI-FRUTTI','massa de baunilha',W,'sorvete tutti-frutti','calda de frutas coloridas','', 'CARNAVAL',['carnaval','tutti-frutti','sorvete']);
+add('COOKIE','COMFORT','ANO NOVO DOURADO','massa de baunilha com manteiga noisette',W,'creme fluido de chocolate branco com baunilha','caramelo claro','pó perolado dourado comestível','ANO NOVO',['ano novo','baunilha','caramelo']);
+add('COOKIE','FRUTADO','ANO NOVO PROSPERIDADE','massa de limão',W,'creme fluido de chocolate branco com limão','curd de limão tingido de verde','glitter comestível prateado','ANO NOVO',['ano novo','limão','verde']);
+add('DOT','COMERCIAL','DOT CHAMPAGNE','massa de baunilha',W,'ganache fluida de chocolate branco com champanhe','compota de pêssego','miçangas prateadas','ANO NOVO',['ano novo','champanhe','pêssego']);
+add('BROOKIE','CHOCOLATUDO','BROOKIE PRATA & CACAU','massa de cookie de cacau',B,'ganache de chocolate blend','brownie intenso','pó perolado prateado comestível','ANO NOVO',['ano novo','cacau','chocolate']);
+add('ICE','FRUTADO','ICE COOKIE UVA VERDE','massa de baunilha',W,'sorvete de uva verde','calda de maçã verde','', 'ANO NOVO',['ano novo','uva verde','sorvete']);
+add('COOKIE','COMFORT','COOKIE M&M’S','massa de baunilha',M,'creme de chocolate ao leite','creme de leite em pó','M&M’s coloridos','DIA DAS CRIANÇAS',['dia das crianças','m&m','chocolate']);
+add('COOKIE','COMERCIAL','COOKIE KINDER OVO','massa de baunilha',B,'creme fluido de chocolate branco com avelã','creme de Kinder','mini ovinhos de chocolate','DIA DAS CRIANÇAS',['dia das crianças','kinder','avelã']);
+add('COOKIE','COMFORT','COOKIE TORTUGUITA','massa de chocolate 50%',M,'creme de chocolate ao leite','creme de amendoim','casquinha fina de chocolate','DIA DAS CRIANÇAS',['dia das crianças','tortuguita','chocolate']);
+add('DOT','COMFORT','DOT BALA FINI','massa de baunilha',W,'creme fluido de chocolate branco com morango','geleia de morango','mini balas de gelatina em cubinhos','DIA DAS CRIANÇAS',['dia das crianças','fini','morango']);
+add('BROOKIE','COMFORT','BROOKIE NESCAU & CEREAL','massa de cookie de baunilha',M,'creme de chocolate com Nescau','brownie de chocolate ao leite','cereal de chocolate crocante','DIA DAS CRIANÇAS',['dia das crianças','nescau','cereal']);
+add('ICE','COMFORT','ICE COOKIE ALGODÃO-DOCE','massa de baunilha',W,'sorvete de algodão-doce','confeitos coloridos crocantes','', 'DIA DAS CRIANÇAS',['dia das crianças','algodão-doce','sorvete']);
+add('ICE','COMFORT','ICE COOKIE MARSHMALLOW','massa de cacau 50%',B,'sorvete de baunilha com marshmallow','calda de chocolate','', 'DIA DAS CRIANÇAS',['dia das crianças','marshmallow','chocolate','sorvete']);
+const keyOptions=['abacaxi','amendoim','amora','avelã','banana','batata chips','cacau','café','caramelo','cereja','champanhe','chocolate','coco','doce de leite','figo','framboesa','frutas vermelhas','goiaba','iogurte','kadayif','kinder','laranja','leite ninho','limão','lotus','m&m','maracujá','marshmallow','morango','nutella','oreo','pistache','queijo','red velvet','sorvete'];
+keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
+let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null;
 const KEY='cosmos.flavor-generator.saved.v2';
 function getSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
 function setSaved(list){localStorage.setItem(KEY,JSON.stringify(list));renderSaved()}
 function ideaText(idea){return idea.parts.map(p=>p[0]+': '+p[1]).join(' · ')}
+function typeLabel(t){return ({COOKIE:'COOKIE',DOT:'DOT COOKIES',BROOKIE:'BROOKIE',ICE:'ICE COOKIE'})[t]||t}
 function renderIdea(idea){
- $('resultTag').textContent=idea.category+' / '+({DOT:'DOT COOKIES',BROOKIE:'BROOKIE',COOKIE:'COOKIE'}[idea.type])+(idea.occasion&&idea.occasion!=='TODAS'?' / '+idea.occasion:'');
+ $('resultTag').textContent=idea.category+' / '+typeLabel(idea.type)+(idea.occasion&&idea.occasion!=='TODAS'?' / '+idea.occasion:'');
  $('resultName').textContent=idea.name;
  $('resultParts').innerHTML='';
  idea.parts.forEach(part=>{
@@ -181,101 +272,44 @@ function renderIdea(idea){
  $('save').disabled=false;
  $('save').textContent=getSaved().some(x=>x.id===idea.id)?'IDEIA SALVA ✓':'SALVAR IDEIA ☆';
 }
-function chocolateFor(idea){
- const explicit={
-  'PIÑA COLADA':'chocolate branco em gotas ou pedaços (necessário para equilibrar coco e abacaxi)',
-  'COOKIE PUDIM':'chocolate branco em gotas ou pedaços (base da ganache sabor pudim)',
-  'RAFFAELLO':'chocolate branco em gotas ou pedaços (essencial para a composição)',
-  'KINDER BUENO':'chocolate blend em gotas ou pedaços (primeira opção; branco se a composição pedir)',
-  'PISTACHE DREAM':'chocolate blend em gotas ou pedaços (primeira opção)',
-  'DUBAI PISTACHE':'chocolate blend em gotas ou pedaços (primeira opção)',
-  'PISTACHE KADAYIF':'chocolate blend em gotas ou pedaços (primeira opção)',
-  'NINHO & NUTELLA':'chocolate blend em gotas ou pedaços (primeira opção)'
- };
- return explicit[idea.name]||'chocolate blend em gotas ou pedaços (prioridade de uso)';
-}
-function buildParts(idea){
- const parts=idea.parts.map(p=>[p[0],p[1]]);
- // o componente CHOCOLATE aparece nos cookies e brookies, separado da massa e do recheio.
- // DOT mantém a estrutura própria: massa, recheio e miçangas no topo.
- if(idea.type==='COOKIE'){
-  const insertAt=Math.max(0,parts.findIndex(p=>p[0]==='MASSA')+1);
-  parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
- }
- if(idea.type==='BROOKIE'){
-  const insertAt=Math.max(0,parts.findIndex(p=>p[0]==='COOKIE')+1);
-  parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
- }
- return parts;
-}
-let lastGeneratedKey = '';
-function makeTitle(parts){
- const clean=value=>value.replace(/^massa de /i,'').replace(/^massa /i,'').replace(/^cookie de /i,'').replace(/^brownie de /i,'').replace(/^ganache de /i,'').replace(/^creme de /i,'').replace(/^geleia de /i,'').replace(/^doce de leite$/i,'doce de leite').replace(/ depois de assar/ig,'').replace(/ antes de assar/ig,'').trim();
- const main=parts.slice(0,2).map(p=>clean(p[1])).filter(v=>v&&!/^sem recheio|^não se aplica/i.test(v));
- if(main.length>=2)return main[0].split(' ').slice(0,3).join(' ')+' & '+main[1].split(' ').slice(0,3).join(' ');
- return main[0]||'NOVA COMBINAÇÃO';
-}
 function generate(){
- const pool=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter));
- if(!pool.length)return;
- let candidates=pool;
- if(occasion!=='TODAS'){
-  candidates=pool.filter(x=>x.occasion===occasion);
-  if(!candidates.length){
-   $('resultTag').textContent=occasion+' / '+filter;
-   $('resultName').textContent='IDEIA SAZONAL EM CONSTRUÇÃO';
-   $('resultParts').innerHTML='<p class="empty">ainda não temos uma composição validada para esta ocasião nesta categoria. prefiro não marcar uma combinação aleatória como sazonal.</p>';
-   $('save').disabled=true;
-   current=null;
-   return;
-  }
+ let candidates=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter)&&(occasion==='TODAS'||x.occasion===occasion)&&(keyFlavor==='TODOS'||x.keys.some(k=>k.toLocaleLowerCase('pt-BR').includes(keyFlavor)||keyFlavor.includes(k.toLocaleLowerCase('pt-BR')))));
+ if(!candidates.length){
+  $('resultTag').textContent=[filter,occasion,keyFlavor!=='TODOS'?keyFlavor.toUpperCase():null].filter(Boolean).join(' / ');
+  $('resultName').textContent='AINDA NÃO TEMOS ESSA COMBINAÇÃO';
+  $('resultParts').innerHTML='<p class="empty">não encontrei uma composição coerente com todos esses filtros. tente outro ingrediente-chave ou produto.</p>';
+  $('save').disabled=true;current=null;return;
  }
- let base=candidates[Math.floor(Math.random()*candidates.length)];
- if(candidates.length>1&&base.id===lastGeneratedKey)base=candidates.find(x=>x.id!==lastGeneratedKey)||base;
- const candidate={...base,parts:buildParts(base),occasion:occasion};
- candidate.id=base.type+'-'+base.category+'-'+(occasion||'TODAS')+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
- lastGeneratedKey=base.id;
- current=candidate;
+ let choices=candidates.filter(x=>x.id!==current?.id);
+ if(!choices.length)choices=candidates;
+ const base=choices[Math.floor(Math.random()*choices.length)];
+ current={...base,parts:base.parts.map(p=>[...p]),id:base.id+'|'+base.name};
  renderIdea(current);
 }
 function renderSaved(){
  const all=getSaved();
  const category=$('savedCategory').value,typeFilter=$('savedType').value,occasionFilter=$('savedOccasion').value;
  const list=all.filter(idea=>(category==='TODAS'||idea.category===category)&&(typeFilter==='TODOS'||idea.type===typeFilter)&&(occasionFilter==='TODAS'||(idea.occasion||'TODAS')===occasionFilter));
- $('savedCount').textContent=list.length+' de '+all.length+' salvas';
- $('savedList').innerHTML='';
+ $('savedCount').textContent=list.length+' de '+all.length+' salvas';$('savedList').innerHTML='';
  if(!all.length){$('savedList').innerHTML='<p class="empty">suas ideias favoritas vão aparecer aqui.</p>';return}
  if(!list.length){$('savedList').innerHTML='<p class="empty">nenhuma ideia encontrada com esses filtros.</p>';return}
  list.forEach(idea=>{
   const item=document.createElement('div');item.className='saved-item';
   const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=idea.name;
-  const small=document.createElement('small');small.textContent=idea.type+' · '+idea.category+(idea.occasion&&idea.occasion!=='TODAS'?' · '+idea.occasion:'')+' · '+ideaText(idea);
+  const small=document.createElement('small');small.textContent=typeLabel(idea.type)+' · '+idea.category+(idea.occasion&&idea.occasion!=='TODAS'?' · '+idea.occasion:'')+' · '+ideaText(idea);
   info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','remover '+idea.name);
-  remove.addEventListener('click',()=>{setSaved(getSaved().filter(x=>x.id!==idea.id))});
+  remove.addEventListener('click',()=>setSaved(getSaved().filter(x=>x.id!==idea.id)));
   item.append(info,remove);$('savedList').append(item);
  });
 }
-$('types').addEventListener('click',e=>{
- const btn=e.target.closest('[data-type]');if(!btn)return;
- type=btn.dataset.type;document.querySelectorAll('.type').forEach(b=>b.classList.toggle('active',b===btn));generate();
-});
-$('filters').addEventListener('click',e=>{
- const btn=e.target.closest('[data-filter]');if(!btn)return;
- filter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));generate();
-});
-$('occasions').addEventListener('click',e=>{
- const btn=e.target.closest('[data-occasion]');if(!btn)return;
- occasion=btn.dataset.occasion;document.querySelectorAll('#occasions .filter').forEach(b=>b.classList.toggle('active',b===btn));
- generate();
-});
+$('types').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(!b)return;type=b.dataset.type;document.querySelectorAll('.type').forEach(x=>x.classList.toggle('active',x===b));generate()});
+$('filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;document.querySelectorAll('#filters .filter').forEach(x=>x.classList.toggle('active',x===b));generate()});
+$('occasions').addEventListener('click',e=>{const b=e.target.closest('[data-occasion]');if(!b)return;occasion=b.dataset.occasion;document.querySelectorAll('#occasions .filter').forEach(x=>x.classList.toggle('active',x===b));generate()});
+$('keyFlavor').addEventListener('change',()=>{keyFlavor=$('keyFlavor').value;generate()});
 ['savedCategory','savedType','savedOccasion'].forEach(id=>$(id).addEventListener('change',renderSaved));
 $('generate').addEventListener('click',generate);
-$('save').addEventListener('click',()=>{
- if(!current)return;
- const list=getSaved();if(!list.some(x=>x.id===current.id)){list.unshift(current);setSaved(list)}
- $('save').textContent='IDEIA SALVA ✓';
-});
-renderSaved();
+$('save').addEventListener('click',()=>{if(!current)return;const list=getSaved();if(!list.some(x=>x.id===current.id)){list.unshift(current);setSaved(list)}$('save').textContent='IDEIA SALVA ✓'});
+renderSaved();generate();
 })();
 </script>
 </body>
