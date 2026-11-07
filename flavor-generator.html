@@ -153,14 +153,43 @@ function renderIdea(idea){
  $('save').disabled=false;
  $('save').textContent=getSaved().some(x=>x.id===idea.id)?'IDEIA SALVA ✓':'SALVAR IDEIA ☆';
 }
+const componentOptions = {
+ DOT: [
+  ['massa amanteigada de baunilha','massa de cacau','massa de pistache','massa de manteiga noisette','massa de coco e baunilha','massa de canela'],
+  ['ganache de chocolate meio amargo','creme de avelã','brigadeiro branco com geleia de frutas','caramelo cremoso','ganache de frutas cítricas','creme de pistache'],
+  ['rosa + branco','azul + amarelo + rosa','verde + branco + dourado','marrom + bege + dourado','amarelo + branco','lilás + rosa + branco']
+ ],
+ BROOKIE: [
+  ['cookie de baunilha','cookie de cacau','cookie de pistache','cookie de canela','cookie de café','cookie de avelã'],
+  ['brownie tradicional','brownie intenso 70%','brownie de chocolate branco','brownie com cacau black'],
+  ['ganache de chocolate','creme de avelã','doce de leite','caramelo salgado','creme de pistache','geleia de frutas vermelhas'],
+  ['pistache picado e fios de chocolate','flor de sal e nibs de cacau','avelãs tostadas','farofa amanteigada','biscoito triturado e chocolate','frutas liofilizadas']
+ ],
+ COOKIE: [
+  ['massa de baunilha','massa de cacau','massa de pistache','massa de café','massa de limão-siciliano','massa de manteiga noisette','massa de canela','massa de coco'],
+  ['ganache de chocolate','creme de avelã','doce de leite','ganache de frutas cítricas','geleia de frutas vermelhas','creme de pistache','goiabada cremosa','sem recheio'],
+  ['sem recheio complementar','caramelo salgado','geleia de frutas','ganache de chocolate amargo','creme de cream cheese','não se aplica'],
+  ['flor de sal depois de assar','pistache picado depois de assar','farofa amanteigada antes de assar','açúcar cítrico depois de assar','coco em flocos antes de assar','nibs de cacau antes de assar']
+ ]
+};
+let lastGeneratedKey = '';
 function generate(){
  const pool=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter));
  if(!pool.length)return;
- const saved=new Set(getSaved().map(x=>x.id));
- const fresh=pool.filter(x=>!saved.has(x.id));
- const choices=fresh.length?fresh:pool;
- const picked=choices[Math.floor(Math.random()*choices.length)];
- current={...picked,id:picked.type+'-'+picked.category+'-'+picked.name};
+ const base=pool[Math.floor(Math.random()*pool.length)];
+ const options=componentOptions[type];
+ let candidate;
+ for(let attempt=0;attempt<12;attempt++){
+  candidate={...base,parts:base.parts.map((part,index)=>{
+   const choices=options[index]||[part[1]];
+   const value=choices[Math.floor(Math.random()*choices.length)];
+   return [part[0],value];
+  })};
+  candidate.id=base.type+'-'+base.category+'-'+base.name+'-'+candidate.parts.map(p=>p[1]).join('|');
+  if(candidate.id!==lastGeneratedKey)break;
+ }
+ lastGeneratedKey=candidate.id;
+ current=candidate;
  renderIdea(current);
 }
 function renderSaved(){
