@@ -253,6 +253,38 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
       <div class="metric"><span>RECHEIO COMPLEMENTAR NECESSÁRIO</span><strong id="needComp">0 G</strong></div>
     </div>
     <p class="note" id="totalNote"></p>
+
+    <div style="margin-top:22px;">
+      <div class="section-title">RENDIMENTO DAS RECEITAS-BASE</div>
+
+      <div class="metrics">
+        <div class="metric">
+          <span>RENDIMENTO DA MASSA</span>
+          <strong id="yieldMassa">—</strong>
+        </div>
+
+        <div class="metric">
+          <span>RENDIMENTO DO RECHEIO BASE</span>
+          <strong id="yieldBase">—</strong>
+        </div>
+
+        <div class="metric">
+          <span>RENDIMENTO DO COMPLEMENTAR</span>
+          <strong id="yieldComp">—</strong>
+        </div>
+
+        <div class="metric">
+          <span>UNIDADES COMPLETAS POSSÍVEIS</span>
+          <strong id="yieldComplete">—</strong>
+        </div>
+      </div>
+
+      <p class="note">
+        CÁLCULO BASEADO NO PESO TOTAL DE CADA RECEITA E NO PESO UNITÁRIO DEFINIDO.
+        O RENDIMENTO COMPLETO CONSIDERA A PREPARAÇÃO COM MENOR DISPONIBILIDADE.
+      </p>
+    </div>
+
     <p class="note">OS PESOS SÃO DEFINIDOS POR VOCÊ PARA CADA SABOR; A SOMA NÃO PRECISA SER 100 G. COLOQUE 0 G EM UMA PREPARAÇÃO QUE O COOKIE NÃO USA. USE VÍRGULA OU PONTO PARA DECIMAIS.</p>
   </section>
 
@@ -618,6 +650,46 @@ function update(){
   $('needComp').textContent=fmtG(r.needs.comp);
   var tot=nz(state.wMassa)+nz(state.wBase)+nz(state.wComp);
   $('totalNote').textContent='PESO TOTAL POR COOKIE: '+fmtG(tot)+' (MASSA + RECHEIO BASE + RECHEIO COMPLEMENTAR).';
+
+  // RENDIMENTO DAS RECEITAS-BASE
+  var rendimentos = {};
+  var unidadesCompletas = [];
+  var preparacoesValidas = 0;
+  var todasPreparacoesValidas = true;
+
+  SECTIONS.forEach(function(s){
+    var pesoUnitario = nz(state[s.weightId]);
+    var pesoReceita = r[s.key].somaBase;
+
+    if(pesoUnitario > 0 && pesoReceita > 0){
+      rendimentos[s.key] = Math.floor(pesoReceita / pesoUnitario);
+      unidadesCompletas.push(rendimentos[s.key]);
+      preparacoesValidas++;
+    } else {
+      rendimentos[s.key] = null;
+
+      if(pesoUnitario > 0){
+        todasPreparacoesValidas = false;
+      }
+    }
+  });
+
+  $('yieldMassa').textContent =
+    rendimentos.massa === null ? '—' : rendimentos.massa + ' UN.';
+
+  $('yieldBase').textContent =
+    rendimentos.base === null ? '—' : rendimentos.base + ' UN.';
+
+  $('yieldComp').textContent =
+    rendimentos.comp === null ? '—' : rendimentos.comp + ' UN.';
+
+  var totalPossivel = (
+    preparacoesValidas > 0 && todasPreparacoesValidas
+  ) ? Math.min.apply(null, unidadesCompletas) : null;
+
+  $('yieldComplete').textContent =
+    totalPossivel === null ? '—' : totalPossivel + ' UN.';
+
   $('exBadge').hidden=!state.example;
   SECTIONS.forEach(function(s){
     var c=r[s.key], R=refs[s.key];
