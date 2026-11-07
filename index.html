@@ -87,8 +87,28 @@ const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_
 const $=id=>document.getElementById(id);
 const panel=$('accountPanel'),toggle=$('accountToggle');
 toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden});
+let serverSessionReady=false;
+async function syncServerSession(session){
+ try{
+  if(!session||!session.access_token){
+   await fetch('/api/session',{method:'DELETE',credentials:'same-origin',cache:'no-store'});
+   return false;
+  }
+  const response=await fetch('/api/session',{
+   method:'POST',
+   credentials:'same-origin',
+   cache:'no-store',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({access_token:session.access_token})
+  });
+  return response.ok;
+ }catch(error){
+  console.error('Não foi possível validar a sessão no servidor:',error);
+  return false;
+ }
+}
 function showSession(user){
- const authorized=!!user&&String(user.email||'').toLowerCase()===ALLOWED_EMAIL;
+ const authorized=serverSessionReady&&!!user&&String(user.email||'').toLowerCase()===ALLOWED_EMAIL;
  $('toolsNav').hidden=!authorized;
  $('accountLoggedOut').hidden=authorized;
  $('accountLoggedIn').hidden=!authorized;
@@ -99,8 +119,11 @@ function showSession(user){
 async function refresh(){
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  const {data,error}=await client.auth.getSession();
- if(error){$('accountStatus').textContent='ERRO AO VERIFICAR A SESSÃO.';return}
- showSession(data.session?.user||null);
+ if(error){serverSessionReady=false;showSession(null);$('accountStatus').textContent='ERRO AO VERIFICAR A SESSÃO.';return}
+ const session=data.session||null;
+ serverSessionReady=session?await syncServerSession(session):false;
+ showSession(session?.user||null);
+ if(session&&!serverSessionReady)$('accountStatus').textContent='NÃO FOI POSSÍVEL VALIDAR A SESSÃO. TENTE ENTRAR NOVAMENTE.';
 }
 $('accountLogin').addEventListener('click',async()=>{
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
@@ -108,18 +131,34 @@ $('accountLogin').addEventListener('click',async()=>{
  if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
  if(email.toLowerCase()!==ALLOWED_EMAIL){$('accountStatus').textContent='ESTA CONTA NÃO TEM AUTORIZAÇÃO DE ACESSO.';return}
  $('accountStatus').textContent='ENTRANDO...';
- const {error}=await client.auth.signInWithPassword({email,password});
- $('accountStatus').textContent=error?'NÃO FOI POSSÍVEL ENTRAR: '+error.message:'LOGIN REALIZADO. SUAS FERRAMENTAS VÃO USAR A NUVEM.';
- if(!error)await refresh();
+ const {data,error}=await client.auth.signInWithPassword({email,password});
+ if(error){
+  $('accountStatus').textContent='NÃO FOI POSSÍVEL ENTRAR: '+error.message;
+ }else{
+  serverSessionReady=await syncServerSession(data.session);
+  showSession(data.session?.user||null);
+  $('accountStatus').textContent=serverSessionReady?'LOGIN REALIZADO. SUAS FERRAMENTAS ESTÃO LIBERADAS.':'LOGIN REALIZADO, MAS NÃO FOI POSSÍVEL VALIDAR O ACESSO. TENTE NOVAMENTE.';
+ }
 });
 $('accountLogout').addEventListener('click',async()=>{
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
  $('accountStatus').textContent='SAINDO...';
  const {error}=await client.auth.signOut();
- $('accountStatus').textContent=error?'ERRO AO SAIR: '+error.message:'VOCÊ SAIU DA CONTA.';
- if(!error)await refresh();
+ if(error){
+  $('accountStatus').textContent='ERRO AO SAIR: '+error.message;
+ }else{
+  serverSessionReady=false;
+  await syncServerSession(null);
+  showSession(null);
+  $('accountStatus').textContent='VOCÊ SAIU DA CONTA.';
+ }
 });
-if(client)client.auth.onAuthStateChange((_event,session)=>showSession(session?.user||null));
+if(client)client.auth.onAuthStateChange((_event,session)=>{
+ Promise.resolve().then(async()=>{
+  serverSessionReady=session?await syncServerSession(session):false;
+  showSession(session?.user||null);
+ });
+});
 refresh();
 })();
 </script>
