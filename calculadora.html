@@ -306,6 +306,21 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 }
 </style>
 
+
+<style>
+/* CRONÔMETRO ORIGINAL COSMOS: APARELHO PRATEADO COM STICKERS */
+.cosmos-device-timer{position:fixed!important;right:18px!important;bottom:18px!important;z-index:9999!important;width:210px!important;user-select:none;filter:none!important}
+.cosmos-device-timer img{width:100%;height:auto;display:block}
+.cosmos-lcd-screen{position:absolute!important;top:31%!important;left:27.5%!important;width:45.5%!important;height:19.5%!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cosmos-lcd-digits{font-family:'Orbitron',monospace!important;font-weight:700!important;font-size:14.5px!important;color:#2563EB!important;letter-spacing:.5px!important;text-align:center;white-space:nowrap;text-shadow:none!important;transform:translateY(2px)}
+.cosmos-btn-click,.cosmos-btn-click:hover,.cosmos-btn-click:active,.cosmos-btn-click:focus,.cosmos-btn-click:focus-visible{position:absolute!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;outline:0!important;color:transparent!important;text-shadow:none!important;appearance:none;-webkit-appearance:none;padding:0!important;cursor:pointer;border-radius:50%;transform:none!important}
+.cosmos-btn-min{top:56.5%!important;left:26.5%!important;width:18.5%!important;height:22.5%!important}
+.cosmos-btn-sec{top:56.5%!important;left:47%!important;width:18.5%!important;height:22.5%!important}
+.cosmos-btn-startstop{top:56.5%!important;left:67.5%!important;width:22%!important;height:22.5%!important;border-radius:12px!important}
+.cosmos-btn-click:before,.cosmos-btn-click:after{display:none!important;content:none!important}
+@media(max-width:560px){.cosmos-device-timer{right:10px!important;bottom:10px!important;width:170px!important}.cosmos-lcd-digits{font-size:11.5px!important}}
+</style>
+
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -403,28 +418,16 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 
   <div id="sections"></div>
 
-  <!-- CRONÔMETRO APARELHO RETRÔ (image_3.PNG) -->
-  <div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos em formato de estrela">
-    <div class="star-timer-shell">
-      <div class="timer-keyring" aria-hidden="true"></div>
-      <div class="star-timer-face">
-        <div class="cosmos-lcd-screen"><div class="cosmos-lcd-digits" id="timerDisplay">00:00</div></div>
-        <div class="star-timer-controls">
-          <div class="star-timer-control">
-            <button class="star-timer-button adjust" id="btnTimerHour" type="button" title="Adicionar uma hora" aria-label="Adicionar uma hora"><span>+</span></button>
-            <small>HOUR</small>
-          </div>
-          <div class="star-timer-control">
-            <button class="star-timer-button adjust" id="btnTimerMinute" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"><span>+</span></button>
-            <small>MIN</small>
-          </div>
-          <div class="star-timer-control">
-            <button class="star-timer-button start" id="btnTimerToggle" type="button" title="Iniciar ou pausar cronômetro" aria-label="Iniciar cronômetro"><span id="timerToggleText">START</span></button>
-            <small id="timerToggleCaption">START</small>
-          </div>
-        </div>
-        <div class="star-timer-mark">★ COSMOS ★</div>
+  <!-- CRONÔMETRO ORIGINAL COSMOS: IMAGEM PRATEADA COM STICKERS -->
+  <div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos">
+    <div style="position:relative;width:100%;">
+      <img src="image_3.PNG" alt="Cronômetro retrô prateado Cosmos">
+      <div class="cosmos-lcd-screen">
+        <div class="cosmos-lcd-digits" id="timerDisplay">00:00</div>
       </div>
+      <button class="cosmos-btn-click cosmos-btn-min" id="btnTimerHour" type="button" title="Adicionar uma hora" aria-label="Adicionar uma hora"></button>
+      <button class="cosmos-btn-click cosmos-btn-sec" id="btnTimerMinute" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"></button>
+      <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" type="button" title="Iniciar ou pausar" aria-label="Iniciar cronômetro"></button>
     </div>
   </div>
 
