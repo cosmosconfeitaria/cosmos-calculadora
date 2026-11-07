@@ -146,7 +146,7 @@ const categories=['CHOCOLATUDO','COMERCIAL','HYPADO','FRUTADO','EXÓTICO','MADUR
 const occasions=['NATAL','PÁSCOA','HALLOWEEN','SÃO JOÃO','DIA DOS NAMORADOS','DIA DAS MÃES','CARNAVAL','ANO NOVO','DIA DAS CRIANÇAS'];
 const ideas=[];
 function add(type,category,name,mass,chocolate,filling,complement,topping,occasion,keys=[]){
- if(/red velvet/i.test(mass)) chocolate='chocolate branco';
+ if(/red velvet/i.test(mass)&&chocolate!==null) chocolate='chocolate branco';
  let parts=[];
  if(type==='COOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING',topping||'sem topping adicional']];
  if(type==='DOT') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE & ADIÇÕES NA MASSA',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING / MIÇANGAS',topping||'miçangas coloridas']];
