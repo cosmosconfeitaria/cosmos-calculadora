@@ -17,12 +17,12 @@ body:before{opacity:.78;background-image:radial-gradient(1px 1px at 13px 19px,#f
 body:after{opacity:.38;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent),radial-gradient(1px 1px at 207px 143px,#fff 98%,transparent);background-size:293px 239px;animation-duration:145s;animation-direction:reverse}
 @keyframes star-drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(7%,5%,0)}}
 @keyframes letter-wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
-main{position:relative;width:min(340px,calc(100% - 32px));min-height:calc(100vh - 64px);margin:32px auto;padding:34px 27px 25px;flex:1;display:flex;flex-direction:column;justify-content:center;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30}
+main{position:relative;width:min(320px,calc(100% - 32px));min-height:calc(100vh - 64px);margin:32px auto;padding:34px 27px 25px;flex:1;display:flex;flex-direction:column;justify-content:center;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30}
 .topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:58px}
-.brand{font-size:10px;letter-spacing:-.5px;font-weight:500;color:var(--blue)}
+.brand{font-size:14px;letter-spacing:-.35px;font-weight:500;color:var(--blue)}
 .logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
 .logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);filter:url(#letter-wiggle);animation:letter-wobble 2.7s ease-in-out infinite;pointer-events:none}
-h1{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(40px,10vw,60px);line-height:.9;letter-spacing:-2.5px;margin:0;color:var(--blue);font-weight:500}
+h1{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(44px,11vw,66px);line-height:.9;letter-spacing:-2.5px;margin:0;color:var(--blue);font-weight:500}
 h1 .logo-type{display:block;width:max-content}
 .subtitle{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.5px;color:var(--blue);margin:18px 0 48px;line-height:1;text-align:justify}
 .tools{display:grid;grid-template-columns:1fr;gap:22px;max-width:100%;margin:0 auto;width:100%}.tools[hidden]{display:none}
@@ -42,7 +42,7 @@ h1 .logo-type{display:block;width:max-content}
 .account-user,.account-status{font-size:10px;line-height:1.2;color:var(--blue);overflow-wrap:anywhere}
 .account-status{min-height:14px;margin:10px 0 0}
 footer{text-align:center;padding:55px 8px 0;margin-top:auto;display:grid;gap:7px}
-footer .stars{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:23px;line-height:1;letter-spacing:-.65px;color:var(--blue);font-weight:500}
+footer .stars{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;line-height:1;letter-spacing:-.7px;color:var(--blue);font-weight:500}
 footer .tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;line-height:1.15;letter-spacing:-.25px;font-weight:400;color:var(--blue)}
 footer .est{font-family:'Gochi Hand',cursive;font-size:14px;letter-spacing:-.5px;color:var(--red)}
 @media(max-width:420px){main{width:calc(100% - 48px);min-height:calc(100svh - 32px);margin:16px auto;padding:27px 22px 22px}.topline{margin-bottom:48px}.subtitle{margin-bottom:39px}footer{padding-top:45px}}
