@@ -251,6 +251,15 @@ add('DOT','COMFORT','DOT BALA FINI','massa de baunilha',W,'creme fluido de choco
 add('BROOKIE','COMFORT','BROOKIE NESCAU & CEREAL','massa de cookie de baunilha',M,'creme de chocolate com Nescau','brownie de chocolate ao leite','cereal de chocolate crocante','DIA DAS CRIANÇAS',['dia das crianças','nescau','cereal']);
 add('ICE','COMFORT','ICE COOKIE ALGODÃO-DOCE','massa de baunilha',W,'sorvete de algodão-doce','confeitos coloridos crocantes','', 'DIA DAS CRIANÇAS',['dia das crianças','algodão-doce','sorvete']);
 add('ICE','COMFORT','ICE COOKIE MARSHMALLOW','massa de cacau 50%',B,'sorvete de baunilha com marshmallow','calda de chocolate','', 'DIA DAS CRIANÇAS',['dia das crianças','marshmallow','chocolate','sorvete']);
+// Mais opções para categorias que pedem perfis de sabor bem definidos.
+add('COOKIE','MADURO','CAFÉ & LARANJA AMARGA','massa de café com manteiga noisette',B,'ganache cremosa de chocolate blend','caramelo de laranja amarga','casca de laranja cristalizada',null,['café','laranja','chocolate','manteiga noisette']);
+add('COOKIE','MADURO','MISSÔ, GERGELIM & CACAU','massa de cacau 50% com missô suave',B,'ganache cremosa de chocolate blend','caramelo de missô','gergelim preto tostado',null,['cacau','gergelim','chocolate']);
+add('BROOKIE','MADURO','BROOKIE 70% & CAFÉ','massa de cookie de café',B,'ganache de chocolate blend intenso','brownie 70%','cacau peneirado',null,['café','chocolate','cacau']);
+add('ICE','MADURO','ICE COOKIE CAFÉ & AMÊNDOAS','massa de café com manteiga noisette',B,'sorvete de café','praliné de amêndoas','',null,['café','amêndoas','sorvete']);
+add('COOKIE','SEM RECHEIO','CHOCOLATE CHUNK CLÁSSICO','massa de baunilha com manteiga noisette',B,'sem recheio','não se aplica','pedaços generosos de chocolate blend',null,['chocolate','manteiga noisette']);
+add('DOT','SEM RECHEIO','DOT BAUNILHA & CHOCOLATE','massa de baunilha',B,'sem recheio','não se aplica','miçangas de chocolate',null,['baunilha','chocolate']);
+add('BROOKIE','SEM RECHEIO','BROOKIE SEM RECHEIO','massa de cookie de baunilha',B,'sem recheio','brownie tradicional','flor de sal',null,['chocolate','brownie']);
+add('COOKIE','SEM RECHEIO','CACAU & FLOR DE SAL','massa de cacau 50% com manteiga noisette',B,'sem recheio','não se aplica','flor de sal e pedaços de chocolate',null,['cacau','chocolate','manteiga noisette']);
 const keyOptions=['abacaxi','amendoim','amora','avelã','banana','batata chips','cacau','café','caramelo','cereja','champanhe','chocolate','coco','doce de leite','figo','framboesa','frutas vermelhas','goiaba','iogurte','kadayif','kinder','laranja','leite ninho','limão','lotus','m&m','maracujá','marshmallow','morango','nutella','oreo','pistache','queijo','red velvet','sorvete'];
 keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
 let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null;
