@@ -353,7 +353,7 @@ async function syncSavedIdeas(){
   setCloudStatus('IDEIAS SINCRONIZADAS NA NUVEM.');
  }catch(error){
   console.error('Erro ao sincronizar ideias:',error);
-  setCloudStatus('SALVO NESTE DISPOSITIVO. PARA ATIVAR A NUVEM, FALTA CONFIGURAR A TABELA DE IDEIAS NO SUPABASE.');
+  setCloudStatus('NÃO FOI POSSÍVEL SINCRONIZAR. SUAS IDEIAS CONTINUAM SALVAS NESTE DISPOSITIVO.');
  }finally{cloudSyncBusy=false}
 }
 async function applyUserSession(user){
