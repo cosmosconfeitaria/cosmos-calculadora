@@ -104,11 +104,13 @@ h1{font-weight:500;letter-spacing:-1.5px}
 .part span{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;color:var(--ink)}
 .key-select,.saved-filters select{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400}
 #alternativesLabel{color:var(--muted);font-weight:400;letter-spacing:.13em}
-#occasionHint,#ingredientHint{font-family:'Gochi Hand',cursive;font-size:15px;line-height:1.35;letter-spacing:0;color:#D22222}
+#occasionHint,#ingredientHint{font-family:'Gochi Hand',cursive;font-size:13px;font-weight:400;line-height:1.35;letter-spacing:.015em;text-transform:uppercase;-webkit-text-stroke:.16px var(--cream);color:#D22222}
 #cloudSavedStatus{display:none!important}
-.saved-filters select{border:0!important;border-radius:0!important;color:var(--blue);background-color:var(--cream)!important;background-image:linear-gradient(135deg,#ffffff8c 0%,transparent 34%,#bcb2a514 48%,transparent 65%),repeating-linear-gradient(0deg,#9b918510 0px,#9b918510 1px,transparent 1px,transparent 5px)!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;padding:12px 10px!important}
-.saved-filters select:focus{outline:1px solid var(--blue);outline-offset:-1px}
-.saved-filters select option{background:var(--cream);color:var(--blue)}
+.key-select,.saved-filters select{border:0!important;border-radius:0!important;color:var(--blue);background-color:#F6F4F1e8!important;background-image:linear-gradient(135deg,#ffffffa8 0%,transparent 32%,#bcb2a51c 48%,transparent 66%),repeating-linear-gradient(0deg,#9b918512 0px,#9b918512 1px,transparent 1px,transparent 5px)!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;padding:12px 10px!important}
+.key-select:focus,.saved-filters select:focus{outline:1px solid var(--blue);outline-offset:-1px}
+.key-select option,.saved-filters select option{background:var(--cream);color:var(--blue)}
+.label:not(#alternativesLabel){font-size:11.5px}
+#alternativesLabel{font-size:10px}
 .alternative.active{border-color:var(--blue);background:#eef3fc}
 footer{padding:25px 10px 10px;gap:3px}
 footer strong{font-size:23px;line-height:1;font-weight:500;letter-spacing:-.65px;color:var(--blue)}
