@@ -7,6 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+.auth-compat{display:none!important}
+
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff;--pink:#e06d8a;--pink-light:#f9ecef}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;text-transform:uppercase}
@@ -190,29 +192,14 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   <h1>CALCULADORA<br>DE RECEITAS</h1>
   <p class="intro">INFORME O COOKIE, A CATEGORIA, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
 
-  <!-- PAINEL DE AUTENTICAÇÃO E NUVEM (SUPABASE) -->
-  <section class="panel" id="authPanel">
-    <div class="section-title">00 / CONTA & NUVEM (SUPABASE)<span class="badge" id="authBadge">OFFLINE</span></div>
-    <div id="loggedOutView">
-      <p class="intro" style="margin-bottom:12px;">FAÇA LOGIN COM SEU E-MAIL E SENHA PARA SALVAR E SINCRONIZAR SUAS FICHAS NA NUVEM.</p>
-      <div class="grid">
-        <div><label for="authEmail">E-MAIL</label><input id="authEmail" type="email" autocomplete="email" placeholder="SEU@EMAIL.COM"></div>
-        <div><label for="authPassword">SENHA</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
-      </div>
-      <div class="actions">
-        <button class="primary" id="btnLogin">ENTRAR</button>
-        <button class="secondary" id="btnSignup">CADASTRAR</button>
-      </div>
-    </div>
-    <div id="loggedInView" style="display:none;">
-      <p class="intro" id="userEmailDisplay" style="margin-bottom:12px; font-weight:800; color:var(--blue);"></p>
-      <div class="actions">
-        <button class="secondary" id="btnLogout">SAIR (LOGOUT)</button>
-        <button class="primary" id="btnSyncCloud">SINCRONIZAR COM A NUVEM</button>
-      </div>
-    </div>
-    <div class="status" id="authStatus" role="status" aria-live="polite"></div>
-  </section>
+  <!-- COMPATIBILIDADE INTERNA: A AUTENTICAÇÃO É FEITA NA PÁGINA INICIAL -->
+  <div class="auth-compat" aria-hidden="true">
+    <div id="loggedOutView"></div><div id="loggedInView"></div>
+    <span id="authBadge"></span><span id="userEmailDisplay"></span><span id="authStatus"></span>
+    <input id="authEmail"><input id="authPassword">
+    <button id="btnLogin"></button><button id="btnSignup"></button>
+    <button id="btnLogout"></button><button id="btnSyncCloud"></button>
+  </div>
 
   <!-- LISTA DE FICHAS: FILTROS E SELEÇÃO -->
   <section class="panel">
