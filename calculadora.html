@@ -206,6 +206,39 @@ button{border:1px solid #aaa8a3;border-radius:8px;background:linear-gradient(180
 @media(max-width:560px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:14px}}
 @media(prefers-reduced-motion:reduce){body:before,body:after{animation:none}}
 </style>
+<style>
+/* AJUSTES FINAIS COSMOS */
+:root{--red:#D22222;--pink:#D22222;--pink-light:#f8e9e6}
+.wrap{width:min(760px,calc(100% - 42px));max-width:760px}
+.brand{font-size:14px;letter-spacing:-.35px;font-weight:500}
+.logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
+.logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);filter:url(#letter-wiggle);animation:letter-wobble 2.7s ease-in-out infinite;pointer-events:none}
+@keyframes letter-wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
+h1{display:flex;flex-direction:column;align-items:flex-start;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(32px,6vw,48px);line-height:.92;letter-spacing:-1.8px;font-weight:500;margin-bottom:12px}
+.section-title{font-size:12px;font-weight:500;letter-spacing:-.2px}
+.badge{font-family:'Gochi Hand',cursive!important;font-size:13px!important;font-weight:400!important;letter-spacing:0!important;color:var(--red)!important;border-color:var(--red)!important}
+.panel{box-shadow:0 2px 0 #d8d5d0}
+button{font-weight:500;box-shadow:inset 0 1px 1px #fff,inset 0 -1px 1px #aaa9a6,0 3px 0 #a5a39e,0 4px 7px #0000000d}
+.primary,.secondary{font-weight:500}
+#save{font-family:'Gochi Hand',cursive;font-size:16px;font-weight:400;letter-spacing:0;color:var(--red)}
+.x,.btn-order{width:27px;height:27px;min-width:27px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-size:15px;font-weight:600;box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e,0 3px 5px #0000000b}
+.x{color:var(--red);border-color:#d9b8b3}
+.btn-order{color:var(--blue)}
+.chk-box{accent-color:var(--red)}
+tr.checked-row td{background:var(--pink-light)!important;color:#a52d25}
+tr.checked-row td input{color:#a52d25}
+tr.checked-row td .v{color:#a52d25}
+.cosmos-btn-click,.cosmos-btn-click:hover,.cosmos-btn-click:active,.cosmos-btn-click:focus,.cosmos-btn-click:focus-visible{
+  background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;outline:0!important;
+  color:transparent!important;text-shadow:none!important;appearance:none;-webkit-appearance:none;transform:none!important;
+}
+.cosmos-btn-click:before,.cosmos-btn-click:after{display:none!important;content:none!important}
+.footer-cosmos .line-brand{font-size:19px;font-weight:500;letter-spacing:-.5px}
+.footer-cosmos .line-tagline{font-size:9px;font-weight:400;letter-spacing:-.25px}
+.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;font-weight:400;letter-spacing:0;color:#D22222}
+@media(max-width:560px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:14px}.footer-cosmos .line-brand{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.logo-type:after{animation:none}}
+</style>
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -1438,36 +1471,4 @@ $('reset').addEventListener('click', restaurar);
 </body>
 </html>
 
-<style>
-/* AJUSTES FINAIS COSMOS */
-:root{--red:#D22222;--pink:#D22222;--pink-light:#f8e9e6}
-.wrap{width:min(760px,calc(100% - 42px));max-width:760px}
-.brand{font-size:14px;letter-spacing:-.35px;font-weight:500}
-.logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
-.logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);filter:url(#letter-wiggle);animation:letter-wobble 2.7s ease-in-out infinite;pointer-events:none}
-@keyframes letter-wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
-h1{display:flex;flex-direction:column;align-items:flex-start;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(32px,6vw,48px);line-height:.92;letter-spacing:-1.8px;font-weight:500;margin-bottom:12px}
-.section-title{font-size:12px;font-weight:500;letter-spacing:-.2px}
-.badge{font-family:'Gochi Hand',cursive!important;font-size:13px!important;font-weight:400!important;letter-spacing:0!important;color:var(--red)!important;border-color:var(--red)!important}
-.panel{box-shadow:0 2px 0 #d8d5d0}
-button{font-weight:500;box-shadow:inset 0 1px 1px #fff,inset 0 -1px 1px #aaa9a6,0 3px 0 #a5a39e,0 4px 7px #0000000d}
-.primary,.secondary{font-weight:500}
-#save{font-family:'Gochi Hand',cursive;font-size:16px;font-weight:400;letter-spacing:0;color:var(--red)}
-.x,.btn-order{width:27px;height:27px;min-width:27px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-size:15px;font-weight:600;box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e,0 3px 5px #0000000b}
-.x{color:var(--red);border-color:#d9b8b3}
-.btn-order{color:var(--blue)}
-.chk-box{accent-color:var(--red)}
-tr.checked-row td{background:var(--pink-light)!important;color:#a52d25}
-tr.checked-row td input{color:#a52d25}
-tr.checked-row td .v{color:#a52d25}
-.cosmos-btn-click,.cosmos-btn-click:hover,.cosmos-btn-click:active,.cosmos-btn-click:focus,.cosmos-btn-click:focus-visible{
-  background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;outline:0!important;
-  color:transparent!important;text-shadow:none!important;appearance:none;-webkit-appearance:none;transform:none!important;
-}
-.cosmos-btn-click:before,.cosmos-btn-click:after{display:none!important;content:none!important}
-.footer-cosmos .line-brand{font-size:19px;font-weight:500;letter-spacing:-.5px}
-.footer-cosmos .line-tagline{font-size:9px;font-weight:400;letter-spacing:-.25px}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;font-weight:400;letter-spacing:0;color:#D22222}
-@media(max-width:560px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:14px}.footer-cosmos .line-brand{font-size:18px}}
-@media(prefers-reduced-motion:reduce){.logo-type:after{animation:none}}
-</style>
+
