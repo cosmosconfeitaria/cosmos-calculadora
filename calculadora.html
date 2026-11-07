@@ -261,6 +261,36 @@ tr.checked-row td .v{color:#8f3b34}
 .star-timer-mark{position:absolute;z-index:2;top:82%;left:0;width:100%;text-align:center;color:#4b5053;font:600 6px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.12em;text-shadow:0 1px 1px #fff}
 @media(max-width:560px){.cosmos-device-timer{width:148px;right:9px;bottom:9px}.star-timer-button{width:33px;height:33px;min-width:33px}.cosmos-lcd-digits{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.star-timer-button{transition:none}}
+
+/* PADRONIZAÇÃO DOS SELETORES, CABEÇALHO E CRONÔMETRO */
+.back{width:34px;height:34px;min-width:34px;display:flex;align-items:center;justify-content:center;margin-left:auto;border:1px solid #aaa8a3;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 1px 1px #fff,0 3px 0 #a5a39e;text-decoration:none}
+.menu-lines{display:flex;flex-direction:column;gap:3px;width:13px}
+.menu-lines i{height:1.5px;width:100%;background:var(--blue);display:block;border-radius:2px}
+.top{gap:10px}
+select{appearance:none;-webkit-appearance:none;border:1px solid #d4d1cc!important;border-radius:10px!important;background-color:#fff!important;background-image:linear-gradient(45deg,transparent 50%,#2263D2 50%),linear-gradient(135deg,#2263D2 50%,transparent 50%)!important;background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%!important;background-size:5px 5px,5px 5px!important;background-repeat:no-repeat!important;color:var(--blue)!important;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif!important;font-size:11px!important;font-weight:500!important;letter-spacing:.02em!important;padding:13px 30px 13px 12px!important;box-shadow:none!important}
+select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!important}
+.intro{text-transform:uppercase}
+.footer-cosmos{gap:3px;padding:28px 12px 20px}
+.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+.footer-cosmos .line-tagline{font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
+.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
+/* estrela metálica lisa: sem aro acolchoado */
+.cosmos-device-timer{width:190px;right:18px;bottom:18px;filter:drop-shadow(0 7px 6px rgba(0,0,0,.28))}
+.star-timer-shell{aspect-ratio:1}
+.star-timer-shell:before{inset:0;clip-path:polygon(50% 1%,61% 31%,96% 35%,69% 57%,79% 94%,50% 75%,21% 94%,31% 57%,4% 35%,39% 31%);background:linear-gradient(132deg,#fff 0%,#aeb2b5 10%,#f8f8f6 19%,#777d82 31%,#e8e9e7 43%,#a5a9ac 55%,#fafaf8 67%,#858b90 80%,#e7e8e6 91%,#fff 100%);filter:none}
+.star-timer-face{inset:2.2%;clip-path:polygon(50% 1%,61% 31%,96% 35%,69% 57%,79% 94%,50% 75%,21% 94%,31% 57%,4% 35%,39% 31%);background:linear-gradient(145deg,#d7d9d9 0%,#f7f7f5 18%,#b6b9ba 34%,#e5e6e4 52%,#a4a8aa 72%,#f5f5f3 88%,#c2c5c6 100%);box-shadow:none}
+.star-timer-face:before{inset:0;background:linear-gradient(125deg,rgba(255,255,255,.42),transparent 28%,rgba(40,45,48,.06) 67%,rgba(255,255,255,.2))}
+.timer-keyring{top:-3%;left:43%;width:25px;height:25px;border:3px solid #858b90;border-top-color:#fff;border-left-color:#c9ccce;border-right-color:#73797d;border-bottom-color:#f4f4f2;background:transparent;box-shadow:0 1px 2px #555;transform:rotate(-20deg)}
+.timer-keyring:after{left:16px;top:12px;width:8px;height:58px;border:0;border-radius:0;background:radial-gradient(circle at 50% 50%,#fff 0 20%,#8b9195 31%,#d9dcdd 55%,#73797d 75%,transparent 78%);background-size:8px 8px;background-repeat:repeat-y;box-shadow:none;transform:rotate(-26deg);transform-origin:top center}
+.cosmos-lcd-screen{top:32%;left:25%;width:50%;height:20%;border:2px solid #596c65;border-radius:3px;background:linear-gradient(180deg,#c9e4bd 0%,#b8d8aa 48%,#9dc391 100%);box-shadow:inset 0 1px 5px rgba(30,65,42,.3),0 1px 0 rgba(255,255,255,.85),0 0 7px rgba(168,225,155,.55)}
+.cosmos-lcd-digits{font-size:clamp(10px,2.6vw,14px);color:#254b38;text-shadow:0 0 4px rgba(115,175,112,.55);letter-spacing:.25px}
+.star-timer-controls{top:60%;left:19%;width:62%;justify-content:space-around}
+.star-timer-control{width:45%;gap:3px}
+.star-timer-button{width:37px;height:37px;min-width:37px;border:1px solid #73797d;border-radius:50%;background:radial-gradient(circle at 31% 23%,#fff 0%,#f1f2f0 19%,#c5c8c9 48%,#858b90 73%,#e8e9e7 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,.98),inset 0 -2px 3px rgba(0,0,0,.22),0 2px 2px rgba(0,0,0,.28);color:#2263D2;font-size:12px}
+.star-timer-button.start{font-size:7px;font-weight:800;letter-spacing:-.1px}
+.star-timer-control small{font-size:6px;color:#284c7e}
+.star-timer-mark{top:83%;font-size:6px;color:#4b5053}
+@media(max-width:560px){.cosmos-device-timer{width:158px;right:9px;bottom:9px}.star-timer-button{width:31px;height:31px;min-width:31px}.cosmos-lcd-digits{font-size:10px}}
 </style>
 </head>
 <body class="auth-pending">
@@ -271,7 +301,7 @@ tr.checked-row td .v{color:#8f3b34}
     <div class="tag" id="cloudTag">LOCAL</div>
   </header>
   <h1><span class="logo-type" data-text="CALCULADORA">CALCULADORA</span><span class="logo-type" data-text="DE RECEITAS">DE RECEITAS</span></h1>
-  <p class="intro">informe o cookie, a categoria, a quantidade e os pesos por unidade. cada preparação é calculada separadamente, com o seu próprio rendimento-base.</p>
+  <p class="intro">INFORME O COOKIE, A CATEGORIA, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
 
   <!-- COMPATIBILIDADE INTERNA: A AUTENTICAÇÃO É FEITA NA PÁGINA INICIAL -->
   <div class="auth-compat" aria-hidden="true">
