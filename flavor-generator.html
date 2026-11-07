@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · FLAVOR GENERATOR</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+body.auth-pending .wrap{visibility:hidden}
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--muted:#77736e;--line:#d8d5d0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;min-height:100vh}
@@ -53,7 +55,7 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 @media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.types{grid-template-columns:repeat(2,minmax(0,1fr))}.type{padding:12px 8px}.saved-filters{grid-template-columns:1fr 1fr}}
 </style>
 </head>
-<body>
+<body class="auth-pending">
 <div class="wrap">
 <header><div class="brand">COSMOS COOKIE LAB</div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
 <p class="eyebrow">01 / CENTRAL DE IDEIAS</p>
@@ -456,6 +458,24 @@ $('keyFlavor').addEventListener('change',()=>{keyFlavor=$('keyFlavor').value;gen
 $('generate').addEventListener('click',generate);
 $('save').addEventListener('click',()=>{if(!current)return;const list=getSaved();if(!list.some(x=>x.id===current.id)){list.unshift(current);setSaved(list)}$('save').textContent='IDEIA SALVA ✓'});
 renderSaved();generate();
+})();
+</script>
+
+<script>
+(async function(){
+  const url='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+  const key='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+  try {
+    const client=window.supabase.createClient(url,key);
+    const {data,error}=await client.auth.getSession();
+    const user=data&&data.session&&data.session.user;
+    if(error||!user||String(user.email||'').toLowerCase()!=='cosmosconfeitaria@gmail.com'){
+      if(user) await client.auth.signOut();
+      window.location.replace('index.html');
+      return;
+    }
+    document.body.classList.remove('auth-pending');
+  } catch(e) { window.location.replace('index.html'); }
 })();
 </script>
 </body>
