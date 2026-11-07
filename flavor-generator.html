@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COSMOS COOKIE LAB · FLAVOR GENERATOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--muted:#77736e;--line:#d8d5d0;--pink:#F3B9EB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Helvetica,Arial,sans-serif;text-transform:uppercase;min-height:100vh}
+.wrap{width:min(850px,100%);margin:auto;padding:22px 18px 36px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
+.brand{font-size:12px;font-weight:900;letter-spacing:.16em;color:var(--blue)}
+.back{font-size:10px;color:var(--blue);text-decoration:none;font-weight:800;letter-spacing:.1em}
+.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 10px}
+h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:0;color:var(--blue);font-weight:900}
+.sub{font-size:11px;line-height:1.6;color:var(--muted);max-width:500px;margin:14px 0 26px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;box-shadow:0 5px 0 #dedbd6}
+.label{font-size:9px;letter-spacing:.15em;font-weight:900;color:var(--muted);margin-bottom:12px}
+.filters{display:flex;flex-wrap:wrap;gap:9px}
+.filter{border:1px solid #b9b6b0;background:linear-gradient(180deg,#fff 0%,#e8e7e4 48%,#d0cfcc 100%);color:var(--blue);padding:11px 16px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.1em;box-shadow:inset 0 1px 0 #fff,0 3px 0 #aaa8a3;cursor:pointer}
+.filter.active{background:linear-gradient(180deg,#dce8fb,#aebfdb);box-shadow:inset 0 1px 0 #fff,0 1px 0 #929eaf;transform:translateY(2px)}
+.result{min-height:210px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.result .tag{font-size:9px;letter-spacing:.14em;color:var(--muted);margin-bottom:12px}
+.result h2{font-size:clamp(24px,5vw,38px);line-height:1.05;color:var(--blue);margin:0 0 12px;letter-spacing:-.035em}
+.result p{font-size:12px;line-height:1.6;margin:0;max-width:560px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.action{border:1px solid #aaa8a3;border-radius:999px;padding:13px 18px;font-size:10px;font-weight:900;letter-spacing:.1em;cursor:pointer;color:var(--blue);background:linear-gradient(180deg,#fff 0%,#e6e5e2 48%,#c9c8c5 100%);box-shadow:inset 0 1px 0 #fff,0 4px 0 #a9a7a2}
+.action:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff,0 1px 0 #a9a7a2}
+.action.primary{background:linear-gradient(180deg,#d9e6fb,#a9bddf 55%,#8fa7d0)}
+.saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.saved-head h3{font-size:12px;letter-spacing:.13em;margin:0;color:var(--blue)}
+.saved-count{font-size:10px;color:var(--muted)}
+.saved-list{display:grid;gap:9px}
+.saved-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream)}
+.saved-item strong{font-size:11px;color:var(--blue);display:block;margin-bottom:4px}
+.saved-item small{font-size:9px;color:var(--muted);line-height:1.5}
+.remove{border:0;background:transparent;color:#b33b43;font-size:18px;cursor:pointer;padding:4px}
+.empty{font-size:10px;color:var(--muted);line-height:1.6}
+footer{text-align:center;padding:28px 10px 12px;display:grid;gap:6px}
+footer strong{font-size:12px;letter-spacing:.18em;color:var(--blue)}
+footer span{font-size:10px;letter-spacing:.14em;font-weight:800}
+footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
+@media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.filter{flex:1;min-width:calc(50% - 8px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="brand">COSMOS COOKIE LAB</div><a class="back" href="index.html">← COSMOS TOOLS</a></header>
+<p class="eyebrow">01 / IDEATION DEVICE</p>
+<h1>FLAVOR<br>GENERATOR</h1>
+<p class="sub">A LITTLE RANDOMNESS, A LOT OF GOOD IDEAS. EXPLORE NEW COOKIE AND BROOKIE COMBINATIONS.</p>
+<section class="panel">
+<div class="label">CHOOSE YOUR MOOD</div>
+<div class="filters" id="filters">
+<button class="filter active" data-filter="ALL">ALL IDEAS</button>
+<button class="filter" data-filter="FRUITY">FRUITY</button>
+<button class="filter" data-filter="COMFORT">COMFORT</button>
+<button class="filter" data-filter="UNEXPECTED">UNEXPECTED</button>
+</div>
+</section>
+<section class="panel result" aria-live="polite">
+<div class="tag" id="resultTag">YOUR NEXT COOKIE IDEA</div>
+<h2 id="resultName">READY WHEN YOU ARE.</h2>
+<p id="resultDescription">GENERATE A FLAVOR TO START EXPLORING.</p>
+<div class="actions">
+<button class="action primary" id="generate">GENERATE FLAVOR ↻</button>
+<button class="action" id="save" disabled>SAVE IDEA ☆</button>
+</div>
+</section>
+<section class="panel">
+<div class="saved-head"><h3>SAVED IDEAS</h3><span class="saved-count" id="savedCount">0 SAVED</span></div>
+<div class="saved-list" id="savedList"><p class="empty">YOUR FAVORITES WILL SHOW UP HERE.</p></div>
+</section>
+<footer><strong>★ COSMOS ★</strong><span>NOT YOUR REGULAR COOKIE</span><small>EST. 2024</small></footer>
+</div>
+<script>
+(function(){
+'use strict';
+const ideas=[
+{mood:'FRUITY',name:'STRAWBERRY SHORTCAKE',desc:'VANILLA COOKIE DOUGH, STRAWBERRY COMPOTE AND WHITE CHOCOLATE. A LITTLE CRUNCH FROM BUTTERY CRUMBLE.',type:'COOKIE'},
+{mood:'FRUITY',name:'LEMON BLUEBERRY PIE',desc:'LEMON-ZESTED DOUGH, BLUEBERRY JAM AND A SOFT VANILLA CHEESECAKE CENTER.',type:'COOKIE'},
+{mood:'FRUITY',name:'PEACHES & CREAM',desc:'BROWN BUTTER DOUGH, PEACH PRESERVES, WHITE CHOCOLATE AND A PINCH OF CINNAMON.',type:'BROOKIE'},
+{mood:'FRUITY',name:'RASPBERRY PISTACHIO',desc:'PISTACHIO DOUGH, TART RASPBERRY FILLING AND ROASTED PISTACHIO PIECES.',type:'COOKIE'},
+{mood:'FRUITY',name:'PASSION FRUIT MERINGUE',desc:'VANILLA COOKIE, BRIGHT PASSION FRUIT GANACHE AND TOASTED MERINGUE NOTES.',type:'BROOKIE'},
+{mood:'FRUITY',name:'CHERRY COLA',desc:'COCOA DOUGH, CHERRY FILLING AND A SUBTLE COLA-SPICE GLAZE. BOLD AND PLAYFUL.',type:'COOKIE'},
+{mood:'COMFORT',name:'CINNAMON ROLL',desc:'BROWN SUGAR COOKIE, CINNAMON SWIRL FILLING AND A CREAM CHEESE TOP NOTE.',type:'COOKIE'},
+{mood:'COMFORT',name:'BANANA BREAD',desc:'BROWN BUTTER DOUGH, BANANA CARAMEL, WALNUTS AND A LITTLE CINNAMON.',type:'BROOKIE'},
+{mood:'COMFORT',name:'S’MORES BROWNIE',desc:'FUDGY BROWNIE BASE, COOKIE TOP, MILK CHOCOLATE AND TOASTED MARSHMALLOW.',type:'BROOKIE'},
+{mood:'COMFORT',name:'HOT CHOCOLATE',desc:'DARK COCOA DOUGH, MILK CHOCOLATE GANACHE AND A MARSHMALLOW CENTER.',type:'COOKIE'},
+{mood:'COMFORT',name:'APPLE CRUMBLE',desc:'VANILLA DOUGH, SOFT SPICED APPLE FILLING AND A BUTTERY CINNAMON CRUMBLE.',type:'COOKIE'},
+{mood:'COMFORT',name:'SALTED CARAMEL PRETZEL',desc:'MILK CHOCOLATE COOKIE, SOFT SALTED CARAMEL AND CRUSHED PRETZEL FOR CRUNCH.',type:'COOKIE'},
+{mood:'UNEXPECTED',name:'MISO WHITE CHOCOLATE',desc:'BROWN BUTTER DOUGH, A TOUCH OF WHITE MISO, WHITE CHOCOLATE AND SESAME BRITTLE.',type:'COOKIE'},
+{mood:'UNEXPECTED',name:'OLIVE OIL & ORANGE',desc:'CITRUS DOUGH WITH OLIVE OIL NOTES, DARK CHOCOLATE AND A FLAKY SALT FINISH.',type:'COOKIE'},
+{mood:'UNEXPECTED',name:'BLACK SESAME STRAWBERRY',desc:'BLACK SESAME DOUGH, STRAWBERRY CENTER AND WHITE CHOCOLATE. NUTTY, FRUITY AND BALANCED.',type:'COOKIE'},
+{mood:'UNEXPECTED',name:'ROSEMARY PEAR',desc:'BROWN BUTTER DOUGH, PEAR COMPOTE AND A VERY GENTLE ROSEMARY AROMA.',type:'COOKIE'},
+{mood:'UNEXPECTED',name:'TAHINI & DARK CHOCOLATE',desc:'TOASTED TAHINI DOUGH, DARK CHOCOLATE CHUNKS AND SESAME BRITTLE.',type:'BROOKIE'},
+{mood:'UNEXPECTED',name:'COFFEE TONIC',desc:'ESPRESSO COOKIE, BITTER ORANGE CARAMEL AND A LIGHT TONIC-INSPIRED CITRUS NOTE.',type:'COOKIE'}
+];
+const $=id=>document.getElementById(id);
+let filter='ALL',current=null;
+const KEY='cosmos.flavor-generator.saved.v1';
+function getSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function setSaved(list){localStorage.setItem(KEY,JSON.stringify(list));renderSaved()}
+function renderSaved(){
+ const list=getSaved();$('savedCount').textContent=list.length+' SAVED';
+ $('savedList').innerHTML='';
+ if(!list.length){$('savedList').innerHTML='<p class="empty">YOUR FAVORITES WILL SHOW UP HERE.</p>';return}
+ list.forEach((idea,i)=>{
+  const item=document.createElement('div');item.className='saved-item';
+  const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=idea.name;
+  const small=document.createElement('small');small.textContent=idea.type+' · '+idea.mood+' · '+idea.desc;
+  info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','REMOVE '+idea.name);
+  remove.addEventListener('click',()=>{const next=getSaved();next.splice(i,1);setSaved(next)});
+  item.append(info,remove);$('savedList').append(item);
+ });
+}
+function generate(){
+ const pool=ideas.filter(x=>filter==='ALL'||x.mood===filter);
+ const savedNames=new Set(getSaved().map(x=>x.name));
+ const fresh=pool.filter(x=>!savedNames.has(x.name));
+ const choices=fresh.length?fresh:pool;
+ current=choices[Math.floor(Math.random()*choices.length)];
+ $('resultTag').textContent=current.mood+' / '+current.type;
+ $('resultName').textContent=current.name;
+ $('resultDescription').textContent=current.desc;
+ $('save').disabled=false;
+ $('save').textContent=getSaved().some(x=>x.name===current.name)?'SAVED ✓':'SAVE IDEA ☆';
+}
+$('filters').addEventListener('click',e=>{
+ const btn=e.target.closest('[data-filter]');if(!btn)return;
+ filter=btn.dataset.filter;
+ document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));
+ generate();
+});
+$('generate').addEventListener('click',generate);
+$('save').addEventListener('click',()=>{
+ if(!current)return;
+ const list=getSaved();if(!list.some(x=>x.name===current.name)){list.unshift(current);setSaved(list)}
+ $('save').textContent='SAVED ✓';
+});
+renderSaved();
+})();
+</script>
+</body>
+</html>
