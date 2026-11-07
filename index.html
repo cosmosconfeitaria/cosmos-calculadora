@@ -20,6 +20,18 @@ h1{font-size:clamp(42px,10vw,76px);line-height:.9;letter-spacing:-.065em;margin:
 .tool-link{display:flex;align-items:center;justify-content:center;min-height:76px;padding:18px 22px;text-decoration:none;text-align:center;color:var(--blue);font-family:'Orbitron',Helvetica,Arial,sans-serif;font-size:clamp(11px,2.8vw,14px);font-weight:700;letter-spacing:.08em;border:1px solid #aaa8a3;border-radius:14px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 5px 0 #a5a39e,0 8px 13px #00000012;text-shadow:none;transition:transform .12s ease,box-shadow .12s ease}
 .tool-link:hover{filter:brightness(1.035);transform:translateY(-1px);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 6px 0 #a5a39e,0 10px 15px #00000016}
 .tool-link:active{transform:translateY(4px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e,0 3px 7px #00000012}
+
+.account-area{position:relative}
+.account-button,.account-actions button,#accountLogout{border:1px solid #aaa8a3;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);font:800 9px Helvetica,Arial,sans-serif;letter-spacing:.08em;padding:9px 13px;box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;cursor:pointer}
+.account-button:active,.account-actions button:active,#accountLogout:active{background:linear-gradient(180deg,#dce8fb,#aebfdb 55%,#9fb3d5);transform:translateY(2px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #929eaf}
+.account-panel{position:absolute;right:0;top:calc(100% + 12px);z-index:20;width:min(310px,calc(100vw - 36px));padding:17px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px #00000018;text-align:left}
+.account-panel[hidden]{display:none}
+.account-heading{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--blue);margin-bottom:13px}
+.account-panel label{display:block;font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin:10px 0 5px}
+.account-panel input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:12px Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+.account-actions{display:flex;gap:8px;margin-top:12px}
+.account-user,.account-status{font-size:10px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+.account-status{min-height:14px;margin:10px 0 0}
 footer{text-align:center;padding:28px 12px 30px;display:grid;gap:7px}
 footer .stars{font-size:12px;letter-spacing:.2em;color:var(--blue);font-weight:900}
 footer .tagline{font-size:10px;letter-spacing:.15em;font-weight:900;color:var(--ink)}
@@ -30,7 +42,27 @@ footer .est{font-size:9px;letter-spacing:.13em;color:var(--muted)}
 </head>
 <body>
 <main>
-<div class="topline"><div class="brand">COSMOS COOKIE LAB</div><div class="version">TOOLS / 001</div></div>
+<div class="topline"><div class="brand">COSMOS COOKIE LAB</div><div class="account-area">
+<button class="account-button" id="accountToggle" type="button">LOGIN</button>
+<div class="account-panel" id="accountPanel" hidden>
+<div class="account-heading" id="accountHeading">CONTA COSMOS</div>
+<div id="accountLoggedOut">
+<label for="accountEmail">E-MAIL</label>
+<input id="accountEmail" type="email" autocomplete="email" placeholder="SEU@EMAIL.COM">
+<label for="accountPassword">SENHA</label>
+<input id="accountPassword" type="password" autocomplete="current-password" placeholder="SUA SENHA">
+<div class="account-actions">
+<button type="button" id="accountLogin">ENTRAR</button>
+<button type="button" id="accountSignup">CRIAR CONTA</button>
+</div>
+</div>
+<div id="accountLoggedIn" hidden>
+<p id="accountUser" class="account-user"></p>
+<button type="button" id="accountLogout">SAIR</button>
+</div>
+<p class="account-status" id="accountStatus" role="status" aria-live="polite"></p>
+</div>
+</div></div>
 <h1>COSMOS<br>TOOLS</h1>
 <p class="subtitle">IDEAS IN THE MAKING.</p>
 <nav class="tools" aria-label="COSMOS TOOLS">
@@ -43,5 +75,55 @@ footer .est{font-size:9px;letter-spacing:.13em;color:var(--muted)}
 <div class="tagline">NOT YOUR REGULAR COOKIE</div>
 <div class="est">EST. 2024</div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+const $=id=>document.getElementById(id);
+const panel=$('accountPanel'),toggle=$('accountToggle');
+toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden});
+function showSession(user){
+ $('accountLoggedOut').hidden=!!user;
+ $('accountLoggedIn').hidden=!user;
+ $('accountToggle').textContent=user?'MINHA CONTA':'LOGIN';
+ $('accountHeading').textContent=user?'CONTA CONECTADA':'CONTA COSMOS';
+ $('accountUser').textContent=user?(user.email||'CONECTADO'):'';
+}
+async function refresh(){
+ if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
+ const {data,error}=await client.auth.getSession();
+ if(error){$('accountStatus').textContent='ERRO AO VERIFICAR A SESSÃO.';return}
+ showSession(data.session?.user||null);
+}
+$('accountLogin').addEventListener('click',async()=>{
+ const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
+ if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
+ $('accountStatus').textContent='ENTRANDO...';
+ const {error}=await client.auth.signInWithPassword({email,password});
+ $('accountStatus').textContent=error?'NÃO FOI POSSÍVEL ENTRAR: '+error.message:'LOGIN REALIZADO. SUAS FERRAMENTAS VÃO USAR A NUVEM.';
+ if(!error)await refresh();
+});
+$('accountSignup').addEventListener('click',async()=>{
+ const email=$('accountEmail').value.trim(),password=$('accountPassword').value;
+ if(!email||!password){$('accountStatus').textContent='INFORME E-MAIL E SENHA.';return}
+ if(password.length<6){$('accountStatus').textContent='A SENHA PRECISA TER PELO MENOS 6 CARACTERES.';return}
+ $('accountStatus').textContent='CRIANDO CONTA...';
+ const {data,error}=await client.auth.signUp({email,password});
+ $('accountStatus').textContent=error?'NÃO FOI POSSÍVEL CRIAR A CONTA: '+error.message:(data.session?'CONTA CRIADA E CONECTADA.':'CONTA CRIADA. VERIFIQUE SEU E-MAIL PARA CONFIRMAR.');
+ await refresh();
+});
+$('accountLogout').addEventListener('click',async()=>{
+ $('accountStatus').textContent='SAINDO...';
+ const {error}=await client.auth.signOut();
+ $('accountStatus').textContent=error?'ERRO AO SAIR: '+error.message:'VOCÊ SAIU DA CONTA.';
+ if(!error)await refresh();
+});
+if(client)client.auth.onAuthStateChange((_event,session)=>showSession(session?.user||null));
+refresh();
+})();
+</script>
 </body>
 </html>
