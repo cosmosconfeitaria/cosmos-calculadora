@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 .auth-compat{display:none!important}
@@ -183,6 +183,28 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   .tablewrap td[data-label]::before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;font-weight:800}
   .tablewrap td.c-adj .v{display:block;background:var(--cream);border-radius:10px;padding:13px 10px;font-size:15px}
 }
+
+/* IDENTIDADE COSMOS */
+:root{--ink:#2D2D2D;--muted:#6f6c68;--line:#d4d1cc}
+html{min-height:100%;background:var(--blue)}
+body{position:relative;isolation:isolate;background:var(--blue);color:var(--blue);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px}
+body:before,body:after{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background-repeat:repeat;animation:cosmos-stars 110s linear infinite}
+body:before{opacity:.75;background-image:radial-gradient(1px 1px at 13px 19px,#fff 98%,transparent),radial-gradient(1px 1px at 77px 53px,#dce8ff 98%,transparent),radial-gradient(1px 1px at 141px 117px,#fff 98%,transparent),radial-gradient(1px 1px at 193px 31px,#c8dcff 98%,transparent);background-size:257px 211px}
+body:after{opacity:.35;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent);background-size:293px 239px;animation-direction:reverse;animation-duration:150s}
+@keyframes cosmos-stars{to{transform:translate3d(6%,5%,0)}}
+.wrap{position:relative;width:min(900px,calc(100% - 42px));margin:24px auto;padding:22px 24px 30px;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30}
+.top{border-bottom:1px solid #d4d1cc}
+.brand,.tag,h1,.section-title,.badge,label,button,.footer-cosmos .line-brand,.footer-cosmos .line-tagline{font-weight:400;letter-spacing:-.35px}
+h1{letter-spacing:-1.5px}
+.intro{font-weight:400;color:#55514d}
+.panel{background:#fff;border:1px solid #d4d1cc;border-radius:10px;box-shadow:0 4px 0 #d8d5d0}
+button{border:1px solid #aaa8a3;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012}
+.primary,.secondary{background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue)}
+.footer-cosmos .line-brand{color:var(--blue)}
+.footer-cosmos .line-tagline{color:var(--blue)}
+.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;font-weight:400;letter-spacing:0;color:#D22222}
+@media(max-width:560px){.wrap{width:calc(100% - 32px);margin:16px auto;padding:14px}}
+@media(prefers-reduced-motion:reduce){body:before,body:after{animation:none}}
 </style>
 </head>
 <body class="auth-pending">
