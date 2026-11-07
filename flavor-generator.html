@@ -31,6 +31,12 @@ h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:
 .result .tag{font-size:9px;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
 .result h2{font-size:clamp(23px,5vw,36px);line-height:1.05;color:var(--blue);margin:0 0 18px;letter-spacing:-.035em}
 .parts{display:grid;gap:10px;width:100%}
+.alternatives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.alternative{min-width:0;text-align:left;padding:11px 9px;border:1px solid var(--line);border-radius:10px;background:var(--cream);color:var(--ink);cursor:pointer}
+.alternative.active{border-color:var(--blue);background:#eef3fc}
+.alternative strong{display:block;color:var(--blue);font-size:10px;line-height:1.3;margin-bottom:6px}
+.alternative small{display:block;color:var(--muted);font-size:9px;line-height:1.4}
+@media(max-width:520px){.alternatives{grid-template-columns:1fr}}
 .part{border-top:1px solid var(--line);padding-top:9px}
 .part strong{display:block;font-size:9px;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
 .part span{font-size:13px;line-height:1.5}
@@ -115,7 +121,9 @@ footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
 <section class="panel result" aria-live="polite">
 <div class="tag" id="resultTag">SUA PRÓXIMA IDEIA</div>
 <h2 id="resultName">PRONTO PARA COMEÇAR?</h2>
-<div class="parts" id="resultParts"><p class="empty">gere uma combinação para explorar uma nova ideia.</p></div>
+<div class="parts" id="resultParts"><p class="empty">gere uma combinação para explorar novas ideias.</p></div>
+<div class="label" style="margin-top:20px">ESCOLHA ENTRE AS 3 IDEIAS SORTEADAS</div>
+<div class="alternatives" id="alternatives"></div>
 <div class="actions">
 <button class="action primary" id="generate">GERAR COMBINAÇÃO ↻</button>
 <button class="action primary" id="save" disabled>SALVAR IDEIA ★</button>
@@ -430,7 +438,7 @@ function buildCreativeIdeas(){
 const keyOptions=['abacaxi','abóbora','ameixa','amêndoas','amendoim','amora','avelã','banana','baunilha','batata chips','cacau','café','canela','caramelo','cereja','champanhe','chocolate','chocolate branco','chocolate ao leite','coco','confeitos','cranberry','creme de queijo','damasco','doce de leite','figo','flor de laranjeira','framboesa','frutas vermelhas','gengibre','gergelim','goiaba','goiabada','hibisco','iogurte','kadayif','kinder','laranja','lavanda','leite ninho','limão','lotus','maçã','manga','maracujá','marshmallow','mascarpone','mel','milho','missô','morango','nozes','nutella','oreo','pêssego','pimenta rosa','pistache','pretzel','queijo','rapadura','red velvet','sorvete','uva verde','cereal','balsâmico'];
 ['abóbora','amêndoas','banana','bergamota','cardamomo','cranberry','damasco','earl grey','erva-doce','figo','gengibre','goiabada','hortelã','lavanda','maçã','manga','mascarpone','milho','noz-pecã','noz-moscada','paçoca','pêssego','pitaya','tamarindo','uva verde','ube','pera','pecan','maltado'].forEach(k=>{if(!keyOptions.includes(k))keyOptions.push(k)});
 keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k.toLocaleUpperCase('pt-BR');$('keyFlavor').append(o)});
-let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null;
+let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null,currentOptions=[];
 const KEY='cosmos.flavor-generator.saved.v2';
 const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
 const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
@@ -537,6 +545,17 @@ function hasIngredient(idea,selected){
  return terms.some(term=>text.includes(normalizeIngredient(term)));
 }
 const recentGenerated=[];
+function renderAlternatives(){
+ const host=$('alternatives');host.innerHTML='';
+ currentOptions.forEach((idea,index)=>{
+  const button=document.createElement('button');button.type='button';button.className='alternative'+(current&&current.id===idea.id+'|'+idea.name?' active':'');
+  const name=document.createElement('strong');name.textContent=idea.name;
+  const summary=document.createElement('small');summary.textContent=idea.category+' · '+idea.parts.slice(1,3).map(p=>p[1]).join(' / ');
+  button.append(name,summary);
+  button.addEventListener('click',()=>{current={...idea,parts:idea.parts.map(p=>[...p]),id:idea.id+'|'+idea.name};renderIdea(current);renderAlternatives()});
+  host.append(button);
+ });
+}
 function generate(){
  const pool=ideas.concat(buildCreativeIdeas());
  let candidates=pool.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter)&&(occasion==='TODAS'||x.occasion===occasion)&&(keyFlavor==='TODOS'||hasIngredient(x,keyFlavor)));
@@ -544,15 +563,19 @@ function generate(){
   $('resultTag').textContent=[filter,occasion,keyFlavor!=='TODOS'?keyFlavor.toUpperCase():null].filter(Boolean).join(' / ');
   $('resultName').textContent='AINDA NÃO TEMOS ESSA COMBINAÇÃO';
   $('resultParts').innerHTML='<p class="empty">não encontrei uma composição coerente com todos esses filtros. tente outro ingrediente-chave ou produto.</p>';
-  $('save').disabled=true;current=null;return;
+  $('alternatives').innerHTML='';
+  $('save').disabled=true;current=null;currentOptions=[];return;
  }
- let choices=candidates.filter(x=>x.id!==current?.id&&!recentGenerated.includes(x.id));
- if(!choices.length)choices=candidates.filter(x=>x.id!==current?.id);
- if(!choices.length)choices=candidates;
- const base=choices[Math.floor(Math.random()*choices.length)];
- current={...base,parts:base.parts.map(p=>[...p]),id:base.id+'|'+base.name};
- recentGenerated.unshift(base.id);recentGenerated.splice(10);
- renderIdea(current);
+ let choices=candidates.filter(x=>!recentGenerated.includes(x.id));
+ if(choices.length<3)choices=candidates.filter(x=>!currentOptions.some(old=>old.id===x.id));
+ if(choices.length<3)choices=candidates;
+ for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]]}
+ currentOptions=choices.slice(0,Math.min(3,choices.length));
+ currentOptions.forEach(x=>{recentGenerated.unshift(x.id)});
+ recentGenerated.splice(15);
+ const first=currentOptions[0];
+ current={...first,parts:first.parts.map(p=>[...p]),id:first.id+'|'+first.name};
+ renderIdea(current);renderAlternatives();
 }
 function renderSaved(){
  const all=getSaved();
