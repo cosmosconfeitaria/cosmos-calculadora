@@ -137,7 +137,7 @@ $('accountLogin').addEventListener('click',async()=>{
  }else{
   serverSessionReady=await syncServerSession(data.session);
   showSession(data.session?.user||null);
-  $('accountStatus').textContent=serverSessionReady?'LOGIN REALIZADO. SUAS FERRAMENTAS ESTÃO LIBERADAS.':'LOGIN REALIZADO, MAS NÃO FOI POSSÍVEL VALIDAR O ACESSO. TENTE NOVAMENTE.';
+  $('accountStatus').textContent=serverSessionReady?'':'LOGIN REALIZADO, MAS NÃO FOI POSSÍVEL VALIDAR O ACESSO. TENTE NOVAMENTE.';
  }
 });
 $('accountLogout').addEventListener('click',async()=>{
