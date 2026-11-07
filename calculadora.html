@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COSMOS COOKIE LAB · CALCULADORA DE RECEITAS</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 .auth-compat{display:none!important}
+body.auth-pending .wrap{visibility:hidden}
 
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#171717;--muted:#686868;--line:#d9d6d1;--white:#fff;--pink:#e06d8a;--pink-light:#f9ecef}
 *{box-sizing:border-box}
@@ -183,7 +185,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 }
 </style>
 </head>
-<body>
+<body class="auth-pending">
 <div class="wrap">
   <header class="top">
     <div class="brand">COSMOS COOKIE LAB</div>
@@ -881,6 +883,9 @@ async function checkAuthUser() {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     setUserSession(session?.user || null);
+    if (session?.user && String(session.user.email || '').toLowerCase() === 'cosmosconfeitaria@gmail.com') {
+      await loadCloudFichas();
+    }
     
     if (!isAuthInitialized) {
       isAuthInitialized = true;
@@ -1403,6 +1408,24 @@ $('duplicar').addEventListener('click', duplicarFicha);
 $('del').addEventListener('click', delFicha);
 $('newF').addEventListener('click', novaFicha);
 $('reset').addEventListener('click', restaurar);
+})();
+</script>
+
+<script>
+(async function(){
+  const url='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+  const key='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+  try {
+    const client=window.supabase.createClient(url,key);
+    const {data,error}=await client.auth.getSession();
+    const user=data&&data.session&&data.session.user;
+    if(error||!user||String(user.email||'').toLowerCase()!=='cosmosconfeitaria@gmail.com'){
+      if(user) await client.auth.signOut();
+      window.location.replace('index.html');
+      return;
+    }
+    document.body.classList.remove('auth-pending');
+  } catch(e) { window.location.replace('index.html'); }
 })();
 </script>
 </body>
