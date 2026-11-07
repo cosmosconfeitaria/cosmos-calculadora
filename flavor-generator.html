@@ -19,7 +19,7 @@ h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:
 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;box-shadow:0 5px 0 #dedbd6}
 .label{font-size:10px;letter-spacing:.13em;font-weight:900;color:var(--muted);margin-bottom:12px}
 .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.filter,.action{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);padding:12px 10px;border-radius:11px;font-size:10px;font-weight:900;letter-spacing:.045em;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012;text-shadow:0 1px 0 #fff;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.filter,.action{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);padding:12px 10px;border-radius:11px;font-size:10px;font-weight:900;letter-spacing:.045em;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
 .filter.active{background:linear-gradient(180deg,#dce8fb,#aebfdb 55%,#9fb3d5);box-shadow:inset 0 2px 1px #fff,0 1px 0 #929eaf;transform:translateY(3px)}
 .types{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .type{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);padding:14px 8px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.05em;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 6px 10px #00000012;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
@@ -146,10 +146,13 @@ const ideas = [
 {type:'COOKIE',category:'COMERCIAL',name:'RED VELVET',parts:[['MASSA','massa red velvet amanteigada'],['RECHEIO','ganache de cream cheese'],['RECHEIO COMPLEMENTAR','opcional: geleia de frutas vermelhas'],['TOPPING','farelo de red velvet antes de assar']]},
 {type:'COOKIE',category:'HYPADO',name:'DUBAI PISTACHE',parts:[['MASSA','massa de baunilha com pistache'],['RECHEIO','creme de pistache com kadayif crocante'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate ao leite'],['TOPPING','pistache picado e fios de chocolate depois de assar']]},
 {type:'COOKIE',category:'FRUTADO',name:'LIMÃO & FRAMBOESA',parts:[['MASSA','massa de limão-siciliano'],['RECHEIO','ganache de limão'],['RECHEIO COMPLEMENTAR','opcional: geleia de framboesa'],['TOPPING','açúcar cítrico ou framboesa liofilizada depois de assar']]},
+{type:'COOKIE',category:'FRUTADO',name:'PIÑA COLADA',occasion:'TODAS',parts:[['MASSA','massa de coco saborizada com leite de coco e suco de abacaxi'],['RECHEIO','compota de abacaxi'],['RECHEIO COMPLEMENTAR','brigadeiro de coco'],['TOPPING','coco ralado para empanar']]},
+{type:'COOKIE',category:'COMFORT',name:'COOKIE PUDIM',parts:[['MASSA','massa de leite em pó saborizada com leite condensado'],['RECHEIO','ganache de pudim com chocolate branco'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','caramelo']]},
 {type:'COOKIE',category:'EXÓTICO',name:'GOIABA, QUEIJO & PIMENTA ROSA',parts:[['MASSA','massa amanteigada com toque de queijo'],['RECHEIO','goiabada cremosa'],['RECHEIO COMPLEMENTAR','opcional: cream cheese'],['TOPPING','pimenta rosa levemente triturada antes de assar']]},
 {type:'COOKIE',category:'MADURO',name:'FIGO, MEL & NOZES',parts:[['MASSA','massa de manteiga noisette'],['RECHEIO','geleia de figo'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate amargo'],['TOPPING','nozes tostadas e um fio de mel depois de assar']]},
 {type:'COOKIE',category:'COMFORT',name:'BANANA BREAD',parts:[['MASSA','massa de banana e canela'],['RECHEIO','doce de leite'],['RECHEIO COMPLEMENTAR','opcional: creme de cream cheese'],['TOPPING','farofa amanteigada antes de assar']]},
 {type:'COOKIE',category:'SEM RECHEIO',name:'BROWN BUTTER CHUNK',parts:[['MASSA','massa de manteiga noisette com chocolate em pedaços'],['RECHEIO','sem recheio'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','flor de sal depois de assar']]},
+{type:'COOKIE',category:'COMFORT',name:'PAÇOCA & DOCE DE LEITE',occasion:'SÃO JOÃO',parts:[['MASSA','massa de baunilha com amendoim torrado'],['RECHEIO','doce de leite cremoso'],['RECHEIO COMPLEMENTAR','creme de paçoca'],['TOPPING','farofa de paçoca']]},
 {type:'COOKIE',category:'FERRERO',name:'RAFFAELLO',parts:[['MASSA','massa de coco e baunilha'],['RECHEIO','ganache de chocolate branco com amêndoas'],['RECHEIO COMPLEMENTAR','opcional: creme de coco'],['TOPPING','coco em flocos e amêndoa triturada antes de assar']]}
 ];
 const $=id=>document.getElementById(id);
@@ -171,25 +174,21 @@ function renderIdea(idea){
  $('save').disabled=false;
  $('save').textContent=getSaved().some(x=>x.id===idea.id)?'IDEIA SALVA ✓':'SALVAR IDEIA ☆';
 }
-const componentOptions = {
- DOT: [
-  ['massa amanteigada de baunilha','massa de cacau','massa de pistache','massa de manteiga noisette','massa de coco e baunilha','massa de canela'],
-  ['ganache de chocolate meio amargo','creme de avelã','brigadeiro branco com geleia de frutas','caramelo cremoso','ganache de frutas cítricas','creme de pistache'],
-  ['rosa + branco','azul + amarelo + rosa','verde + branco + dourado','marrom + bege + dourado','amarelo + branco','lilás + rosa + branco']
- ],
- BROOKIE: [
-  ['cookie de baunilha','cookie de cacau','cookie de pistache','cookie de canela','cookie de café','cookie de avelã'],
-  ['brownie tradicional','brownie intenso 70%','brownie de chocolate branco','brownie com cacau black'],
-  ['ganache de chocolate','creme de avelã','doce de leite','caramelo salgado','creme de pistache','geleia de frutas vermelhas'],
-  ['pistache picado e fios de chocolate','flor de sal e nibs de cacau','avelãs tostadas','farofa amanteigada','biscoito triturado e chocolate','frutas liofilizadas']
- ],
- COOKIE: [
-  ['massa de baunilha','massa de cacau','massa de pistache','massa de café','massa de limão-siciliano','massa de manteiga noisette','massa de canela','massa de coco'],
-  ['ganache de chocolate','creme de avelã','doce de leite','ganache de frutas cítricas','geleia de frutas vermelhas','creme de pistache','goiabada cremosa','sem recheio'],
-  ['sem recheio complementar','caramelo salgado','geleia de frutas','ganache de chocolate amargo','creme de cream cheese','não se aplica'],
-  ['flor de sal depois de assar','pistache picado depois de assar','farofa amanteigada antes de assar','açúcar cítrico depois de assar','coco em flocos antes de assar','nibs de cacau antes de assar']
- ]
-};
+function chocolateFor(idea){
+ const text=idea.parts.map(p=>p[1]).join(' ').toLowerCase();
+ if(/abacaxi|coco|limão|limao|maracujá|maracuja|morango|framboesa|frutas vermelhas|yuzu/.test(text)) return 'chocolate branco em gotas ou pedaços (combinação mais adequada)';
+ if(/pistache|kadayif|avelã|avela|nutella|kinder|rocher|ferrero/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
+ if(/cacau|chocolate amargo|70%|café/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
+ return 'chocolate blend em gotas ou pedaços (primeira opção)';
+}
+function buildParts(idea){
+ const parts=idea.parts.map(p=>[p[0],p[1]]);
+ const insertAt=idea.type==='BROOKIE'
+  ? Math.max(0,parts.findIndex(p=>p[0]==='BROWNIE')+1)
+  : 1;
+ parts.splice(insertAt,0,['CHOCOLATE',chocolateFor(idea)]);
+ return parts;
+}
 let lastGeneratedKey = '';
 function makeTitle(parts){
  const clean=value=>value.replace(/^massa de /i,'').replace(/^massa /i,'').replace(/^cookie de /i,'').replace(/^brownie de /i,'').replace(/^ganache de /i,'').replace(/^creme de /i,'').replace(/^geleia de /i,'').replace(/^doce de leite$/i,'doce de leite').replace(/ depois de assar/ig,'').replace(/ antes de assar/ig,'').trim();
@@ -200,21 +199,23 @@ function makeTitle(parts){
 function generate(){
  const pool=ideas.filter(x=>x.type===type&&(filter==='TODAS'||x.category===filter));
  if(!pool.length)return;
- const base=pool[Math.floor(Math.random()*pool.length)];
- const options=componentOptions[type];
- let candidate;
- for(let attempt=0;attempt<12;attempt++){
-  candidate={...base,parts:base.parts.map((part,index)=>{
-   const choices=options[index]||[part[1]];
-   const value=choices[Math.floor(Math.random()*choices.length)];
-   return [part[0],value];
-  })};
-  candidate.name=makeTitle(candidate.parts);
-  candidate.occasion=occasion;
-  candidate.id=base.type+'-'+base.category+'-'+(occasion||'TODAS')+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
-  if(candidate.id!==lastGeneratedKey)break;
+ let candidates=pool;
+ if(occasion!=='TODAS'){
+  candidates=pool.filter(x=>x.occasion===occasion);
+  if(!candidates.length){
+   $('resultTag').textContent=occasion+' / '+filter;
+   $('resultName').textContent='IDEIA SAZONAL EM CONSTRUÇÃO';
+   $('resultParts').innerHTML='<p class="empty">ainda não temos uma composição validada para esta ocasião nesta categoria. prefiro não marcar uma combinação aleatória como sazonal.</p>';
+   $('save').disabled=true;
+   current=null;
+   return;
+  }
  }
- lastGeneratedKey=candidate.id;
+ let base=candidates[Math.floor(Math.random()*candidates.length)];
+ if(candidates.length>1&&base.id===lastGeneratedKey)base=candidates.find(x=>x.id!==lastGeneratedKey)||base;
+ const candidate={...base,parts:buildParts(base),occasion:occasion};
+ candidate.id=base.type+'-'+base.category+'-'+(occasion||'TODAS')+'-'+candidate.name+'-'+candidate.parts.map(p=>p[1]).join('|');
+ lastGeneratedKey=base.id;
  current=candidate;
  renderIdea(current);
 }
