@@ -147,6 +147,9 @@ const ideas = [
 {type:'COOKIE',category:'HYPADO',name:'DUBAI PISTACHE',parts:[['MASSA','massa de baunilha com pistache'],['RECHEIO','creme de pistache com kadayif crocante'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate ao leite'],['TOPPING','pistache picado e fios de chocolate depois de assar']]},
 {type:'COOKIE',category:'FRUTADO',name:'LIMÃO & FRAMBOESA',parts:[['MASSA','massa de limão-siciliano'],['RECHEIO','ganache de limão'],['RECHEIO COMPLEMENTAR','opcional: geleia de framboesa'],['TOPPING','açúcar cítrico ou framboesa liofilizada depois de assar']]},
 {type:'COOKIE',category:'FRUTADO',name:'PIÑA COLADA',occasion:'TODAS',parts:[['MASSA','massa de coco saborizada com leite de coco e suco de abacaxi'],['RECHEIO','compota de abacaxi'],['RECHEIO COMPLEMENTAR','brigadeiro de coco'],['TOPPING','coco ralado para empanar']]},
+{type:'COOKIE',category:'HYPADO',name:'CHIPS & CHOCOLATE',parts:[['MASSA','massa de manteiga noisette com baunilha'],['RECHEIO','ganache de chocolate blend'],['RECHEIO COMPLEMENTAR','opcional: caramelo salgado'],['TOPPING','batata chips triturada e pedaços crocantes para finalizar']]},
+{type:'COOKIE',category:'COMERCIAL',name:'NINHO & NUTELLA',parts:[['MASSA','massa saborizada com leite em pó'],['RECHEIO','Nutella'],['RECHEIO COMPLEMENTAR','brigadeiro de leite em pó'],['TOPPING','farofa de leite em pó']]},
+{type:'COOKIE',category:'COMFORT',name:'PAÇOCA JUNINA',occasion:'SÃO JOÃO',parts:[['MASSA','massa de baunilha com amendoim torrado'],['RECHEIO','doce de leite cremoso'],['RECHEIO COMPLEMENTAR','creme de paçoca'],['TOPPING','farofa de paçoca para empanar']]},
 {type:'COOKIE',category:'COMFORT',name:'COOKIE PUDIM',parts:[['MASSA','massa de leite em pó saborizada com leite condensado'],['RECHEIO','ganache de pudim com chocolate branco'],['RECHEIO COMPLEMENTAR','não se aplica'],['TOPPING','caramelo']]},
 {type:'COOKIE',category:'EXÓTICO',name:'GOIABA, QUEIJO & PIMENTA ROSA',parts:[['MASSA','massa amanteigada com toque de queijo'],['RECHEIO','goiabada cremosa'],['RECHEIO COMPLEMENTAR','opcional: cream cheese'],['TOPPING','pimenta rosa levemente triturada antes de assar']]},
 {type:'COOKIE',category:'MADURO',name:'FIGO, MEL & NOZES',parts:[['MASSA','massa de manteiga noisette'],['RECHEIO','geleia de figo'],['RECHEIO COMPLEMENTAR','opcional: ganache de chocolate amargo'],['TOPPING','nozes tostadas e um fio de mel depois de assar']]},
@@ -176,8 +179,8 @@ function renderIdea(idea){
 }
 function chocolateFor(idea){
  const text=idea.parts.map(p=>p[1]).join(' ').toLowerCase();
- if(/chocolate branco/.test(text)||/abacaxi|coco/.test(text)) return 'chocolate branco em gotas ou pedaços (combinação mais adequada)';
- if(/pistache|kadayif|avelã|avela|nutella|kinder|rocher|ferrero/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
+ if(/PIÑA COLADA|COOKIE PUDIM/i.test(idea.name)) return 'chocolate branco em gotas ou pedaços (necessário para a composição)';
+ if(/chocolate ao leite/.test(text)) return 'chocolate blend em gotas ou pedaços (prioridade de uso)';
  if(/cacau|chocolate amargo|70%|café/.test(text)) return 'chocolate blend em gotas ou pedaços (primeira opção)';
  return 'chocolate blend em gotas ou pedaços (primeira opção)';
 }
