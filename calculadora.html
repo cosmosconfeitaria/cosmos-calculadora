@@ -226,6 +226,9 @@ button{font-weight:500;box-shadow:inset 0 1px 1px #fff,inset 0 -1px 1px #aaa9a6,
 .x,.btn-order{width:27px;height:27px;min-width:27px;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-size:15px;font-weight:600;border:1px solid #fff;background:linear-gradient(180deg,#fff 0%,#f0efed 48%,#d8d7d4 100%);box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e,0 3px 5px #0000000b}
 .x{color:var(--red);border-color:#fff}
 .btn-order{color:var(--blue)}
+/* SETAS DE ORDENAÇÃO: APENAS A PONTA, EM PESO VISUAL COMPATÍVEL COM O X */
+.btn-order{font-size:18px!important;font-weight:700!important;line-height:1!important}
+
 .chk-box{accent-color:var(--blue)}
 tr.checked-row td{background:#f8eeeb!important;color:#8f3b34}
 tr.checked-row td input{color:#8f3b34}
@@ -719,12 +722,12 @@ function renderRows(key){
     var td4=document.createElement('td'); td4.className='c-rm';
     var rowActions=document.createElement('div'); rowActions.className='row-actions';
 
-    var btnUp=document.createElement('button'); btnUp.className='btn-order'; btnUp.type='button'; btnUp.textContent='↑';
+    var btnUp=document.createElement('button'); btnUp.className='btn-order'; btnUp.type='button'; btnUp.textContent='⌃';
     btnUp.setAttribute('aria-label','MOVER PARA CIMA'); btnUp.title='MOVER PARA CIMA';
     if(i === 0) btnUp.disabled = true;
     btnUp.addEventListener('click',function(){ moveItem(key, i, i - 1); });
 
-    var btnDown=document.createElement('button'); btnDown.className='btn-order'; btnDown.type='button'; btnDown.textContent='↓';
+    var btnDown=document.createElement('button'); btnDown.className='btn-order'; btnDown.type='button'; btnDown.textContent='⌄';
     btnDown.setAttribute('aria-label','MOVER PARA BAIXO'); btnDown.title='MOVER PARA BAIXO';
     if(i === list.length - 1) btnDown.disabled = true;
     btnDown.addEventListener('click',function(){ moveItem(key, i, i + 1); });
