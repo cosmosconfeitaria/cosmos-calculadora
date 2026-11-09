@@ -227,7 +227,7 @@ button{font-weight:500;box-shadow:inset 0 1px 1px #fff,inset 0 -1px 1px #aaa9a6,
 .x{color:var(--red);border-color:#fff}
 .btn-order{color:var(--blue)}
 /* SETAS DE ORDENAÇÃO: APENAS A PONTA, EM PESO VISUAL COMPATÍVEL COM O X */
-.x,.btn-order{font-family:'Gochi Hand',cursive}.x{font-size:17px!important;transform:translate(-2px,5px)}.btn-order{display:inline-flex;align-items:center;justify-content:center;text-align:center;vertical-align:middle}.btn-order .order-glyph{display:block;font-family:'Gochi Hand',cursive;font-size:19px;line-height:1;font-weight:400;color:var(--blue)}.btn-order .order-glyph-up{transform:translateY(3px)}.btn-order .order-glyph-down{transform:translateY(1px) rotate(180deg)}
+.x,.btn-order{font-family:'Gochi Hand',cursive}.x{font-size:17px!important;transform:none}.x .x-glyph{display:block;transform:translateY(2px)}.btn-order{display:inline-flex;align-items:center;justify-content:center;text-align:center;vertical-align:middle}.btn-order .order-glyph{display:block;font-family:'Gochi Hand',cursive;font-size:19px;line-height:1;font-weight:400;color:var(--blue)}.btn-order .order-glyph-up{transform:translateY(3px)}.btn-order .order-glyph-down{transform:translateY(1px) rotate(180deg)}
 
 .chk-box{accent-color:var(--blue)}
 tr.checked-row td{background:#f8eeeb!important;color:#8f3b34}
@@ -732,7 +732,7 @@ function renderRows(key){
     if(i === list.length - 1) btnDown.disabled = true;
     btnDown.addEventListener('click',function(){ moveItem(key, i, i + 1); });
 
-    var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.textContent='×';
+    var rm=document.createElement('button'); rm.className='x'; rm.type='button'; rm.innerHTML='<span class="x-glyph" aria-hidden="true">×</span>';
     rm.setAttribute('aria-label','REMOVER INGREDIENTE'); rm.title='REMOVER INGREDIENTE';
     rm.addEventListener('click',function(){state[key].items.splice(i,1);touched(true);renderRows(key);update();});
 
