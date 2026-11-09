@@ -145,6 +145,13 @@ footer.footer-cosmos .line-brand .logo-type{font-size:inherit;font-weight:inheri
 footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
 footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
 @media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
+
+/* PAGINAÇÃO DAS IDEIAS SALVAS: BOTÕES METÁLICOS CENTRALIZADOS */
+.saved-pagination{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;margin:18px auto 0;text-align:center}
+.saved-pagination .saved-page-button{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 11px;border:1px solid #aaa8a3;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:0;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 3px 0 #a5a39e,0 5px 8px #00000012;cursor:pointer}
+.saved-pagination .saved-page-button[aria-current="page"]{background:linear-gradient(180deg,#e8e7e4 0%,#d4d3d0 48%,#c5c4c1 52%,#deddd9 100%);box-shadow:inset 0 2px 3px #aaa9a6,0 1px 0 #fff;transform:translateY(2px)}
+.saved-pagination .saved-page-button:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:520px){.saved-pagination{gap:7px}.saved-pagination .saved-page-button{min-width:32px;height:30px;padding:0 9px}}
 </style>
 
 </head>
