@@ -54,10 +54,7 @@ h1{font-size:clamp(30px,7vw,58px);line-height:.98;letter-spacing:-.055em;margin:
 .saved-item small{font-size:10px;color:var(--muted);line-height:1.5;display:block}
 .remove{border:0;background:transparent;color:#b33b43;font-size:18px;cursor:pointer;padding:4px}
 .empty{font-size:11px;color:var(--muted);line-height:1.6}
-footer{text-align:center;padding:28px 10px 12px;display:grid;gap:6px}
-footer strong{font-size:12px;letter-spacing:.18em;color:var(--blue)}
-footer span{font-size:10px;letter-spacing:.14em;font-weight:800}
-footer small{font-size:9px;color:var(--muted);letter-spacing:.12em}
+/* O RODAPÉ USA EXCLUSIVAMENTE A IMPLEMENTAÇÃO OFICIAL .footer-cosmos. */
 @media(max-width:520px){.wrap{padding:16px 14px 28px}.panel{padding:16px}.types{grid-template-columns:repeat(2,minmax(0,1fr))}.type{padding:12px 8px}.saved-filters{grid-template-columns:1fr 1fr}}
 
 /* IDENTIDADE COSMOS */
@@ -144,6 +141,7 @@ footer small{font-size:9px;line-height:1.1;color:#D22222}
 /* RODAPÉ OFICIAL COSMOS: COPIADO DA HOME E DO RECIPE CALCULATOR */
 footer.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;margin:0;gap:3px;background:transparent}
 footer.footer-cosmos .line-brand{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+footer.footer-cosmos .line-brand .logo-type{font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit}
 footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
 footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
 @media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
