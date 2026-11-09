@@ -79,6 +79,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   width: 100%;
   height: auto;
   display: block;
+  background: transparent;
 }
 .cosmos-lcd-screen {
   position: absolute;
@@ -104,11 +105,17 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 }
 .cosmos-btn-click {
   position: absolute;
-  background: transparent;
-  border: none;
+  z-index: 2;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
   cursor: pointer;
   border-radius: 50%;
   padding: 0;
+  min-width: 0;
+  min-height: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .cosmos-btn-min {
   top: 56.5%;
@@ -125,9 +132,9 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .cosmos-btn-startstop {
   top: 56.5%;
   left: 67.5%;
-  width: 22%;
+  width: 18.5%;
   height: 22.5%;
-  border-radius: 12px;
+  border-radius: 50%;
 }
 
 /* RODAPÉ MINIMALISTA COSMOS */
