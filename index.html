@@ -83,57 +83,66 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 }
 .cosmos-lcd-screen {
   position: absolute;
-  top: 31%;
+  top: 29.5%;
   left: 27.5%;
   width: 45.5%;
-  height: 19.5%;
+  height: 21%;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  pointer-events: none;
 }
 .cosmos-lcd-digits {
   font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 14.5px;
-  color: #2563EB;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  font-size: clamp(15px, 8.8vw, 19px);
+  line-height: 1;
+  color: #00B7FF;
+  letter-spacing: 0.1px;
   text-align: center;
   white-space: nowrap;
-  transform: translateY(2px);
+  text-shadow: 0 0 2px #8CE8FF, 0 0 6px #00B7FF, 0 0 11px rgba(0,183,255,.9);
+  transform: translateY(-1px);
 }
 .cosmos-btn-click {
   position: absolute;
-  z-index: 2;
+  z-index: 20;
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   background: transparent !important;
   border: 0 !important;
+  outline: 0;
   box-shadow: none !important;
   cursor: pointer;
   border-radius: 50%;
-  padding: 0;
-  min-width: 0;
-  min-height: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 .cosmos-btn-min {
-  top: 56.5%;
-  left: 26.5%;
-  width: 18.5%;
-  height: 22.5%;
+  top: 56%;
+  left: 26%;
+  width: 19%;
+  height: 23%;
 }
 .cosmos-btn-sec {
-  top: 56.5%;
-  left: 47%;
-  width: 18.5%;
-  height: 22.5%;
+  top: 56%;
+  left: 46.5%;
+  width: 19%;
+  height: 23%;
 }
 .cosmos-btn-startstop {
-  top: 56.5%;
-  left: 67.5%;
-  width: 18.5%;
-  height: 22.5%;
+  top: 56%;
+  left: 67%;
+  width: 19%;
+  height: 23%;
   border-radius: 50%;
 }
 
@@ -304,9 +313,9 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
       <div class="cosmos-lcd-screen">
         <div class="cosmos-lcd-digits" id="timerDisplay">00:00:00</div>
       </div>
-      <button type="button" class="cosmos-btn-click cosmos-btn-min" id="btnTimerToggle" aria-label="Iniciar ou parar o cronômetro" title="Iniciar / Parar"></button>
+      <button type="button" class="cosmos-btn-click cosmos-btn-min" id="btnTimerReset" aria-label="Zerar o cronômetro" title="Zerar"></button>
       <button type="button" class="cosmos-btn-click cosmos-btn-sec" id="btnTimerPause" aria-label="Pausar o cronômetro" title="Pausar"></button>
-      <button type="button" class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerReset" aria-label="Zerar o cronômetro" title="Zerar"></button>
+      <button type="button" class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" aria-label="Iniciar ou parar o cronômetro" title="Iniciar / Parar"></button>
     </div>
   </div>
 
