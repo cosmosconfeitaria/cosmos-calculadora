@@ -298,20 +298,36 @@ tr.checked-row td .v{color:#8f3b34}
 .key-flavor-option:hover,.key-flavor-option[aria-selected="true"]{background:rgba(34,99,210,.09);color:var(--blue)}
 .key-flavor-option:focus-visible{outline:1px solid var(--blue);outline-offset:-2px}
 </style>
+<style>
+/* CABEÇALHO OFICIAL COSMOS: MESMO CÓDIGO DO FLAVOR GENERATOR */
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
+.brand{font-size:14px;font-weight:500;letter-spacing:-.35px;color:var(--blue)}
+.back{width:42px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #aaa8a3;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;text-decoration:none}
+.menu-lines{display:grid;gap:4px;width:17px}
+.menu-lines i{display:block;height:2px;border-radius:2px;background:var(--blue)}
+header{border-bottom:1px solid #d4d1cc}
+.back:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.logo-type:after{animation:none}}
+
+/* RODAPÉ OFICIAL COSMOS: MESMO CÓDIGO DO FLAVOR GENERATOR */
+footer.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;margin:0;gap:3px;background:transparent}
+footer.footer-cosmos .line-brand{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+footer.footer-cosmos .line-brand .logo-type{font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit}
+footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
+footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
+@media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
+</style>
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <div class="wrap">
-  <header class="top">
-    <div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div>
-     <a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a>
-    <div class="tag" id="cloudTag">LOCAL</div>
-  </header>
+  <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
   <h1><span class="logo-type" data-text="CALCULADORA">CALCULADORA</span><span class="logo-type" data-text="DE RECEITAS">DE RECEITAS</span></h1>
   <p class="intro">INFORME O COOKIE, A CATEGORIA, A QUANTIDADE E OS PESOS POR UNIDADE. CADA PREPARAÇÃO É CALCULADA SEPARADAMENTE, COM O SEU PRÓPRIO RENDIMENTO-BASE.</p>
 
   <!-- COMPATIBILIDADE INTERNA: A AUTENTICAÇÃO É FEITA NA PÁGINA INICIAL -->
   <div class="auth-compat" aria-hidden="true">
+    <div class="tag" id="cloudTag">LOCAL</div>
     <div id="loggedOutView"></div><div id="loggedInView"></div>
     <span id="authBadge"></span><span id="userEmailDisplay"></span><span id="authStatus"></span>
     <input id="authEmail"><input id="authPassword">
