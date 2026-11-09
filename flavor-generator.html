@@ -164,12 +164,19 @@ footer small{font-size:9px;line-height:1.1;color:#D22222}
 .footer-cosmos .line-tagline{font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
 .footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
 </style>
+<style>
+/* PADRÃO DE SELETORES E PAGINAÇÃO COSMOS */
+.saved-filters .key-flavor-select{width:100%;min-width:0}
+.saved-filters select.key-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;opacity:0!important;pointer-events:none!important}
+.saved-filters .key-select-trigger{width:100%;min-height:40px}
+.saved-filters .key-flavor-menu{max-height:220px}
+.saved-pagination{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px}
+.saved-page-button{min-width:32px;height:30px;padding:0 9px;border:1px solid #aaa8a3;border-radius:6px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e;cursor:pointer}
+.saved-page-button[aria-current="page"]{transform:translateY(2px);box-shadow:inset 0 1px 1px #fff,0 1px 0 #929eaf}
+.saved-page-button:disabled{opacity:.4;cursor:not-allowed}
+</style>
 </head>
 <body class="auth-pending">
-<button class="cosmos-btn-click cosmos-btn-min" id="btnTimerMin" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"></button>
- <button class="cosmos-btn-click cosmos-btn-sec" id="btnTimerSec" type="button" title="Adicionar um segundo" aria-label="Adicionar um segundo"></button>
- <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" type="button" title="Iniciar ou pausar. Clique duas vezes para zerar" aria-label="Iniciar cronômetro"></button>
-</div>
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <div class="wrap">
 <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
@@ -250,6 +257,7 @@ footer small{font-size:9px;line-height:1.1;color:#D22222}
 <div class="saved-head"><h3>IDEIAS SALVAS</h3><span class="saved-count" id="savedCount">0 salvas</span></div>
 <div class="saved-filters"><select id="savedCategory" aria-label="FILTRAR IDEIAS POR CATEGORIA"><option value="TODAS">TODAS AS CATEGORIAS</option><option>CHOCOLATUDO</option><option>COMERCIAL</option><option>HYPADO</option><option>FRUTADO</option><option>EXÓTICO</option><option>MADURO</option><option>COMFORT</option><option>SEM RECHEIO</option><option>FERRERO</option><option>QUEIJOS</option></select><select id="savedType" aria-label="FILTRAR IDEIAS POR PRODUTO"><option value="TODOS">TODOS OS PRODUTOS</option><option value="DOT">DOT COOKIES</option><option value="BROOKIE">BROOKIE</option><option value="COOKIE">COOKIE</option><option value="ICE">ICE COOKIE</option></select><select id="savedOccasion" aria-label="FILTRAR IDEIAS POR OCASIÃO"><option value="TODAS">TODAS AS OCASIÕES</option><option>NATAL</option><option>PÁSCOA</option><option>HALLOWEEN</option><option>SÃO JOÃO</option><option>DIA DOS NAMORADOS</option><option>DIA DAS MÃES</option><option>CARNAVAL</option><option>ANO NOVO</option><option>DIA DAS CRIANÇAS</option></select></div>
 <div class="saved-list" id="savedList"><p class="empty">suas ideias favoritas vão aparecer aqui.</p></div>
+<div class="saved-pagination" id="savedPagination" aria-label="PAGINAÇÃO DAS IDEIAS SALVAS"></div>
 </section>
 <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
@@ -604,6 +612,32 @@ keyOptions.forEach(k=>{const o=document.createElement('option');o.value=k;o.text
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){close();trigger.focus()}});
  sync();
 })();
+function setupSavedFilterMenu(selectId){
+ const select=$(selectId);if(!select)return;
+ const control=document.createElement('div');control.className='key-flavor-select saved-filter-control';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='key-select-trigger';trigger.id=selectId+'Trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-controls',selectId+'Menu');trigger.setAttribute('aria-label',select.getAttribute('aria-label')||selectId);
+ const triggerText=document.createElement('span');triggerText.id=selectId+'TriggerText';
+ const chevron=document.createElement('span');chevron.className='chevron';chevron.setAttribute('aria-hidden','true');chevron.textContent='⌄';trigger.append(triggerText,chevron);
+ const menu=document.createElement('div');menu.className='key-flavor-menu';menu.id=selectId+'Menu';menu.setAttribute('role','listbox');menu.setAttribute('aria-label',select.getAttribute('aria-label')||selectId);menu.hidden=true;
+ select.parentNode.insertBefore(control,select);control.append(select,trigger,menu);select.classList.add('key-select-native');
+ const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+ function sync(){
+  const selected=select.options[select.selectedIndex]||select.options[0];triggerText.textContent=selected?selected.textContent:'SELECIONE';
+  menu.innerHTML='';
+  Array.from(select.options).forEach(option=>{
+   const item=document.createElement('button');item.type='button';item.className='key-flavor-option';item.setAttribute('role','option');item.dataset.value=option.value;item.textContent=option.textContent;item.setAttribute('aria-selected',String(option.value===select.value));
+   item.addEventListener('click',()=>{select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();close();trigger.focus()});
+   menu.append(item);
+  });
+ }
+ trigger.addEventListener('click',()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden){sync();const selected=menu.querySelector('[aria-selected="true"]');if(selected)selected.scrollIntoView({block:'nearest'})}});
+ select.addEventListener('change',sync);
+ document.addEventListener('click',e=>{if(!control.contains(e.target))close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){close();trigger.focus()}});
+ const observer=new MutationObserver(sync);observer.observe(select,{childList:true,subtree:true,attributes:true});
+ sync();
+}
+['savedCategory','savedType','savedOccasion'].forEach(setupSavedFilterMenu);
 let type='COOKIE',filter='TODAS',occasion='TODAS',keyFlavor='TODOS',current=null,currentOptions=[];
 const KEY='cosmos.flavor-generator.saved.v2';
 const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
@@ -743,30 +777,49 @@ function generate(){
  current={...first,parts:first.parts.map(p=>[...p]),id:first.id+'|'+first.name};
  renderIdea(current);renderAlternatives();
 }
+let savedPage=1;
+const SAVED_PAGE_SIZE=5;
 function renderSaved(){
  const all=getSaved();
  const category=$('savedCategory').value,typeFilter=$('savedType').value,occasionFilter=$('savedOccasion').value;
  const list=all.filter(idea=>(category==='TODAS'||idea.category===category)&&(typeFilter==='TODOS'||idea.type===typeFilter)&&(occasionFilter==='TODAS'||(idea.occasion||'TODAS')===occasionFilter));
+ const totalPages=Math.max(1,Math.ceil(list.length/SAVED_PAGE_SIZE));
+ savedPage=Math.min(Math.max(1,savedPage),totalPages);
  $('savedCount').textContent=list.length+' de '+all.length+' salvas';$('savedList').innerHTML='';
+ const pagination=$('savedPagination');pagination.innerHTML='';
  if(!all.length){$('savedList').innerHTML='<p class="empty">suas ideias favoritas vão aparecer aqui.</p>';return}
  if(!list.length){$('savedList').innerHTML='<p class="empty">nenhuma ideia encontrada com esses filtros.</p>';return}
- list.forEach(idea=>{
+ const startIndex=(savedPage-1)*SAVED_PAGE_SIZE;
+ list.slice(startIndex,startIndex+SAVED_PAGE_SIZE).forEach(idea=>{
   const item=document.createElement('div');item.className='saved-item';
   const info=document.createElement('div');const strong=document.createElement('strong');strong.textContent=idea.name;
   const small=document.createElement('small');small.textContent=typeLabel(idea.type)+' · '+idea.category+(occasionFilter!=='TODAS'&&idea.occasion===occasionFilter?' · '+idea.occasion:'')+' · '+ideaText(idea);
   info.append(strong,small);const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','remover '+idea.name);
   remove.addEventListener('click',async()=>{
-  setSaved(getSaved().filter(x=>x.id!==idea.id));
-  if(currentUser){try{await removeIdeaFromCloud(idea.id);setCloudStatus('IDEIA REMOVIDA DA NUVEM.')}catch(error){setCloudStatus('IDEIA REMOVIDA DESTE DISPOSITIVO, MAS NÃO DA NUVEM.');}}
- });
+   setSaved(getSaved().filter(x=>x.id!==idea.id));
+   if(currentUser){try{await removeIdeaFromCloud(idea.id);setCloudStatus('IDEIA REMOVIDA DA NUVEM.')}catch(error){setCloudStatus('IDEIA REMOVIDA DESTE DISPOSITIVO, MAS NÃO DA NUVEM.');}}
+  });
   item.append(info,remove);$('savedList').append(item);
  });
+ if(totalPages>1){
+  const addPageButton=(label,page,aria,active=false,disabled=false)=>{
+   const button=document.createElement('button');button.type='button';button.className='saved-page-button';button.textContent=label;button.setAttribute('aria-label',aria);
+   if(active)button.setAttribute('aria-current','page');if(disabled)button.disabled=true;
+   button.addEventListener('click',()=>{savedPage=page;renderSaved()});pagination.append(button);
+  };
+  addPageButton('‹',Math.max(1,savedPage-1),'PÁGINA ANTERIOR',false,savedPage===1);
+  let pages=[];
+  if(totalPages<=5)pages=Array.from({length:totalPages},(_,i)=>i+1);
+  else{const first=Math.max(1,Math.min(savedPage-2,totalPages-4));pages=Array.from({length:5},(_,i)=>first+i)}
+  pages.forEach(page=>addPageButton(String(page),page,'PÁGINA '+page,page===savedPage));
+  addPageButton('›',Math.min(totalPages,savedPage+1),'PRÓXIMA PÁGINA',false,savedPage===totalPages);
+ }
 }
 $('types').addEventListener('click',e=>{const b=e.target.closest('[data-type]');if(!b)return;type=b.dataset.type;document.querySelectorAll('.type').forEach(x=>x.classList.toggle('active',x===b));generate()});
 $('filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;document.querySelectorAll('#filters .filter').forEach(x=>x.classList.toggle('active',x===b));generate()});
 $('occasions').addEventListener('click',e=>{const b=e.target.closest('[data-occasion]');if(!b)return;occasion=b.dataset.occasion;document.querySelectorAll('#occasions .filter').forEach(x=>x.classList.toggle('active',x===b));generate()});
 $('keyFlavor').addEventListener('change',()=>{keyFlavor=$('keyFlavor').value;generate()});
-['savedCategory','savedType','savedOccasion'].forEach(id=>$(id).addEventListener('change',renderSaved));
+['savedCategory','savedType','savedOccasion'].forEach(id=>$(id).addEventListener('change',()=>{savedPage=1;renderSaved()}));
 $('generate').addEventListener('click',generate);
 $('save').addEventListener('click',()=>{if(!current)return;const list=getSaved();if(!list.some(x=>x.id===current.id)){list.unshift(current);setSaved(list)}$('save').textContent='IDEIA SALVA ✓'});
 renderSaved();generate();
