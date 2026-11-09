@@ -308,35 +308,18 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 
 
 <style>
-/* CRONÔMETRO ORIGINAL COSMOS: APARELHO PRATEADO COM STICKERS */
-.cosmos-device-timer{position:fixed!important;right:18px!important;bottom:18px!important;z-index:9999!important;width:210px!important;user-select:none;filter:none!important}
-.cosmos-device-timer img{width:100%;height:auto;display:block}
-.cosmos-lcd-screen{position:absolute!important;top:31%!important;left:27.5%!important;width:45.5%!important;height:19.5%!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.cosmos-lcd-digits{font-family:'Orbitron',monospace!important;font-weight:700!important;font-size:14.5px!important;color:#2563EB!important;letter-spacing:.5px!important;text-align:center;white-space:nowrap;text-shadow:none!important;transform:translateY(2px)}
-.cosmos-btn-click,.cosmos-btn-click:hover,.cosmos-btn-click:active,.cosmos-btn-click:focus,.cosmos-btn-click:focus-visible{position:absolute!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;outline:0!important;color:transparent!important;text-shadow:none!important;appearance:none;-webkit-appearance:none;padding:0!important;cursor:pointer;border-radius:50%;transform:none!important}
-.cosmos-btn-min{top:56.5%!important;left:26.5%!important;width:18.5%!important;height:22.5%!important}
-.cosmos-btn-sec{top:56.5%!important;left:47%!important;width:18.5%!important;height:22.5%!important}
-.cosmos-btn-startstop{top:56.5%!important;left:67.5%!important;width:22%!important;height:22.5%!important;border-radius:12px!important}
-.cosmos-btn-click:before,.cosmos-btn-click:after{display:none!important;content:none!important}
-@media(max-width:560px){.cosmos-device-timer{right:10px!important;bottom:10px!important;width:170px!important}.cosmos-lcd-digits{font-size:11.5px!important}}
+/* TIMER ESTRELA COSMOS - ARTE ORIGINAL TRANSPARENTE */
+.cosmos-device-timer{position:fixed;right:18px;bottom:18px;z-index:99999;width:210px;user-select:none;isolation:isolate}
+.cosmos-device-timer img{display:block;width:100%;height:auto;pointer-events:none}
+.cosmos-lcd-screen{position:absolute;z-index:2;top:45.6%;left:33%;width:33.2%;height:14.5%;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
+.cosmos-lcd-digits{font:700 15px 'Orbitron',monospace;color:#174a9a;letter-spacing:.4px;white-space:nowrap;text-shadow:none}
+.cosmos-btn-click{position:absolute;z-index:3;top:63.5%;width:12.5%;height:12.5%;padding:0;border:0;border-radius:50%;background:transparent;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cosmos-btn-min{left:30.2%}.cosmos-btn-sec{left:43.5%}.cosmos-btn-startstop{left:56.8%}
+.cosmos-btn-click:focus-visible{outline:2px solid #2263D2;outline-offset:2px}
+.cosmos-btn-click:active{background:rgba(34,99,210,.12)}
+@media(max-width:560px){.cosmos-device-timer{right:10px;bottom:10px;width:170px}.cosmos-lcd-digits{font-size:12px}}
 </style>
 
-<style>
-/* CORREÇÃO DE CLIQUE: CONTROLES DO APARELHO ORIGINAL */
-.cosmos-device-timer{isolation:isolate}
-.cosmos-device-timer img{pointer-events:none}
-.cosmos-lcd-screen{z-index:2;pointer-events:none}
-.cosmos-btn-click,
-.cosmos-btn-click:hover,
-.cosmos-btn-click:active,
-.cosmos-btn-click:focus,
-.cosmos-btn-click:focus-visible{
-  z-index:5!important;
-  pointer-events:auto!important;
-  touch-action:manipulation!important;
-  -webkit-tap-highlight-color:transparent;
-}
-</style>
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -434,18 +417,14 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 
   <div id="sections"></div>
 
-  <!-- CRONÔMETRO ORIGINAL COSMOS: IMAGEM PRATEADA COM STICKERS -->
-  <div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos">
-    <div style="position:relative;width:100%;">
-      <img src="image_3.PNG" alt="Cronômetro retrô prateado Cosmos">
-      <div class="cosmos-lcd-screen">
-        <div class="cosmos-lcd-digits" id="timerDisplay">00:00</div>
-      </div>
-      <button class="cosmos-btn-click cosmos-btn-min" id="btnTimerHour" type="button" title="Adicionar uma hora" aria-label="Adicionar uma hora"></button>
-      <button class="cosmos-btn-click cosmos-btn-sec" id="btnTimerMinute" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"></button>
-      <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" type="button" title="Iniciar ou pausar" aria-label="Iniciar cronômetro"></button>
-    </div>
-  </div>
+<!-- CRONÔMETRO ESTRELA COSMOS -->
+<div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos">
+ <img src="Design%20sem%20nome.png" alt="Cronômetro prateado em formato de estrela">
+ <div class="cosmos-lcd-screen"><span class="cosmos-lcd-digits" id="timerDisplay">00:00</span></div>
+ <button class="cosmos-btn-click cosmos-btn-min" id="btnTimerMin" type="button" title="Adicionar um minuto" aria-label="Adicionar um minuto"></button>
+ <button class="cosmos-btn-click cosmos-btn-sec" id="btnTimerSec" type="button" title="Adicionar um segundo" aria-label="Adicionar um segundo"></button>
+ <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" type="button" title="Iniciar ou pausar. Clique duas vezes para zerar" aria-label="Iniciar cronômetro"></button>
+</div>
 
   <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
@@ -1450,85 +1429,44 @@ $('btnSyncCloud').addEventListener('click', async () => {
   loadCloudFichas();
 });
 
-/* ---------- CRONÔMETRO COM TIMESTAMPS E LOCALSTORAGE (image_3.PNG) ---------- */
-var TIMER_KEY = 'cosmos.calculadora.timer.v1';
-var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
-
-function loadTimerState(){
-  var raw = lsGet(TIMER_KEY);
-  if(raw){
-    try{
-      var parsed = JSON.parse(raw);
-      if(parsed && typeof parsed === 'object'){
-        timerState.running = !!parsed.running;
-        timerState.startTime = Number(parsed.startTime) || 0;
-        timerState.elapsedBefore = Number(parsed.elapsedBefore) || 0;
-      }
-    }catch(e){}
-  }
-}
-
-function saveTimerState(){
-  lsSet(TIMER_KEY, JSON.stringify(timerState));
-}
-
-function getElapsedMs(){
-  if(!timerState.running) return timerState.elapsedBefore;
-  return timerState.elapsedBefore + (Date.now() - timerState.startTime);
-}
-
-function formatTime(ms){
-  var totalMin = Math.floor(ms / 60000);
-  var hrs = Math.floor(totalMin / 60);
-  var mins = totalMin % 60;
-  return String(hrs).padStart(2, '0') + ':' + ('0' + mins).slice(-2);
-}
-
-function updateTimerControls(){
-  var label = $('timerToggleText');
-  var caption = $('timerToggleCaption');
-  var button = $('btnTimerToggle');
-  if(label) label.textContent = timerState.running ? 'PAUSE' : 'START';
-  if(caption) caption.textContent = timerState.running ? 'PAUSE' : 'START';
-  if(button) button.setAttribute('aria-label', timerState.running ? 'Pausar cronômetro' : 'Iniciar cronômetro');
-}
-function updateTimerDisplay(){
-  var el = $('timerDisplay');
-  if(el) el.textContent = formatTime(getElapsedMs());
-  updateTimerControls();
-}
-
-setInterval(function(){
-  if(timerState.running){
-    updateTimerDisplay();
-  }
-}, 200);
-
-var btnToggle = $('btnTimerToggle');
-if(btnToggle){
-  btnToggle.addEventListener('click', function(){
-    if(!timerState.running){
-      timerState.running = true;
-      timerState.startTime = Date.now();
-    } else {
-      timerState.elapsedBefore += (Date.now() - timerState.startTime);
-      timerState.running = false;
-    }
-    saveTimerState();
-    updateTimerDisplay();
+<script>
+/* TIMER GLOBAL COSMOS: CONTINUA ENTRE AS FERRAMENTAS */
+(function(){
+ 'use strict';
+ var KEY='cosmos.timer.global.v2';
+ var state={running:false,startTime:0,elapsedBefore:0};
+ function read(key){try{return localStorage.getItem(key)}catch(e){return null}}
+ function write(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+ function load(){
+  var raw=read(KEY)||read('cosmos.calculadora.timer.v1');
+  if(raw){try{var p=JSON.parse(raw);state.running=!!p.running;state.startTime=Number(p.startTime)||0;state.elapsedBefore=Number(p.elapsedBefore)||0}catch(e){}}
+  if(state.running&&!state.startTime)state.running=false;
+ }
+ function elapsed(){return state.elapsedBefore+(state.running?Math.max(0,Date.now()-state.startTime):0)}
+ function display(){
+  var total=Math.floor(elapsed()/1000),mins=Math.floor(total/60),secs=total%60;
+  var el=document.getElementById('timerDisplay');
+  if(el)el.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+  var b=document.getElementById('btnTimerToggle');
+  if(b)b.setAttribute('aria-label',state.running?'Pausar cronômetro':'Iniciar cronômetro');
+ }
+ function adjust(ms){state.elapsedBefore=Math.max(0,elapsed()+ms);if(state.running)state.startTime=Date.now();write();display()}
+ var min=document.getElementById('btnTimerMin'),sec=document.getElementById('btnTimerSec'),toggle=document.getElementById('btnTimerToggle');
+ if(min)min.addEventListener('click',function(){adjust(60000)});
+ if(sec)sec.addEventListener('click',function(){adjust(1000)});
+ if(toggle){
+  toggle.addEventListener('click',function(){
+   if(state.running){state.elapsedBefore=elapsed();state.running=false;state.startTime=0}
+   else{state.running=true;state.startTime=Date.now()}
+   write();display();
   });
-}
-
-function adjustTimer(amount){
-  timerState.elapsedBefore = Math.max(0, getElapsedMs() + amount);
-  if(timerState.running) timerState.startTime = Date.now();
-  saveTimerState();
-  updateTimerDisplay();
-}
-var btnHour = $('btnTimerHour');
-if(btnHour) btnHour.addEventListener('click', function(){ adjustTimer(3600000); });
-var btnMinute = $('btnTimerMinute');
-if(btnMinute) btnMinute.addEventListener('click', function(){ adjustTimer(60000); });
+  toggle.addEventListener('dblclick',function(e){e.preventDefault();state.running=false;state.startTime=0;state.elapsedBefore=0;write();display()});
+ }
+ window.addEventListener('pagehide',write);
+ document.addEventListener('visibilitychange',function(){if(!document.hidden)display()});
+ load();write();display();window.setInterval(display,200);
+})();
+</script>
 
 /* ---------- INÍCIO ---------- */
 buildSections(); 
