@@ -245,15 +245,15 @@ tr.checked-row td .v{color:#8f3b34}
 /* TIMER COSMOS: arte original TIMER.png do branch main */
 .cosmos-device-timer{position:fixed;right:18px;bottom:18px;width:190px;z-index:99999;user-select:none;isolation:isolate}
 .cosmos-device-timer img{display:block;width:100%;height:auto;pointer-events:none}
-.cosmos-lcd-screen{position:absolute;z-index:2;top:45.6%;left:33%;width:33.2%;height:14.5%;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
-.cosmos-lcd-digits{font-family:'Orbitron',monospace;font-weight:700;font-size:15px;color:#174a9a;letter-spacing:.4px;text-align:center;white-space:nowrap;text-shadow:none;transform:translateY(1px)}
+.cosmos-lcd-screen{position:absolute;z-index:2;top:45.6%;left:25.5%;width:47%;height:14.5%;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
+.cosmos-lcd-digits{font-family:'Roboto Condensed','Arial Narrow',sans-serif;font-weight:700;font-size:16px;color:#174a9a;letter-spacing:.1px;text-align:center;white-space:nowrap;text-shadow:none;transform:translate(-1.5px,1px)}
 .cosmos-timer-hit{position:absolute;z-index:4;top:63.5%;width:12.5%;height:12.5%;padding:0;margin:0;border:0!important;border-radius:50%;background:transparent!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;color:transparent!important}
 .cosmos-timer-hit:focus{outline:none!important}
 .cosmos-timer-hit:focus-visible{outline:2px solid #2263D2!important;outline-offset:2px}
 .cosmos-timer-hit:active{background:rgba(34,99,210,.12)!important}
-.cosmos-timer-start{left:30.2%}
+.cosmos-timer-reset{left:30.2%}
 .cosmos-timer-pause{left:43.5%}
-.cosmos-timer-reset{left:56.8%}
+.cosmos-timer-start{left:56.8%}
 @media(max-width:560px){.cosmos-device-timer{width:158px;right:9px;bottom:9px}.cosmos-lcd-digits{font-size:12px}}
 </style>
 <style>
@@ -373,14 +373,11 @@ tr.checked-row td .v{color:#8f3b34}
 <!-- CRONÔMETRO COSMOS: TIMER.png (MAIN) -->
 <div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos">
  <img src="https://raw.githubusercontent.com/cosmosconfeitaria/cosmos-calculadora/main/TIMER.png" alt="Cronômetro prateado em formato de estrela com três botões">
- <div class="cosmos-lcd-screen"><span class="cosmos-lcd-digits" id="timerDisplay">00:00</span></div>
- <button class="cosmos-timer-hit cosmos-timer-start" id="btnTimerStartStop" type="button" aria-label="Iniciar ou parar o cronômetro" title="Iniciar ou parar"></button>
- <button class="cosmos-timer-hit cosmos-timer-pause" id="btnTimerPause" type="button" aria-label="Pausar o cronômetro" title="Pausar"></button>
+ <div class="cosmos-lcd-screen"><span class="cosmos-lcd-digits" id="timerDisplay">00:00:00</span></div>
  <button class="cosmos-timer-hit cosmos-timer-reset" id="btnTimerReset" type="button" aria-label="Zerar o cronômetro" title="Zerar"></button>
+ <button class="cosmos-timer-hit cosmos-timer-pause" id="btnTimerPause" type="button" aria-label="Pausar o cronômetro" title="Pausar"></button>
+ <button class="cosmos-timer-hit cosmos-timer-start" id="btnTimerStartStop" type="button" aria-label="Iniciar ou parar o cronômetro" title="Iniciar ou parar"></button>
 </div>
- <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerStartStop" type="button" title="Iniciar ou parar a contagem" aria-label="Iniciar cronômetro"></button>
- <button class="cosmos-btn-click cosmos-btn-pause" id="btnTimerPause" type="button" title="Pausar a contagem" aria-label="Pausar cronômetro"></button>
- <button class="cosmos-btn-click cosmos-btn-reset" id="btnTimerReset" type="button" title="Zerar o cronômetro" aria-label="Zerar cronômetro"></button>
 </div>
 
   <footer class="footer-cosmos">
@@ -1394,9 +1391,9 @@ $('btnSyncCloud').addEventListener('click', async () => {
  function elapsed(){return state.elapsedMs+(state.mode==='running'?Math.max(0,Date.now()-state.startedAt):0)}
  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
  function render(){
-  var total=Math.floor(elapsed()/1000),mins=Math.floor(total/60),secs=total%60;
+  var total=Math.floor(elapsed()/1000),hours=Math.floor(total/3600),mins=Math.floor((total%3600)/60),secs=total%60;
   var display=document.getElementById('timerDisplay');
-  if(display)display.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+  if(display)display.textContent=String(hours).padStart(2,'0')+':'+String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
   var start=document.getElementById('btnTimerStartStop');
   if(start)start.setAttribute('aria-label',state.mode==='running'?'Parar cronômetro':'Iniciar cronômetro');
  }
