@@ -242,55 +242,19 @@ tr.checked-row td .v{color:#8f3b34}
 @media(prefers-reduced-motion:reduce){.logo-type:after{animation:none}}
 </style>
 <style>
-/* CRONÔMETRO ESTRELA COSMOS */
-.cosmos-device-timer{position:fixed;right:18px;bottom:18px;z-index:9999;width:178px;user-select:none;filter:drop-shadow(0 9px 8px rgba(0,0,0,.24))}
-.star-timer-shell{position:relative;width:100%;aspect-ratio:1}
-.star-timer-shell:before{content:"";position:absolute;inset:0;clip-path:polygon(50% 1%,61% 32%,96% 35%,69% 57%,79% 94%,50% 74%,21% 94%,31% 57%,4% 35%,39% 32%);background:linear-gradient(135deg,#fff 0%,#8d9092 12%,#f5f5f3 23%,#8c8e90 38%,#e8e8e6 50%,#777a7d 65%,#f7f7f5 78%,#898b8d 91%,#fff 100%);filter:drop-shadow(0 3px 2px rgba(0,0,0,.42))}
-.star-timer-face{position:absolute;inset:5%;clip-path:polygon(50% 1%,61% 32%,96% 35%,69% 57%,79% 94%,50% 74%,21% 94%,31% 57%,4% 35%,39% 32%);background:linear-gradient(145deg,#f7f7f5 0%,#c5c6c5 13%,#e8e8e6 27%,#a2a4a5 42%,#f0f0ee 56%,#9b9d9f 73%,#e7e7e5 88%,#b4b6b7 100%);box-shadow:inset 0 0 0 2px #fff}
-.star-timer-face:before{content:"";position:absolute;inset:3%;clip-path:inherit;background:linear-gradient(125deg,rgba(255,255,255,.75),transparent 32%,rgba(60,60,60,.13) 67%,rgba(255,255,255,.55));pointer-events:none}
-.timer-keyring{position:absolute;z-index:0;top:-3%;left:43%;width:28px;height:28px;border:5px solid #9b9d9f;border-right-color:#f5f5f4;border-bottom-color:#777a7d;border-radius:50%;box-shadow:inset 0 1px 2px #fff,0 1px 2px #555;transform:rotate(-22deg)}
-.timer-keyring:after{content:"";position:absolute;left:16px;top:10px;width:6px;height:6px;border:2px solid #a5a7a8;border-radius:50%;background:linear-gradient(135deg,#fff,#777);box-shadow:8px 5px 0 -1px #a5a7a8,15px 12px 0 -1px #888,19px 20px 0 -1px #b8b9b9}
-.cosmos-lcd-screen{position:absolute;z-index:2;top:34%;left:24%;width:52%;height:20%;border:4px solid #85898a;border-radius:5px;background:linear-gradient(180deg,#737a78,#c5ccc3 18%,#aeb9ad 55%,#68716d 100%);box-shadow:inset 0 2px 5px rgba(0,0,0,.72),0 1px 1px rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.cosmos-lcd-digits{font-family:'Orbitron',monospace;font-weight:700;font-size:clamp(9px,2.4vw,13px);color:#1f302a;letter-spacing:.2px;text-align:center;white-space:nowrap;text-shadow:0 0 3px rgba(91,135,107,.55);transform:translateY(1px)}
-.star-timer-controls{position:absolute;z-index:3;top:61%;left:22%;width:56%;display:flex;align-items:flex-start;justify-content:space-between}
-.star-timer-control{display:flex;flex-direction:column;align-items:center;gap:3px;width:48%}
-.star-timer-button{appearance:none;-webkit-appearance:none;width:39px;height:39px;min-width:39px;padding:0;border:2px solid #777a7c;border-radius:50%;background:radial-gradient(circle at 32% 25%,#fff 0%,#e9e9e7 22%,#b7b9b9 58%,#74787a 100%);box-shadow:inset 0 2px 2px rgba(255,255,255,.95),inset 0 -2px 3px rgba(0,0,0,.28),0 2px 2px rgba(0,0,0,.32);color:#274d83;font:500 13px 'Helvetica Neue',Helvetica,Arial,sans-serif;line-height:1;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
-.star-timer-button:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.28),0 1px 1px rgba(255,255,255,.6)}
-.star-timer-button.start{font-size:7px;font-weight:700;letter-spacing:-.2px}
-.star-timer-control small{font:600 6px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.08em;color:#284c7e;line-height:1}
-.star-timer-mark{position:absolute;z-index:2;top:82%;left:0;width:100%;text-align:center;color:#4b5053;font:600 6px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.12em;text-shadow:0 1px 1px #fff}
-@media(max-width:560px){.cosmos-device-timer{width:148px;right:9px;bottom:9px}.star-timer-button{width:33px;height:33px;min-width:33px}.cosmos-lcd-digits{font-size:10px}}
-@media(prefers-reduced-motion:reduce){.star-timer-button{transition:none}}
-
-/* PADRONIZAÇÃO DOS SELETORES, CABEÇALHO E CRONÔMETRO */
-.back{width:34px;height:34px;min-width:34px;display:flex;align-items:center;justify-content:center;margin-left:auto;border:1px solid #aaa8a3;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 1px 1px #fff,0 3px 0 #a5a39e;text-decoration:none}
-.menu-lines{display:flex;flex-direction:column;gap:3px;width:13px}
-.menu-lines i{height:1.5px;width:100%;background:var(--blue);display:block;border-radius:2px}
-.top{gap:10px}
-select{appearance:none;-webkit-appearance:none;border:1px solid #d4d1cc!important;border-radius:10px!important;background-color:#fff!important;background-image:linear-gradient(45deg,transparent 50%,#2263D2 50%),linear-gradient(135deg,#2263D2 50%,transparent 50%)!important;background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%!important;background-size:5px 5px,5px 5px!important;background-repeat:no-repeat!important;color:var(--blue)!important;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif!important;font-size:11px!important;font-weight:500!important;letter-spacing:.02em!important;padding:13px 30px 13px 12px!important;box-shadow:none!important}
-select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!important}
-.intro{text-transform:uppercase}
-.footer-cosmos{gap:3px;padding:28px 12px 20px}
-.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
-.footer-cosmos .line-tagline{font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
-/* estrela metálica lisa: sem aro acolchoado */
-.cosmos-device-timer{width:190px;right:18px;bottom:18px;filter:drop-shadow(0 7px 6px rgba(0,0,0,.28))}
-.star-timer-shell{aspect-ratio:1}
-.star-timer-shell:before{inset:0;clip-path:polygon(50% 1%,61% 31%,96% 35%,69% 57%,79% 94%,50% 75%,21% 94%,31% 57%,4% 35%,39% 31%);background:linear-gradient(132deg,#fff 0%,#aeb2b5 10%,#f8f8f6 19%,#777d82 31%,#e8e9e7 43%,#a5a9ac 55%,#fafaf8 67%,#858b90 80%,#e7e8e6 91%,#fff 100%);filter:none}
-.star-timer-face{inset:2.2%;clip-path:polygon(50% 1%,61% 31%,96% 35%,69% 57%,79% 94%,50% 75%,21% 94%,31% 57%,4% 35%,39% 31%);background:linear-gradient(145deg,#d7d9d9 0%,#f7f7f5 18%,#b6b9ba 34%,#e5e6e4 52%,#a4a8aa 72%,#f5f5f3 88%,#c2c5c6 100%);box-shadow:none}
-.star-timer-face:before{inset:0;background:linear-gradient(125deg,rgba(255,255,255,.42),transparent 28%,rgba(40,45,48,.06) 67%,rgba(255,255,255,.2))}
-.timer-keyring{top:-3%;left:43%;width:25px;height:25px;border:3px solid #858b90;border-top-color:#fff;border-left-color:#c9ccce;border-right-color:#73797d;border-bottom-color:#f4f4f2;background:transparent;box-shadow:0 1px 2px #555;transform:rotate(-20deg)}
-.timer-keyring:after{left:16px;top:12px;width:8px;height:58px;border:0;border-radius:0;background:radial-gradient(circle at 50% 50%,#fff 0 20%,#8b9195 31%,#d9dcdd 55%,#73797d 75%,transparent 78%);background-size:8px 8px;background-repeat:repeat-y;box-shadow:none;transform:rotate(-26deg);transform-origin:top center}
-.cosmos-lcd-screen{top:32%;left:25%;width:50%;height:20%;border:2px solid #596c65;border-radius:3px;background:linear-gradient(180deg,#c9e4bd 0%,#b8d8aa 48%,#9dc391 100%);box-shadow:inset 0 1px 5px rgba(30,65,42,.3),0 1px 0 rgba(255,255,255,.85),0 0 7px rgba(168,225,155,.55)}
-.cosmos-lcd-digits{font-size:clamp(10px,2.6vw,14px);color:#254b38;text-shadow:0 0 4px rgba(115,175,112,.55);letter-spacing:.25px}
-.star-timer-controls{top:60%;left:19%;width:62%;justify-content:space-around}
-.star-timer-control{width:45%;gap:3px}
-.star-timer-button{width:37px;height:37px;min-width:37px;border:1px solid #73797d;border-radius:50%;background:radial-gradient(circle at 31% 23%,#fff 0%,#f1f2f0 19%,#c5c8c9 48%,#858b90 73%,#e8e9e7 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,.98),inset 0 -2px 3px rgba(0,0,0,.22),0 2px 2px rgba(0,0,0,.28);color:#2263D2;font-size:12px}
-.star-timer-button.start{font-size:7px;font-weight:800;letter-spacing:-.1px}
-.star-timer-control small{font-size:6px;color:#284c7e}
-.star-timer-mark{top:83%;font-size:6px;color:#4b5053}
-@media(max-width:560px){.cosmos-device-timer{width:158px;right:9px;bottom:9px}.star-timer-button{width:31px;height:31px;min-width:31px}.cosmos-lcd-digits{font-size:10px}}
+/* TIMER COSMOS: arte original TIMER.png do branch main */
+.cosmos-device-timer{position:fixed;right:18px;bottom:18px;width:190px;z-index:99999;user-select:none;isolation:isolate}
+.cosmos-device-timer img{display:block;width:100%;height:auto;pointer-events:none}
+.cosmos-lcd-screen{position:absolute;z-index:2;top:45.6%;left:33%;width:33.2%;height:14.5%;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
+.cosmos-lcd-digits{font-family:'Orbitron',monospace;font-weight:700;font-size:15px;color:#174a9a;letter-spacing:.4px;text-align:center;white-space:nowrap;text-shadow:none;transform:translateY(1px)}
+.cosmos-timer-hit{position:absolute;z-index:4;top:63.5%;width:12.5%;height:12.5%;padding:0;margin:0;border:0!important;border-radius:50%;background:transparent!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;color:transparent!important}
+.cosmos-timer-hit:focus{outline:none!important}
+.cosmos-timer-hit:focus-visible{outline:2px solid #2263D2!important;outline-offset:2px}
+.cosmos-timer-hit:active{background:rgba(34,99,210,.12)!important}
+.cosmos-timer-start{left:30.2%}
+.cosmos-timer-pause{left:43.5%}
+.cosmos-timer-reset{left:56.8%}
+@media(max-width:560px){.cosmos-device-timer{width:158px;right:9px;bottom:9px}.cosmos-lcd-digits{font-size:12px}}
 </style>
 <style>
 /* CONTROLES FUNCIONAIS DO CRONÔMETRO HH:MM */
@@ -307,18 +271,7 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 </style>
 
 
-<style>
-/* TIMER ESTRELA COSMOS - ARTE ORIGINAL TRANSPARENTE */
-.cosmos-device-timer{position:fixed;right:18px;bottom:18px;z-index:99999;width:210px;user-select:none;isolation:isolate}
-.cosmos-device-timer img{display:block;width:100%;height:auto;pointer-events:none}
-.cosmos-lcd-screen{position:absolute;z-index:2;top:45.6%;left:33%;width:33.2%;height:14.5%;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
-.cosmos-lcd-digits{font:700 15px 'Orbitron',monospace;color:#174a9a;letter-spacing:.4px;white-space:nowrap;text-shadow:none;transform:translate(0,1px)}
-.cosmos-btn-click{position:absolute;z-index:3;top:63.5%;width:12.5%;height:12.5%;padding:0;border:0;border-radius:50%;background:transparent;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.cosmos-btn-startstop{left:30.2%}.cosmos-btn-pause{left:43.5%}.cosmos-btn-reset{left:56.8%}
-.cosmos-btn-click:focus-visible{outline:2px solid #2263D2;outline-offset:2px}
-.cosmos-btn-click:active{background:rgba(34,99,210,.12)}
-@media(max-width:560px){.cosmos-device-timer{right:10px;bottom:10px;width:170px}.cosmos-lcd-digits{font-size:12px}}
-</style>
+
 
 </head>
 <body class="auth-pending">
@@ -417,10 +370,14 @@ select:focus{outline:1px solid var(--blue);outline-offset:1px;box-shadow:none!im
 
   <div id="sections"></div>
 
-<!-- CRONÔMETRO ESTRELA COSMOS -->
+<!-- CRONÔMETRO COSMOS: TIMER.png (MAIN) -->
 <div class="cosmos-device-timer" id="floatingTimer" aria-label="Cronômetro Cosmos">
- <img src="Design%20sem%20nome.png" alt="Cronômetro prateado em formato de estrela">
+ <img src="https://raw.githubusercontent.com/cosmosconfeitaria/cosmos-calculadora/main/TIMER.png" alt="Cronômetro prateado em formato de estrela com três botões">
  <div class="cosmos-lcd-screen"><span class="cosmos-lcd-digits" id="timerDisplay">00:00</span></div>
+ <button class="cosmos-timer-hit cosmos-timer-start" id="btnTimerStartStop" type="button" aria-label="Iniciar ou parar o cronômetro" title="Iniciar ou parar"></button>
+ <button class="cosmos-timer-hit cosmos-timer-pause" id="btnTimerPause" type="button" aria-label="Pausar o cronômetro" title="Pausar"></button>
+ <button class="cosmos-timer-hit cosmos-timer-reset" id="btnTimerReset" type="button" aria-label="Zerar o cronômetro" title="Zerar"></button>
+</div>
  <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerStartStop" type="button" title="Iniciar ou parar a contagem" aria-label="Iniciar cronômetro"></button>
  <button class="cosmos-btn-click cosmos-btn-pause" id="btnTimerPause" type="button" title="Pausar a contagem" aria-label="Pausar cronômetro"></button>
  <button class="cosmos-btn-click cosmos-btn-reset" id="btnTimerReset" type="button" title="Zerar o cronômetro" aria-label="Zerar cronômetro"></button>
@@ -1432,39 +1389,41 @@ $('btnSyncCloud').addEventListener('click', async () => {
 /* TIMER COSMOS - SOMENTE NA CALCULADORA DE RECEITAS */
 (function(){
  'use strict';
- var KEY='cosmos.recipe.timer.v3';
- var state={running:false,startedAt:0,elapsedMs:0};
+ var KEY='cosmos.recipe.timer.v4';
+ var state={mode:'stopped',startedAt:0,elapsedMs:0};
+ function elapsed(){return state.elapsedMs+(state.mode==='running'?Math.max(0,Date.now()-state.startedAt):0)}
  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
- function elapsed(){return state.elapsedMs+(state.running?Math.max(0,Date.now()-state.startedAt):0)}
  function render(){
-  var total=Math.floor(elapsed()/1000), mins=Math.floor(total/60), secs=total%60;
-  var screen=document.getElementById('timerDisplay');
-  if(screen)screen.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+  var total=Math.floor(elapsed()/1000),mins=Math.floor(total/60),secs=total%60;
+  var display=document.getElementById('timerDisplay');
+  if(display)display.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
   var start=document.getElementById('btnTimerStartStop');
-  if(start)start.setAttribute('aria-label',state.running?'Parar cronômetro':'Iniciar cronômetro');
+  if(start)start.setAttribute('aria-label',state.mode==='running'?'Parar cronômetro':'Iniciar cronômetro');
  }
  try{
   var saved=JSON.parse(localStorage.getItem(KEY)||'null');
-  if(saved&&typeof saved==='object'){
-   state.running=!!saved.running;
-   state.startedAt=Number(saved.startedAt)||0;
-   state.elapsedMs=Math.max(0,Number(saved.elapsedMs)||0);
-   if(state.running&&!state.startedAt)state.running=false;
+  if(saved&&['running','paused','stopped'].includes(saved.mode)){
+   state.mode=saved.mode;state.startedAt=Number(saved.startedAt)||0;state.elapsedMs=Math.max(0,Number(saved.elapsedMs)||0);
+   if(state.mode==='running'&&!state.startedAt)state.mode='stopped';
   }
- }catch(e){state={running:false,startedAt:0,elapsedMs:0}}
+ }catch(e){state={mode:'stopped',startedAt:0,elapsedMs:0}}
  var start=document.getElementById('btnTimerStartStop');
  var pause=document.getElementById('btnTimerPause');
  var reset=document.getElementById('btnTimerReset');
  if(start)start.addEventListener('click',function(){
-  if(state.running){state.elapsedMs=elapsed();state.running=false;state.startedAt=0}
-  else{state.running=true;state.startedAt=Date.now()}
+  if(state.mode==='running'){
+   state.elapsedMs=elapsed();state.mode='stopped';state.startedAt=0;
+  }else{
+   if(state.mode==='stopped')state.elapsedMs=0;
+   state.mode='running';state.startedAt=Date.now();
+  }
   save();render();
  });
  if(pause)pause.addEventListener('click',function(){
-  if(state.running){state.elapsedMs=elapsed();state.running=false;state.startedAt=0;save();render()}
+  if(state.mode==='running'){state.elapsedMs=elapsed();state.mode='paused';state.startedAt=0;save();render()}
  });
  if(reset)reset.addEventListener('click',function(){
-  state={running:false,startedAt:0,elapsedMs:0};save();render();
+  state={mode:'stopped',startedAt:0,elapsedMs:0};save();render();
  });
  window.addEventListener('pagehide',save);
  document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
