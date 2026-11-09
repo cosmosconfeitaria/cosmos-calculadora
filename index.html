@@ -66,7 +66,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
 .fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* CRONÔMETRO APARELHO RETRÔ (TIMER.png) */
+/* CRONÔMETRO APARELHO RETRÔ (image_3.PNG) */
 .cosmos-device-timer {
   position: fixed;
   bottom: 20px;
@@ -79,71 +79,55 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   width: 100%;
   height: auto;
   display: block;
-  background: transparent;
 }
 .cosmos-lcd-screen {
   position: absolute;
-  top: 29.5%;
+  top: 31%;
   left: 27.5%;
   width: 45.5%;
-  height: 21%;
+  height: 19.5%;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  pointer-events: none;
 }
 .cosmos-lcd-digits {
   font-family: 'Orbitron', monospace;
-  font-weight: 800;
-  font-size: clamp(15px, 8.8vw, 19px);
-  line-height: 1;
-  color: #00B7FF;
-  letter-spacing: 0.1px;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #2563EB;
+  letter-spacing: 0.5px;
   text-align: center;
   white-space: nowrap;
-  text-shadow: 0 0 2px #8CE8FF, 0 0 6px #00B7FF, 0 0 11px rgba(0,183,255,.9);
-  transform: translateY(-1px);
+  transform: translateY(2px);
 }
 .cosmos-btn-click {
   position: absolute;
-  z-index: 20;
-  display: block;
-  appearance: none;
-  -webkit-appearance: none;
-  margin: 0 !important;
-  padding: 0 !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0;
-  box-shadow: none !important;
+  background: transparent;
+  border: none;
   cursor: pointer;
   border-radius: 50%;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  pointer-events: auto;
+  padding: 0;
 }
 .cosmos-btn-min {
-  top: 56%;
-  left: 26%;
-  width: 19%;
-  height: 23%;
+  top: 56.5%;
+  left: 26.5%;
+  width: 18.5%;
+  height: 22.5%;
 }
 .cosmos-btn-sec {
-  top: 56%;
-  left: 46.5%;
-  width: 19%;
-  height: 23%;
+  top: 56.5%;
+  left: 47%;
+  width: 18.5%;
+  height: 22.5%;
 }
 .cosmos-btn-startstop {
-  top: 56%;
-  left: 67%;
-  width: 19%;
-  height: 23%;
-  border-radius: 50%;
+  top: 56.5%;
+  left: 67.5%;
+  width: 22%;
+  height: 22.5%;
+  border-radius: 12px;
 }
 
 /* RODAPÉ MINIMALISTA COSMOS */
@@ -306,16 +290,16 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 
   <div id="sections"></div>
 
-  <!-- CRONÔMETRO APARELHO RETRÔ (TIMER.png) -->
+  <!-- CRONÔMETRO APARELHO RETRÔ (image_3.PNG) -->
   <div class="cosmos-device-timer" id="floatingTimer">
     <div style="position: relative; width: 100%;">
-      <img src="TIMER.png" alt="Cronômetro Cosmos">
+      <img src="image_3.PNG" alt="Cronômetro Cosmos">
       <div class="cosmos-lcd-screen">
         <div class="cosmos-lcd-digits" id="timerDisplay">00:00:00</div>
       </div>
-      <button type="button" class="cosmos-btn-click cosmos-btn-min" id="btnTimerReset" aria-label="Zerar o cronômetro" title="Zerar"></button>
-      <button type="button" class="cosmos-btn-click cosmos-btn-sec" id="btnTimerPause" aria-label="Pausar o cronômetro" title="Pausar"></button>
-      <button type="button" class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" aria-label="Iniciar ou parar o cronômetro" title="Iniciar / Parar"></button>
+      <button class="cosmos-btn-click cosmos-btn-min" id="btnTimerReset" title="Zerar"></button>
+      <button class="cosmos-btn-click cosmos-btn-sec" title="Segundos"></button>
+      <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" title="Iniciar / Pausar"></button>
     </div>
   </div>
 
@@ -1335,27 +1319,21 @@ $('btnSyncCloud').addEventListener('click', async () => {
   loadCloudFichas();
 });
 
-/* ---------- CRONÔMETRO PERSISTENTE DA CALCULADORA ---------- */
-var TIMER_KEY = 'cosmos.calculadora.timer.v2';
-var timerState = { mode: 'stopped', running: false, startTime: 0, elapsedBefore: 0 };
+/* ---------- CRONÔMETRO COM TIMESTAMPS E LOCALSTORAGE (image_3.PNG) ---------- */
+var TIMER_KEY = 'cosmos.calculadora.timer.v1';
+var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
 
 function loadTimerState(){
   var raw = lsGet(TIMER_KEY);
-  if(!raw) return;
-  try{
-    var parsed = JSON.parse(raw);
-    if(parsed && typeof parsed === 'object'){
-      timerState.running = !!parsed.running;
-      timerState.startTime = Number(parsed.startTime) || 0;
-      timerState.elapsedBefore = Math.max(0, Number(parsed.elapsedBefore) || 0);
-      timerState.mode = timerState.running ? 'running' : (parsed.mode === 'paused' ? 'paused' : 'stopped');
-      if(timerState.running && !timerState.startTime){
-        timerState.running = false;
-        timerState.mode = 'stopped';
+  if(raw){
+    try{
+      var parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === 'object'){
+        timerState.running = !!parsed.running;
+        timerState.startTime = Number(parsed.startTime) || 0;
+        timerState.elapsedBefore = Number(parsed.elapsedBefore) || 0;
       }
-    }
-  }catch(e){
-    timerState = { mode: 'stopped', running: false, startTime: 0, elapsedBefore: 0 };
+    }catch(e){}
   }
 }
 
@@ -1364,9 +1342,8 @@ function saveTimerState(){
 }
 
 function getElapsedMs(){
-  return timerState.running
-    ? timerState.elapsedBefore + Math.max(0, Date.now() - timerState.startTime)
-    : timerState.elapsedBefore;
+  if(!timerState.running) return timerState.elapsedBefore;
+  return timerState.elapsedBefore + (Date.now() - timerState.startTime);
 }
 
 function formatTime(ms){
@@ -1382,49 +1359,25 @@ function updateTimerDisplay(){
   if(el) el.textContent = formatTime(getElapsedMs());
 }
 
-function stopTimer(){
+setInterval(function(){
   if(timerState.running){
-    timerState.elapsedBefore = getElapsedMs();
+    updateTimerDisplay();
   }
-  timerState.running = false;
-  timerState.startTime = 0;
-  timerState.mode = 'stopped';
-  saveTimerState();
-  updateTimerDisplay();
-}
-
-function startTimer(){
-  if(timerState.running) return;
-  timerState.startTime = Date.now();
-  timerState.running = true;
-  timerState.mode = 'running';
-  saveTimerState();
-  updateTimerDisplay();
-}
-
-function pauseTimer(){
-  if(!timerState.running) return;
-  timerState.elapsedBefore = getElapsedMs();
-  timerState.running = false;
-  timerState.startTime = 0;
-  timerState.mode = 'paused';
-  saveTimerState();
-  updateTimerDisplay();
-}
-
-setInterval(updateTimerDisplay, 200);
+}, 200);
 
 var btnToggle = $('btnTimerToggle');
 if(btnToggle){
   btnToggle.addEventListener('click', function(){
-    if(timerState.running) stopTimer();
-    else startTimer();
+    if(!timerState.running){
+      timerState.running = true;
+      timerState.startTime = Date.now();
+    } else {
+      timerState.elapsedBefore += (Date.now() - timerState.startTime);
+      timerState.running = false;
+    }
+    saveTimerState();
+    updateTimerDisplay();
   });
-}
-
-var btnPause = $('btnTimerPause');
-if(btnPause){
-  btnPause.addEventListener('click', pauseTimer);
 }
 
 var btnReset = $('btnTimerReset');
@@ -1433,7 +1386,6 @@ if(btnReset){
     timerState.running = false;
     timerState.startTime = 0;
     timerState.elapsedBefore = 0;
-    timerState.mode = 'stopped';
     saveTimerState();
     updateTimerDisplay();
   });
