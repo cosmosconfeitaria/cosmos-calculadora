@@ -227,7 +227,7 @@ button{font-weight:500;box-shadow:inset 0 1px 1px #fff,inset 0 -1px 1px #aaa9a6,
 .x{color:var(--red);border-color:#fff}
 .btn-order{color:var(--blue)}
 /* SETAS DE ORDENAÇÃO: APENAS A PONTA, EM PESO VISUAL COMPATÍVEL COM O X */
-.btn-order{display:inline-flex;align-items:center;justify-content:center;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:18px!important;font-weight:700!important;line-height:18px!important;vertical-align:middle}
+.btn-order{display:inline-flex;align-items:center;justify-content:center;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:18px!important;font-weight:700!important;line-height:18px!important;vertical-align:middle}.btn-order .order-glyph{display:block;line-height:18px}.btn-order .order-glyph-up{position:relative;top:2px}.btn-order .order-glyph-down{position:relative;top:-2px}
 
 .chk-box{accent-color:var(--blue)}
 tr.checked-row td{background:#f8eeeb!important;color:#8f3b34}
@@ -722,12 +722,12 @@ function renderRows(key){
     var td4=document.createElement('td'); td4.className='c-rm';
     var rowActions=document.createElement('div'); rowActions.className='row-actions';
 
-    var btnUp=document.createElement('button'); btnUp.className='btn-order'; btnUp.type='button'; btnUp.textContent='⌃';
+    var btnUp=document.createElement('button'); btnUp.className='btn-order'; btnUp.type='button'; btnUp.innerHTML='<span class="order-glyph order-glyph-up">⌃</span>';
     btnUp.setAttribute('aria-label','MOVER PARA CIMA'); btnUp.title='MOVER PARA CIMA';
     if(i === 0) btnUp.disabled = true;
     btnUp.addEventListener('click',function(){ moveItem(key, i, i - 1); });
 
-    var btnDown=document.createElement('button'); btnDown.className='btn-order'; btnDown.type='button'; btnDown.textContent='⌄';
+    var btnDown=document.createElement('button'); btnDown.className='btn-order'; btnDown.type='button'; btnDown.innerHTML='<span class="order-glyph order-glyph-down">⌄</span>';
     btnDown.setAttribute('aria-label','MOVER PARA BAIXO'); btnDown.title='MOVER PARA BAIXO';
     if(i === list.length - 1) btnDown.disabled = true;
     btnDown.addEventListener('click',function(){ moveItem(key, i, i + 1); });
