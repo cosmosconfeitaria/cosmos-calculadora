@@ -66,7 +66,7 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
 .status{font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--blue);margin-top:12px;min-height:14px;line-height:1.4}
 .fichas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* CRONÔMETRO APARELHO RETRÔ (image_3.PNG) */
+/* CRONÔMETRO APARELHO RETRÔ (TIMER.png) */
 .cosmos-device-timer {
   position: fixed;
   bottom: 20px;
@@ -293,13 +293,13 @@ button:focus-visible{outline:3px solid #2263d233;outline-offset:2px}
   <!-- CRONÔMETRO APARELHO RETRÔ (image_3.PNG) -->
   <div class="cosmos-device-timer" id="floatingTimer">
     <div style="position: relative; width: 100%;">
-      <img src="image_3.PNG" alt="Cronômetro Cosmos">
+      <img src="TIMER.png" alt="Cronômetro Cosmos">
       <div class="cosmos-lcd-screen">
         <div class="cosmos-lcd-digits" id="timerDisplay">00:00:00</div>
       </div>
-      <button class="cosmos-btn-click cosmos-btn-min" id="btnTimerReset" title="Zerar"></button>
-      <button class="cosmos-btn-click cosmos-btn-sec" title="Segundos"></button>
-      <button class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerToggle" title="Iniciar / Pausar"></button>
+      <button type="button" class="cosmos-btn-click cosmos-btn-min" id="btnTimerToggle" aria-label="Iniciar ou parar o cronômetro" title="Iniciar / Parar"></button>
+      <button type="button" class="cosmos-btn-click cosmos-btn-sec" id="btnTimerPause" aria-label="Pausar o cronômetro" title="Pausar"></button>
+      <button type="button" class="cosmos-btn-click cosmos-btn-startstop" id="btnTimerReset" aria-label="Zerar o cronômetro" title="Zerar"></button>
     </div>
   </div>
 
@@ -1319,21 +1319,27 @@ $('btnSyncCloud').addEventListener('click', async () => {
   loadCloudFichas();
 });
 
-/* ---------- CRONÔMETRO COM TIMESTAMPS E LOCALSTORAGE (image_3.PNG) ---------- */
-var TIMER_KEY = 'cosmos.calculadora.timer.v1';
-var timerState = { running: false, startTime: 0, elapsedBefore: 0 };
+/* ---------- CRONÔMETRO PERSISTENTE DA CALCULADORA ---------- */
+var TIMER_KEY = 'cosmos.calculadora.timer.v2';
+var timerState = { mode: 'stopped', running: false, startTime: 0, elapsedBefore: 0 };
 
 function loadTimerState(){
   var raw = lsGet(TIMER_KEY);
-  if(raw){
-    try{
-      var parsed = JSON.parse(raw);
-      if(parsed && typeof parsed === 'object'){
-        timerState.running = !!parsed.running;
-        timerState.startTime = Number(parsed.startTime) || 0;
-        timerState.elapsedBefore = Number(parsed.elapsedBefore) || 0;
+  if(!raw) return;
+  try{
+    var parsed = JSON.parse(raw);
+    if(parsed && typeof parsed === 'object'){
+      timerState.running = !!parsed.running;
+      timerState.startTime = Number(parsed.startTime) || 0;
+      timerState.elapsedBefore = Math.max(0, Number(parsed.elapsedBefore) || 0);
+      timerState.mode = timerState.running ? 'running' : (parsed.mode === 'paused' ? 'paused' : 'stopped');
+      if(timerState.running && !timerState.startTime){
+        timerState.running = false;
+        timerState.mode = 'stopped';
       }
-    }catch(e){}
+    }
+  }catch(e){
+    timerState = { mode: 'stopped', running: false, startTime: 0, elapsedBefore: 0 };
   }
 }
 
@@ -1342,8 +1348,9 @@ function saveTimerState(){
 }
 
 function getElapsedMs(){
-  if(!timerState.running) return timerState.elapsedBefore;
-  return timerState.elapsedBefore + (Date.now() - timerState.startTime);
+  return timerState.running
+    ? timerState.elapsedBefore + Math.max(0, Date.now() - timerState.startTime)
+    : timerState.elapsedBefore;
 }
 
 function formatTime(ms){
@@ -1359,25 +1366,49 @@ function updateTimerDisplay(){
   if(el) el.textContent = formatTime(getElapsedMs());
 }
 
-setInterval(function(){
+function stopTimer(){
   if(timerState.running){
-    updateTimerDisplay();
+    timerState.elapsedBefore = getElapsedMs();
   }
-}, 200);
+  timerState.running = false;
+  timerState.startTime = 0;
+  timerState.mode = 'stopped';
+  saveTimerState();
+  updateTimerDisplay();
+}
+
+function startTimer(){
+  if(timerState.running) return;
+  timerState.startTime = Date.now();
+  timerState.running = true;
+  timerState.mode = 'running';
+  saveTimerState();
+  updateTimerDisplay();
+}
+
+function pauseTimer(){
+  if(!timerState.running) return;
+  timerState.elapsedBefore = getElapsedMs();
+  timerState.running = false;
+  timerState.startTime = 0;
+  timerState.mode = 'paused';
+  saveTimerState();
+  updateTimerDisplay();
+}
+
+setInterval(updateTimerDisplay, 200);
 
 var btnToggle = $('btnTimerToggle');
 if(btnToggle){
   btnToggle.addEventListener('click', function(){
-    if(!timerState.running){
-      timerState.running = true;
-      timerState.startTime = Date.now();
-    } else {
-      timerState.elapsedBefore += (Date.now() - timerState.startTime);
-      timerState.running = false;
-    }
-    saveTimerState();
-    updateTimerDisplay();
+    if(timerState.running) stopTimer();
+    else startTimer();
   });
+}
+
+var btnPause = $('btnTimerPause');
+if(btnPause){
+  btnPause.addEventListener('click', pauseTimer);
 }
 
 var btnReset = $('btnTimerReset');
@@ -1386,6 +1417,7 @@ if(btnReset){
     timerState.running = false;
     timerState.startTime = 0;
     timerState.elapsedBefore = 0;
+    timerState.mode = 'stopped';
     saveTimerState();
     updateTimerDisplay();
   });
