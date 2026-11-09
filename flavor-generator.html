@@ -141,53 +141,14 @@ footer small{font-size:9px;line-height:1.1;color:#D22222}
 .sub{text-transform:uppercase}
 </style>
 <style>
-/* RODAPÉ PADRÃO COSMOS, IGUAL AO RECIPE CALCULATOR */
-/* RODAPÉ PADRONIZADO: MESMA IDENTIDADE DA PÁGINA INICIAL E DA CALCULADORA */
-.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;gap:3px;background:transparent}
-.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
-.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
-@media(max-width:520px){.footer-cosmos .line-brand{font-size:26px}}
+/* RODAPÉ OFICIAL COSMOS: COPIADO DA HOME E DO RECIPE CALCULATOR */
+footer.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;margin:0;gap:3px;background:transparent}
+footer.footer-cosmos .line-brand{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
+footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
+@media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
 </style>
-<style>
-/* RODAPÉ PADRONIZADO: MESMA COMPOSIÇÃO DE COSMOS TOOLS E RECIPE CALCULATOR */
-.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;gap:3px;background:transparent}
-.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
-.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
-@media(max-width:520px){.footer-cosmos .line-brand{font-size:26px}}
-</style>
-<style>
-/* RODAPÉ COPIADO EXATAMENTE DO RECIPE CALCULATOR */
-.footer-cosmos{gap:3px;padding:28px 12px 20px}
-.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
-.footer-cosmos .line-tagline{font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
-</style>
-<style>
-/* PADRÃO DE SELETORES E PAGINAÇÃO COSMOS */
-.saved-filters .key-flavor-select{width:100%;min-width:0}
-.saved-filters select.key-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;opacity:0!important;pointer-events:none!important}
-.saved-filters .key-select-trigger{width:100%;min-height:40px}
-.saved-filters .key-flavor-menu{max-height:220px}
-.saved-pagination{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px}
-.saved-page-button{min-width:32px;height:30px;padding:0 9px;border:1px solid #aaa8a3;border-radius:6px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e;cursor:pointer}
-.saved-page-button[aria-current="page"]{transform:translateY(2px);box-shadow:inset 0 1px 1px #fff,0 1px 0 #929eaf}
-.saved-page-button:disabled{opacity:.4;cursor:not-allowed}
-</style>
-<style>
-/* AJUSTE FINAL: RODAPÉ E ALINHAMENTO DAS IDEIAS SALVAS */
-.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;gap:3px;background:transparent}
-.footer-cosmos .line-brand{font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
-.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
-.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
-.saved-item{align-items:center}
-.saved-item .remove{flex:0 0 28px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;align-self:center;line-height:1;padding:0}
-.saved-pagination{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap}
-.saved-page-button{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;line-height:1;min-width:32px;height:30px}
-.saved-page-button[aria-current="page"]{transform:none;box-shadow:inset 0 1px 3px #aaa8a3,0 1px 0 #929eaf}
-@media(max-width:520px){.footer-cosmos .line-brand{font-size:26px}}
-</style>
+
 </head>
 <body class="auth-pending">
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="letter-wiggle"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="1" seed="8" result="noise"><animate attributeName="baseFrequency" values=".025;.045;.03;.025" dur="5s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
