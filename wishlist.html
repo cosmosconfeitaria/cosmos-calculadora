@@ -209,6 +209,70 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 .advanced-fields{grid-column:1/-1;border:1px solid var(--line);padding:10px 12px;background:#fff}.advanced-fields summary{cursor:pointer;color:var(--blue);font-size:10px;letter-spacing:.06em;padding:3px 0}.advanced-fields[open] summary{margin-bottom:12px}.advanced-fields .form-grid{padding:0}
 .manual-price-entry{margin:12px 0;border:1px solid var(--line);padding:10px 12px;background:#fff}.manual-price-entry summary{cursor:pointer;color:var(--blue);font-size:10px;letter-spacing:.05em}.manual-price-entry[open] summary{margin-bottom:10px}
 .finance-ok{color:var(--blue)!important;background:#edf3ff!important}.detail-product-image{background:transparent!important;object-fit:contain!important}
+
+/* AJUSTES COSMOS · COMPARATIVO, FILTROS E JANELAS */
+.category-filter-box{padding:9px 10px;margin-bottom:13px}
+.category-filter-heading{font-size:9px;margin-bottom:7px}
+.category-checks{gap:5px}
+.category-check{gap:5px;padding:5px 6px;font-size:8px;letter-spacing:0}
+.category-check input,.subcategory-option input{width:9px;height:9px;flex:0 0 9px}
+.subcategory-filters{gap:6px;margin-top:8px;padding-top:8px}
+.subcategory-trigger{padding:8px 9px;font-size:9px;border-radius:7px}
+.subcategory-option{gap:7px;padding:6px 10px;font-size:9px}
+.product-result .favorite-star{width:20px;height:20px;min-width:20px;flex:0 0 20px;font-size:14px!important}
+.product-result .result-select{width:10px;height:10px;flex:0 0 10px;margin:0}
+.product-result .result-actions{gap:5px}
+.product-result .result-actions>button:not(.favorite-star){padding:5px 7px;font-size:8px;min-height:25px}
+.result-toolbar .meta{font-size:9px}
+.chart-controls .silver[data-chart-range="365"]{flex:0 0 62px}
+.chart-controls .silver[data-chart-range="custom"]{flex:1.5 1 0}
+.chart-empty{font:10px/1.35 'Gochi Hand',cursive;color:var(--red);padding:13px 10px}
+.purchase-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.purchase-grid .field{min-width:0}
+.purchase-grid input{min-width:0;width:100%;padding:9px 8px;font-size:11px}
+.purchase-block .form-actions{gap:6px}
+.archive-links{display:flex;gap:6px;flex-wrap:wrap}
+.archive-links .silver{padding:8px 10px;font-size:9px}
+.close{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--blue)!important;font:22px/1 'Gochi Hand',cursive!important;padding:0!important}
+.comparison-backdrop{position:fixed;inset:0;z-index:10998;background:rgba(22,38,65,.48);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#comparisonPanel{position:fixed;z-index:10999;left:50%;top:50%;transform:translate(-50%,-50%);width:min(940px,calc(100vw - 24px));max-height:88vh;overflow:auto;margin:0;padding:14px;background:var(--cream);border:1px solid #fff;box-shadow:0 18px 55px #102f6a55}
+#comparisonPanel .section-line{position:sticky;top:-14px;z-index:2;background:var(--cream);padding:4px 0 8px}
+#comparisonContent{overflow:visible!important}
+.comparison-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:9px}
+.comparison-table th,.comparison-table td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}
+.comparison-table thead th{font-size:9px;line-height:1.25}
+.comparison-table thead th:first-child,.comparison-table tbody th{width:112px;text-align:left}
+.comparison-table tbody th{font-size:8px;white-space:normal;line-height:1.25}
+.comparison-product-head{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.comparison-product-head img{width:48px;height:42px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.comparison-product-head strong{font-size:8px;font-weight:500;line-height:1.2;overflow-wrap:anywhere}
+.comparison-product-head-placeholder{width:48px;height:42px;display:grid;place-items:center;background:#fff;color:#aaa;border:1px solid var(--line)}
+.comparison-verdict{margin-top:12px;padding:10px 12px;border:1px solid #c9d8f4;background:#edf3ff;color:var(--ink);font-size:10px;line-height:1.5}
+.comparison-verdict strong{display:block;color:var(--blue);font-size:11px;font-weight:500;margin-bottom:4px}
+.cosmos-toast{position:fixed;z-index:12000;left:50%;bottom:22px;transform:translateX(-50%);width:min(440px,calc(100vw - 28px));display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;background:rgba(246,244,241,.97);border:1px solid #d4d1cc;box-shadow:0 9px 28px #102f6a30;color:var(--red);font:12px/1.4 'Gochi Hand',cursive}
+.cosmos-toast.hidden{display:none!important}
+.cosmos-toast .close{flex:0 0 24px}
+.popup{background:rgba(246,244,241,.97);border:1px solid #d4d1cc;box-shadow:0 12px 35px #102f6a35;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.popup-head strong{font:12px 'Gochi Hand',cursive;color:var(--blue)}
+.notice{background:rgba(255,255,255,.85);font-size:10px;border-color:#e7c5c5}
+.flatpickr-calendar{font-family:'Gochi Hand',cursive!important;border:1px solid #d4d1cc!important;border-radius:8px!important;box-shadow:0 10px 28px #102f6a25!important;background:rgba(246,244,241,.98)!important;padding:4px!important}
+.flatpickr-months,.flatpickr-weekdays{background:transparent!important}
+.flatpickr-current-month,.flatpickr-monthDropdown-months{font:14px 'Gochi Hand',cursive!important;color:var(--blue)!important;fill:var(--blue)!important}
+.flatpickr-weekday{font:12px 'Gochi Hand',cursive!important;color:var(--blue)!important;fill:var(--blue)!important}
+.flatpickr-day{font:12px 'Gochi Hand',cursive!important;border-radius:5px!important;color:var(--ink)!important}
+.flatpickr-day.weekend-day{color:var(--red)!important}
+.flatpickr-day.selected,.flatpickr-day.startRange,.flatpickr-day.endRange{background:var(--blue)!important;border-color:var(--blue)!important;color:#fff!important}
+.flatpickr-day.today{border-color:var(--red)!important}
+@media(max-width:520px){
+ #comparisonPanel{width:calc(100vw - 16px);max-height:90vh;padding:10px}
+ .comparison-table thead th:first-child,.comparison-table tbody th{width:86px}
+ .comparison-table th,.comparison-table td{padding:5px 3px;font-size:8px}
+ .comparison-product-head img,.comparison-product-head-placeholder{width:38px;height:34px}
+ .comparison-product-head strong{font-size:7px}
+ .purchase-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .category-check{font-size:7.5px}
+}
+
 </style>
 </head>
 <body>
@@ -216,7 +280,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
 <p class="eyebrow">COSMOS TOOLS / WISHLIST</p>
 <h1>WISHLIST</h1>
-<p class="intro">ORGANIZE SUAS COMPRAS, ACOMPANHE OS PREÇOS E PLANEJE SUAS PRÓXIMAS CONQUISTAS.</p>
+<p class="intro">ORGANIZE COMPRAS, ACOMPANHE PREÇOS E PLANEJE PRÓXIMAS CONQUISTAS.</p>
 <div class="toolbar wishlist-toolbar">
 <input id="search" list="suggestions" placeholder="BUSCAR ITEM..." autocomplete="off" aria-label="BUSCAR ITEM"><datalist id="suggestions"></datalist>
 <button class="silver" id="addBtn" type="button">+ NOVO ITEM</button>
@@ -266,11 +330,11 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <section id="detailPanel" class="panel hidden">
 <div class="section-line" style="margin-top:0"><h2 id="detailTitle">DETALHES</h2><button class="close" id="detailClose" aria-label="fechar">×</button></div>
 <div id="detailContent"></div>
-<section class="panel hidden" id="comparisonPanel"><div class="section-line" style="margin:0"><h2>COMPARAÇÃO DE MODELOS</h2><button class="close" id="comparisonClose">×</button></div><div id="comparisonContent" style="overflow-x:auto;margin-top:12px"></div></section>
+<div class="comparison-backdrop hidden" id="comparisonBackdrop"></div><section class="panel hidden" id="comparisonPanel" role="dialog" aria-modal="true" aria-labelledby="comparisonTitle"><div class="section-line" style="margin:0"><h2 id="comparisonTitle">COMPARAÇÃO DE MODELOS</h2><button class="close" id="comparisonClose" aria-label="fechar">×</button></div><div id="comparisonContent" style="margin-top:10px"></div></section>
 </section>
 <div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
 <div class="cards" id="items"></div>
-<section class="panel achievements-entry"><div class="section-line" style="margin:0"><div><h2>CONQUISTAS</h2><div class="meta">ITENS QUE JÁ FIZERAM PARTE DA OPERAÇÃO COSMOS</div></div><a class="silver nav-action" href="conquistas.html">VER CONQUISTAS</a></div></section>
+<section class="panel achievements-entry"><div class="section-line" style="margin:0"><div><h2>ACERVO COSMOS</h2><div class="meta">COMPRAS CONCLUÍDAS E ITENS GUARDADOS COM ESTRELINHA</div></div><div class="archive-links"><a class="silver nav-action" href="conquistas.html">CONQUISTAS</a><a class="silver nav-action" href="favoritos.html">FAVORITOS</a></div></div></section>
 
 <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
@@ -279,7 +343,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
   </footer>
 </div>
 <button class="floating-inbox" id="inboxBtn" type="button" aria-label="ABRIR CAIXA DE ENTRADA" title="CAIXA DE ENTRADA">✉<span class="dot hidden" id="inboxDot"></span></button>
-<div class="popup hidden" id="inboxPopup"><div class="popup-head"><strong>✉ CAIXA DE ENTRADA</strong><button class="close" id="inboxClose">×</button></div><div id="notices"></div></div>
+<div class="popup hidden" id="inboxPopup"><div class="popup-head"><strong>✉ CAIXA DE ENTRADA</strong><button class="close" id="inboxClose">×</button></div><div id="notices"></div></div><div class="cosmos-toast hidden" id="cosmosToast" role="status" aria-live="polite"><span id="cosmosToastText"></span><button class="close" id="cosmosToastClose" aria-label="fechar">×</button></div>
 <script>
 (function(){
 'use strict';
@@ -291,6 +355,8 @@ const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_
 window.addEventListener('error',event=>{const el=document.getElementById('items');if(el)el.innerHTML='<div class="notice">ERRO NA PÁGINA: '+String(event.message||'FALHA INESPERADA').replace(/[&<>]/g,'')+'. ATUALIZE E TENTE NOVAMENTE.</div>';});
 window.addEventListener('unhandledrejection',event=>{const el=document.getElementById('items');if(el)el.innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONCLUIR A AÇÃO: '+String(event.reason?.message||event.reason||'ERRO INESPERADO').replace(/[&<>]/g,'')+'</div>';});
 const $=id=>document.getElementById(id);
+function cosmosNotify(message){const host=$('cosmosToast'),text=$('cosmosToastText');if(!host||!text){console.warn(message);return}text.textContent=String(message||'');host.classList.remove('hidden');clearTimeout(window.__cosmosToastTimer);window.__cosmosToastTimer=setTimeout(()=>host.classList.add('hidden'),5200)}
+window.alert=cosmosNotify;
 let user=null,items=[],editingId=null,detailId=null,notices=[],compareIds=new Set();
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
@@ -394,7 +460,7 @@ async function saveItem(payload){
  const wantedType=payload.subcategory||'';
  const base=items.find(x=>x.id===editingId)||items.find(x=>x.status==='WISHLIST'&&x.category===payload.category&&String(x.title||'').trim().toLocaleLowerCase('pt-BR')===normalizedTitle&&(x.data?.subcategory||x.data?.productType||'')===wantedType);
  const voltage=String(payload.voltage||'');if(voltage!=='220V'&&voltage!=='BIVOLT')throw new Error('CONFIRME QUE O PRODUTO É 220V OU BIVOLT ANTES DE SALVAR.');
- const row={user_id:user.id,title:payload.title,category:payload.category,status:base?.status||'WISHLIST',importance:payload.importance,data:{...(base?.data||{}),...payload,subcategory:payload.subcategory||base?.data?.subcategory||base?.data?.productType||'',voltage,addedAt:base?.data?.addedAt||today()}};
+ const row={user_id:user.id,title:compactProductTitle(payload.title,payload.model,payload.capacity,payload.productBrand),category:payload.category,status:base?.status||'WISHLIST',importance:payload.importance,data:{...(base?.data||{}),...payload,subcategory:payload.subcategory||base?.data?.subcategory||base?.data?.productType||'',voltage,addedAt:base?.data?.addedAt||today()}};
  if(payload.initialOffer){row.data.stores=[...(row.data.stores||[]),payload.initialOffer];row.data.priceHistory=[...(row.data.priceHistory||[]),{store:payload.initialOffer.store,price:payload.initialOffer.price,shipping:0,url:payload.initialOffer.url,at:today(),searchBatch:'initial-'+today(),read:false}];delete row.data.initialOffer;}
  delete row.data.image;delete row.data.productType;
  if(base){
@@ -467,7 +533,7 @@ function priceChart(history,range='365',customFrom='',customTo=''){
  const buckets=new Map();
  filtered.forEach(h=>{const d=new Date(h.at+'T12:00:00');let key,label;if(step==='month'){key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');label=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}else if(step==='week'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);key=d.toISOString().slice(0,10);label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}else{key=h.at;label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}const value=Number(h.price)+Number(h.shipping||0);const old=buckets.get(key);if(!old||value<old.value)buckets.set(key,{key,label,value})});
  const points=[...buckets.values()].sort((a,b)=>a.key.localeCompare(b.key));
- const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">1 ANO</button><button type="button" class="silver" data-chart-range="90">3 MESES</button><button type="button" class="silver" data-chart-range="30">1 MÊS</button><button type="button" class="silver" <button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom '+(range==='custom'?'':'hidden')+'"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
+ const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">1 ANO</button><button type="button" class="silver" data-chart-range="90">3 MESES</button><button type="button" class="silver" data-chart-range="30">1 MÊS</button><button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom '+(range==='custom'?'':'hidden')+'"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
  let graph='<div class="chart-empty">AINDA NÃO HÁ PREÇOS REGISTRADOS NESTE PERÍODO. FAÇA UMA BUSCA PARA COMEÇAR A CONSTRUIR O HISTÓRICO.</div>';
  if(points.length){
   const values=points.map(p=>p.value),min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min),W=720,H=250,L=65,R=18,T=18,B=42,iw=W-L-R,ih=H-T-B;
@@ -540,7 +606,7 @@ $('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
   const response=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'NÃO FOI POSSÍVEL LER O LINK.');
   const form=$('itemForm'),set=(name,value,overwrite=false)=>{const el=form.elements[name];if(el&&value&&(overwrite||!el.value))el.value=value};
-  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.technicalSummary||result.specs||result.description,true);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);updateItemSubcategory('');
+  set('title',compactProductTitle(result.title,result.model,result.capacity,result.brand));set('model',result.model);set('warranty',result.warranty);set('specs',result.technicalSummary||result.specs||result.description,true);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);updateItemSubcategory('');
   if(result.price)set('currentPrice',result.price,true);
   const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
   let previousMeta={};try{previousMeta=JSON.parse(form.dataset.productMeta||'{}')}catch(_){}
@@ -567,7 +633,7 @@ $('itemForm').addEventListener('submit',async e=>{
 
 function voltageStatus(product){const text=[product.title,product.voltage,product.description].filter(Boolean).join(' ');if(/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(text))return 'INCOMPATIBLE';if(/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(text))return 'BIVOLT';if(/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(text))return 'CONFIRMED_220V';return 'UNKNOWN'}
 async function saveDiscoveryResult(p,status='WISHLIST'){
- const title=String(p.title||'').trim();if(!title)throw new Error('PRODUTO SEM NOME.');
+ const rawTitle=String(p.title||'').trim();if(!rawTitle)throw new Error('PRODUTO SEM NOME.');const title=compactProductTitle(rawTitle,p.model,p.capacity,p.brand);
  const same=items.find(x=>x.status===status&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
  if(same)return same.id;
  const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',searchTerm=String($('productLookup').value||''),productTerm=String(p.title||''),subcategory=inferSubcategory(category,searchTerm+' '+productTerm)||$('itemForm').elements.subcategory.value||'',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':p.voltageStatus==='CONFIRMED_220V'?'220V':'NÃO CONFIRMADA';
@@ -576,8 +642,8 @@ async function saveDiscoveryResult(p,status='WISHLIST'){
  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);
  const recent=history.filter(h=>new Date((h.at||'')+'T12:00:00')>=cutoff&&Number(h.price)>0);
  const historicalLow=recent.length?Math.min(...recent.map(h=>Number(h.price)+Number(h.shipping||0))):null;
- const technical=p.technicalSummary||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
- const data={subcategory,voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
+ const technical=p.technicalSummary||p.specs||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
+ const data={subcategory,voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productBrand:p.brand||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
  if(current&&p.link){data.stores.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,searchedAt:today(),title,image:p.thumbnail||'',voltageConfirmed:true});data.priceHistory.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,at:today(),searchBatch:'initial-'+today(),read:false})}
  const {data:row,error}=await client.from('cosmos_wishlist_items').insert({user_id:user.id,title,category,status,importance:'MEDIA',data}).select('id').single();
  if(error)throw error;
@@ -609,10 +675,11 @@ async function searchWishlistProducts(){
    }
    p.voltageStatus=status;p.voltageConfirmed=status==='CONFIRMED_220V'||status==='BIVOLT';return p;
   }));
+  products=products.filter(p=>p.voltageStatus!=='INCOMPATIBLE');
   host.innerHTML='';
-  if(!products.length){host.innerHTML='<p class="discovery-note">NÃO ENCONTRAMOS RESULTADOS PARA ESSA PALAVRA-CHAVE. TENTE UMA VARIAÇÃO SIMPLES.</p>';return}
+  if(!products.length){host.innerHTML='<p class="discovery-note">NÃO ENCONTRAMOS MODELOS COMPATÍVEIS COM 220V OU BIVOLT NESTA BUSCA.</p>';return}
   const top=document.createElement('div');top.className='result-toolbar';
-  const note=document.createElement('span');note.className='meta';note.textContent=products.length+' RESULTADO(S) · '+(result.source||'GOOGLE');
+  const note=document.createElement('span');note.className='meta';note.textContent=products.length+' RESULTADO(S)';
   const bulk=document.createElement('button');bulk.type='button';bulk.className='silver';bulk.textContent='ADICIONAR SELECIONADOS';bulk.disabled=true;top.append(note,bulk);host.append(top);
   const selected=new Set(),syncBulk=()=>{bulk.disabled=!selected.size;bulk.textContent=selected.size?'ADICIONAR '+selected.size+' SELECIONADO(S)':'ADICIONAR SELECIONADOS'};
   products.forEach((p,index)=>{
@@ -671,36 +738,46 @@ function productPrice(item){
  return null;
 }
 function numericValue(s){const m=String(s||'').replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):null}
-function showTypeComparison(id){
+function warrantyMonths(s){const text=String(s||'').toLowerCase(),n=numericValue(text);if(n==null)return null;if(/ano/.test(text))return n*12;if(/mes/.test(text))return n;return n>5?n:n*12}
+function compactProductTitle(title,model,capacity,brand){const m=String(model||'').trim(),c=String(capacity||'').match(/[0-9]+(?:[,.][0-9]+)?\s?L/i)?.[0]?.replace(/\s+/g,'').toUpperCase()||'',b=String(brand||'').trim();if(m&&c)return [m,c,b].filter(Boolean).join(' ').toUpperCase();const raw=String(title||'').trim(),match=raw.match(/\b([A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2})\b.*?\b(\d+(?:[,.]\d+)?\s?L)\b/i);if(match){const brandGuess=b||raw.split(/\s+/).slice(-1)[0];return [match[1],match[2].replace(/\s+/g,'').toUpperCase(),brandGuess].filter(Boolean).join(' ').toUpperCase()}return raw.toUpperCase()}
+async function showTypeComparison(id){
  const current=items.find(x=>x.id===id);if(!current)return;
  const type=String(current.data?.subcategory||current.data?.productType||inferSubcategory(current.category,current.title)||'').trim().toLocaleUpperCase('pt-BR');
- if(!type){$('comparisonContent').innerHTML='<div class="notice">NÃO FOI POSSÍVEL IDENTIFICAR A SUBCATEGORIA DESTE ITEM. EDITE O CADASTRO PARA CONFERIR O TIPO DO PRODUTO.</div>';$('comparisonPanel').classList.remove('hidden');return}
  const group=items.filter(x=>x.status==='WISHLIST'&&x.category===current.category&&String(x.data?.subcategory||x.data?.productType||inferSubcategory(x.category,x.title)||'').trim().toLocaleUpperCase('pt-BR')===type);
+ const columns=await Promise.all(group.map(async x=>{const d=x.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);return '<th><div class="comparison-product-head">'+(img?'<img src="'+esc(img)+'" alt="">':'<div class="comparison-product-head-placeholder">✧</div>')+'<strong>'+esc(compactProductTitle(x.title,d.model,d.capacity,d.productBrand))+'</strong></div></th>'}));
  const metrics=[
   {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
   {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:'max'},
-  {label:'LOTE ESTIMADO · COOKIES DE 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4):null},fmt:v=>v==null?'NÃO INFORMADA':v+' COOKIES',best:'max'},
-  {label:'GARANTIA',get:x=>numericValue(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
-  {label:'AVALIAÇÃO / REVIEWS',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'},
-  {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA'}
+  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4.5):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:'max'},
+  {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'},
+  {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
+  {label:'AVALIAÇÃO',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'}
  ];
- const columns=group.map(x=>'<th>'+esc((x.data.model||x.title).toUpperCase())+'</th>').join('');
- const rows=metrics.map(m=>{
-  const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;
-  return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
- }).join('');
- const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['AVALIAÇÕES',x=>x.data.reviews],['QUALIDADE / CONFIABILIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
+ const rows=metrics.map(m=>{const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>'}).join('');
+ const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['QUALIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
- $('comparisonContent').innerHTML='<p class="meta">TIPO DE PRODUTO: '+esc(type)+' · CADA COLUNA REPRESENTA UM MODELO. VERDE INDICA O MELHOR VALOR NO CRITÉRIO COMPARÁVEL; VERMELHO, O MENOS FAVORÁVEL. </p><p class="comparison-note">ESTIMATIVA PROPORCIONAL À REFERÊNCIA DE UMA BATEDEIRA DE 4 LITROS, QUE RENDE CERCA DE 30 COOKIES DE 70G. O RENDIMENTO REAL VARIA CONFORME A MASSA, A TIGELA E O LIMITE DE CARGA DO FABRICANTE.</p>'+(group.length<2?'<div class="notice">SÓ EXISTE UM(A) '+esc(type)+' CADASTRADO(A) NA WISHLIST. CADASTRE OUTRO PRODUTO DO MESMO TIPO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns+'</tr></thead><tbody>'+rows+extra+'</tbody></table>';
- $('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'});
+ const mixers=/BATEDEIRA|MIXER|PLANETÁRIA/.test(type+' '+current.title.toUpperCase());
+ let recommendation='';
+ if(group.length){const rated=group.map(x=>{const d=x.data||{},price=productPrice(x),liters=numericValue(d.capacity),watts=numericValue(d.power),months=warrantyMonths(d.warranty);let score=0,parts=0;
+  if(price!=null){const prices=group.map(g=>productPrice(g)).filter(v=>v!=null),min=Math.min(...prices);score+=(min/price)*40;parts+=40}
+  if(liters!=null){const fit=mixers?Math.max(0,1-Math.abs(liters-7.6)/12):Math.min(1,liters/15);score+=fit*25;parts+=25}
+  if(watts!=null){score+=Math.min(1,watts/700)*20;parts+=20}
+  if(months!=null){score+=Math.min(1,months/24)*10;parts+=10}
+  const completeness=['model','capacity','power','warranty','reviews','specs'].filter(k=>String(d[k]||'').trim()).length;score+=(completeness/6)*5;parts+=5;
+  return {item:x,score:parts?score/parts:0,parts};
+ }).sort((a,b)=>b.score-a.score);const winner=rated[0];
+ recommendation='<div class="comparison-verdict"><strong>PALPITE COSMOS: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>parece a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis'+(mixers?' · para a rotina atual, uma capacidade próxima de 7,6 L tende a equilibrar aumento de produção e investimento':'')+'. '+(winner.parts<70?'ainda faltam dados técnicos para transformar esse palpite em uma recomendação firme.':'confira a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
+ }
+ $('comparisonContent').innerHTML=(type?'<div class="meta">TIPO DE PRODUTO: '+esc(type)+'</div>':'')+(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
+ $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
 }
-$('comparisonClose').onclick=()=>$('comparisonPanel').classList.add('hidden');
+const closeComparison=()=>{$('comparisonPanel').classList.add('hidden');$('comparisonBackdrop').classList.add('hidden')};$('comparisonClose').onclick=closeComparison;$('comparisonBackdrop').onclick=closeComparison;document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('comparisonPanel').classList.contains('hidden'))closeComparison()});
 $('search').addEventListener('input',render);
 $('categoryChecks').addEventListener('change',()=>{renderSubcategoryFilters();render()});
 $('itemForm').elements.category.addEventListener('change',()=>updateItemSubcategory(inferSubcategory($('itemForm').elements.category.value,$('itemForm').elements.title.value)||''));
 $('itemForm').elements.title.addEventListener('input',()=>{const detected=inferSubcategory($('itemForm').elements.category.value,$('itemForm').elements.title.value);if(detected)updateItemSubcategory(detected)});
 
-$('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');
+$('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');$('cosmosToastClose').onclick=()=>$('cosmosToast').classList.add('hidden');
 async function init(){
  renderSubcategoryFilters();
  if(!client){$('items').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONECTAR AO SUPABASE. RECARREGUE A PÁGINA.</div>';return}
