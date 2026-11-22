@@ -620,11 +620,40 @@ document.addEventListener('input',event=>{
  const el=event.target;
  if(el.matches('input[type="text"],input:not([type]),textarea')&&el.type!=='url'&&el.name!=='referenceUrl'){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
 });
+async function autoFillTechnicalData(payload){
+ const missing=['model','capacity','power','warranty','reviews','specs'].some(k=>!String(payload[k]||'').trim());
+ if(!missing||payload.referenceUrl)return payload;
+ const status=$('linkImportStatus');if(status)status.textContent='BUSCANDO DADOS TÉCNICOS DO MODELO...';
+ try{
+  const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:String(payload.title||'').trim(),mode:'discover'})});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||'BUSCA TÉCNICA INDISPONÍVEL');
+  let candidates=result.products||[];
+  candidates=candidates.filter(p=>p.voltageStatus!=='INCOMPATIBLE');
+  for(const original of candidates.slice(0,5)){
+   let p={...original};
+   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,link:original.link,thumbnail:original.thumbnail||detail.image||''}}}catch(_){}}
+   const volts=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});
+   const titleMatch=String(p.title||'').toLowerCase().includes(String(payload.model||payload.title||'').toLowerCase().split(' ').slice(0,2).join(' '))||String(payload.title||'').toLowerCase().includes(String(p.model||'').toLowerCase());
+   if(volts==='INCOMPATIBLE'||(!titleMatch&&candidates.length>1))continue;
+   for(const key of ['model','capacity','power','warranty','reviews'])if(!String(payload[key]||'').trim()&&p[key])payload[key]=p[key];
+   if(!String(payload.specs||'').trim())payload.specs=p.technicalSummary||p.specs||p.description||'';
+   if(!payload.productBrand&&p.brand)payload.productBrand=p.brand;
+   if(!payload.productImageUrl&&(p.image||p.thumbnail))payload.productImageUrl=p.image||p.thumbnail;
+   if(p.voltage)payload.voltage=/BIVOLT/i.test(p.voltage)?'BIVOLT':/220\s?V/i.test(p.voltage)?'220V':payload.voltage;
+   if(payload.model&&payload.capacity)payload.title=compactProductTitle(payload.title,payload.model,payload.capacity,payload.productBrand);
+   if(status)status.textContent='DADOS TÉCNICOS PREENCHIDOS COM BASE NO ANÚNCIO ENCONTRADO.';
+   return payload;
+  }
+  if(status)status.textContent='NÃO ENCONTRAMOS UMA FICHA TÉCNICA CONFIÁVEL. O CADASTRO CONTINUARÁ COM OS DADOS DISPONÍVEIS.';
+ }catch(error){if(status)status.textContent='NÃO FOI POSSÍVEL COMPLETAR A BUSCA TÉCNICA AUTOMÁTICA.'}
+ return payload;
+}
 $('itemForm').addEventListener('submit',async e=>{
  e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());try{Object.assign(payload,JSON.parse(form.dataset.productMeta||'{}'))}catch(_){}if(!payload.voltage)payload.voltage='220V';const file=form.elements.image.files[0];
  if(!payload.title||!payload.title.trim()){alert('INFORME O NOME DO PRODUTO.');return}
  const submit=form.querySelector('button[type="submit"]');if(submit){submit.disabled=true;submit.textContent='SALVANDO...'}
  try{
+  await autoFillTechnicalData(payload);
   const id=await saveItem(payload);
   if(file){const path=await uploadImage(file,id);await load();const item=items.find(x=>x.id===id);await patchData(id,{...item.data,imagePath:path})}
   await load();closeForm();
@@ -715,19 +744,26 @@ async function runPriceSearch(id){
  const item=items.find(x=>x.id===id);if(!item)return;
  const button=$('detailSearchPrices');if(button){button.disabled=true;button.textContent='BUSCANDO...'}
  try{
-  const d=item.data||{},query=[item.title,d.model,d.subcategory].filter(Boolean).join(' ');
+  const d=item.data||{},query=[item.title,d.model,d.subcategory,'220V BIVOLT'].filter(Boolean).join(' ');
   const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
-  const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString(),previousSearchLowest=fresh.lastSearchLowest||null,candidates=(result.products||[]).filter(p=>p.priceValue&&p.link).map(p=>({title:p.title,store:p.source,price:Number(p.priceValue),url:p.link,thumbnail:p.thumbnail||'',voltageStatus:p.voltageStatus||'UNKNOWN',searchedAt:today()}));
-  for(const p of result.products||[]){
-   const price=Number(p.priceValue||0);if(!price||!p.link)continue;
-   history.push({store:p.source||'GOOGLE SHOPPING',price,shipping:0,url:p.link||'',at:today(),searchBatch:batch,voltageStatus:p.voltageStatus||'UNKNOWN',title:p.title,read:false});
-   stores.push({store:p.source||'GOOGLE SHOPPING',price,shipping:0,url:p.link||'',searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageStatus:p.voltageStatus||'UNKNOWN'});
+  const enriched=await Promise.all((result.products||[]).map(async original=>{
+   let p={...original};
+   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,source:original.source||detail.source,link:original.link,thumbnail:original.thumbnail||detail.image||''}}}catch(_){}}
+   p.voltageStatus=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});
+   return p;
+  }));
+  const eligible=enriched.filter(p=>Number(p.priceValue)>0&&p.link&&['CONFIRMED_220V','BIVOLT'].includes(p.voltageStatus));
+  const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString(),previousSearchLowest=fresh.lastSearchLowest||null,candidates=eligible.map(p=>({title:p.title,store:p.source,price:Number(p.priceValue),url:p.link,thumbnail:p.thumbnail||'',voltageStatus:p.voltageStatus,searchedAt:today()}));
+  for(const p of eligible){
+   const price=Number(p.priceValue||0);
+   history.push({store:p.source||'LOJA',price,shipping:0,url:p.link,at:today(),searchBatch:batch,voltageStatus:p.voltageStatus,title:p.title,read:false});
+   stores.push({store:p.source||'LOJA',price,shipping:0,url:p.link,searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageStatus:p.voltageStatus});
   }
   const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
   const todays=history.filter(h=>h.searchBatch===batch),lowest=todays.reduce((m,h)=>!m||Number(h.price)<m.price?{price:Number(h.price),store:h.store}:m,null),cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);const recentHistory=history.filter(h=>new Date((h.at||'')+'T12:00:00')>=cutoff&&Number(h.price)>0),lowest12m=recentHistory.length?Math.min(...recentHistory.map(h=>Number(h.price)+Number(h.shipping||0))):null;
-  await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:result.ignoredForVoltage||0,lastSearchCandidates:candidates,previousSearchLowest,lastSearchLowest:lowest?.price||fresh.lastSearchLowest||null,targetPrice:lowest12m||fresh.targetPrice||lowest?.price||fresh.currentPrice||null,priceTargetBasis:lowest12m?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO'});
-  if(todays.length){await showDetail(id)}else alert('NÃO ENCONTRAMOS PREÇOS COM LINK E VALOR IDENTIFICADOS NESTA BUSCA. O HISTÓRICO PERMANECE INALTERADO.');
+  await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:(result.ignoredForVoltage||0)+(enriched.length-eligible.length),lastSearchCandidates:candidates,previousSearchLowest,lastSearchLowest:lowest?.price||fresh.lastSearchLowest||null,targetPrice:lowest12m||fresh.targetPrice||lowest?.price||fresh.currentPrice||null,priceTargetBasis:lowest12m?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO'});
+  if(todays.length){await showDetail(id)}else alert('NÃO ENCONTRAMOS OFERTAS COM PREÇO, LINK E VOLTAGEM 220V/BIVOLT CONFIRMADOS. RESULTADOS SEM COMPATIBILIDADE COMPROVADA FORAM DESCARTADOS E O HISTÓRICO PERMANECE INALTERADO.');
  }catch(error){alert('NÃO FOI POSSÍVEL FAZER A BUSCA: '+error.message)}
  finally{if(button){button.disabled=false;button.textContent='BUSCAR PREÇOS'}}
 }
