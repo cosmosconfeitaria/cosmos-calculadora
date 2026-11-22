@@ -142,7 +142,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 /* AJUSTES DE HARMONIA DA WISHLIST */
 #itemForm input[type="text"],#itemForm textarea,#search{text-transform:uppercase}
 #itemForm input[type="url"],#itemForm input[name="referenceUrl"],#itemForm input[type="email"]{text-transform:none!important;font-size:11px!important;letter-spacing:0!important}
-.reference-url{font-size:11px!important;letter-spacing:0!important;text-transform:none!important}
+.reference-url{font-size:11px!important;letter-spacing:0!important;text-transform:none!important}.reference-display,.reference-display a{font-size:10px!important;line-height:1.35!important;overflow-wrap:anywhere}
 .store-link-row,.store-link-row a,.small-link{font-size:10px!important;line-height:1.35!important;overflow-wrap:anywhere}
 .store-link-row .small-link{font-size:10px!important;font-weight:500}
 .finance-kicker{font:400 12px 'Gochi Hand',cursive;color:var(--red);letter-spacing:.04em;margin-bottom:7px}
@@ -268,13 +268,13 @@ function calcHtml(d){
  const f=finance(d),monthsLabel=f.months===1?'MÊS':'MESES';
  if(!Number(d.targetPrice)||!d.targetDate)return '<span class="finance-empty">PREENCHA O PREÇO-ALVO E A DATA PREVISTA PARA VISUALIZAR SEU PLANEJAMENTO.</span>';
  const method=d.paymentMethod||'PIX / À VISTA';
- if(Number(d.installments)>0){
+ if(Number(d.installments)>0&&method==='CARTÃO DE CRÉDITO'){
   const details='<div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(method)+'</b></div><div class="finance-line"><span>PARCELAMENTO</span><b>'+esc(d.installments)+'X SEM JUROS</b></div>';
   const contribution=f.planned?'<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>':'';
   return '<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div>'+details+'<div class="finance-main"><span>GUARDAR PARA A ENTRADA</span><strong>'+money(f.saveDown)+'/MÊS</strong></div><div class="finance-line"><span>PARCELA ESTIMADA</span><b>'+money(f.install)+'/MÊS · '+esc(d.installments)+'X</b></div><div class="finance-line"><span>COMPROMISSO MENSAL NAS PARCELAS</span><b>'+money(f.commit)+'</b></div>'+contribution;
  }
  const difference=Math.max(0,f.cash-f.planned);
- return '<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div><div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(method)+'</b></div><div class="finance-main"><span>PARA COMPRAR À VISTA · GUARDAR</span><strong>'+money(f.cash)+'/MÊS</strong></div><div class="finance-line"><span>PRAZO</span><b>'+f.months+' '+monthsLabel+'</b></div>'+(f.planned?'<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>':'')+(f.planned&&difference>0?'<div class="finance-gap"><span>FALTAM POR MÊS PARA CUMPRIR O PRAZO</span><strong>'+money(difference)+'</strong></div>':f.planned?'<div class="finance-ok">APORTE PLANEJADO SUFICIENTE PARA CUMPRIR O PRAZO.</div>':'');
+ return '<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div><div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(method)+'</b></div><div class="finance-main"><span>'+(method==='PIX / À VISTA'?'PARA COMPRAR À VISTA · GUARDAR':'VALOR A RESERVAR')+'</span><strong>'+money(f.cash)+'/MÊS</strong></div><div class="finance-line"><span>PRAZO</span><b>'+f.months+' '+monthsLabel+'</b></div>'+(method==='CARTÃO DE CRÉDITO'?'<div class="finance-line"><span>PARCELAMENTO</span><b>NÃO DEFINIDO</b></div>':'')+(f.planned?'<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>':'')+(f.planned&&difference>0?'<div class="finance-gap"><span>FALTAM POR MÊS PARA CUMPRIR O PRAZO</span><strong>'+money(difference)+'</strong></div>':f.planned?'<div class="finance-ok">APORTE PLANEJADO SUFICIENTE PARA CUMPRIR O PRAZO.</div>':'');
 }
 function updateFinancePreview(){
  const d=Object.fromEntries(new FormData($('itemForm')).entries());
@@ -414,7 +414,7 @@ async function showDetail(id){
  const links=(d.stores||[]).map(s=>'<p class="meta store-link-row"><strong>'+esc(s.store)+'</strong> · '+(s.price?money(Number(s.price)+Number(s.shipping||0))+(s.shipping?' (com frete)':''):'preço não registrado')+' · <a class="small-link" href="'+esc(s.url)+'" target="_blank" rel="noopener">abrir loja</a></p>').join('')||'<p class="meta">adicione links de lojas e comparadores.</p>';
  const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
  $('detailContent').innerHTML=(img?'<img src="'+img+'" style="width:min(220px,100%);max-height:190px;object-fit:contain;background:var(--cream);margin-bottom:12px">':'')+
- '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · VOLTAGEM: 220V · SUBCATEGORIA: '+esc(d.subcategory||d.productType||'NÃO DEFINIDA')+' · IMPORTÂNCIA: '+esc(item.importance)+'</div>'+
+ '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · VOLTAGEM: 220V · SUBCATEGORIA: '+esc(d.subcategory||d.productType||'NÃO DEFINIDA')+' · IMPORTÂNCIA: '+esc(item.importance)+'</div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button></div>'+
  '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+
  '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
@@ -461,7 +461,7 @@ $('itemForm').addEventListener('input',event=>{
 $('itemImage').addEventListener('change',updateFileName);
 document.addEventListener('input',event=>{
  const el=event.target;
- if(el.matches('input[type="text"],textarea')&&el.type!=='url'&&el.name!=='referenceUrl'){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
+ if(el.matches('input[type="text"],input:not([type]),textarea')&&el.type!=='url'&&el.name!=='referenceUrl'){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
 });
 $('itemForm').addEventListener('submit',async e=>{
  e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());const file=form.elements.image.files[0];
