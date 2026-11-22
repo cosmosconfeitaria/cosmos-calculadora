@@ -39,7 +39,9 @@ export async function POST(request){
   const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
   const pageText=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
   const creditMatch=pageText.match(/(?:no\s+cr[eé]dito|cart[aã]o)[^R$]{0,30}R\$\s*([\d.,]+)/i);
-  const installmentPlan=(pageText.match(/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+/i)||[])[0]||'';
+  const installmentMatch=pageText.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
+  const installmentPlan=installmentMatch?installmentMatch[0]:'';
+  const installmentTotal=installmentMatch?moneyValue(installmentMatch[2])*Number(installmentMatch[1]):null;
   const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
   const description=product.description||meta(html,'og:description')||meta(html,'description');
   const titleModel=(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}\s+(?:PLUS|PRO|MAX|DIGITAL|ELETRÔNICA|ELETRONICA)\b/i)||[])[0]||'';const sku=titleModel||product.sku||product.mpn||product.model||meta(html,'product:retailer_item_id')||meta(html,'og:sku')||(String(description||'').match(/modelo\s*[:\-]\s*([A-Z0-9-]+)/i)||[])[1]||(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}(?:\s+[A-Z0-9]+)?\b/)||[])[0]||'';
@@ -58,6 +60,6 @@ export async function POST(request){
   for(const term of featureTerms){const match=textContent.match(new RegExp('.{0,65}'+term+'.{0,100}','i'));if(match){const line=clean(match[0]);if(line.length>12&&!featureLines.some(x=>x.toLowerCase()===line.toLowerCase()))featureLines.push(line)}}
   const specs=[...propertySpecs,...featureLines].filter((line,i,all)=>all.findIndex(x=>x.toLowerCase()===line.toLowerCase())===i).slice(0,18).join('\n');
   const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+specs),description&&('DESCRIÇÃO DO FABRICANTE: '+clean(description))].filter(Boolean).join('\n');
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice:moneyValue(price),creditPrice:creditMatch?moneyValue(creditMatch[1]):null,installmentPlan,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice:moneyValue(price),creditPrice:creditMatch?moneyValue(creditMatch[1]):(installmentTotal||null),installmentPlan,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
