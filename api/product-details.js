@@ -11,12 +11,14 @@ const ALLOWED_HOSTS = [
  'kitchenaid.com.br','www.kitchenaid.com.br','brastemp.com.br','www.brastemp.com.br',
  'electrolux.com.br','www.electrolux.com.br','philips.com.br','www.philips.com.br'
 ];
+function sameOrigin(request){const origin=request.headers.get('origin');if(!origin)return true;const host=request.headers.get('x-forwarded-host')||request.headers.get('host');try{return !!host&&new URL(origin).host===host}catch(_){return false}}
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store, private'}})}
 function cookie(request){const p=(request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE_NAME+'='));return p?decodeURIComponent(p.slice(COOKIE_NAME.length+1)):''}
 function clean(s){return String(s||'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()}
 function meta(html,key){for(const tag of html.matchAll(/<meta\b[^>]*>/gi)){const attrs={};for(const m of tag[0].matchAll(/([\w:-]+)\s*=\s*["']([^"']*)["']/g))attrs[m[1].toLowerCase()]=m[2];if((attrs.property||attrs.name)===key)return clean(attrs.content)}return ''}
 function findProductJson(value,out=[]){if(!value||typeof value!=='object')return out;if(Array.isArray(value)){for(const v of value)findProductJson(v,out);return out}const type=value['@type'];if(type==='Product'||(Array.isArray(type)&&type.includes('Product')))out.push(value);for(const v of Object.values(value))if(v&&typeof v==='object')findProductJson(v,out);return out}
 export async function POST(request){
+ if(!sameOrigin(request))return json({error:'ORIGEM NÃO AUTORIZADA.'},403);
  const token=cookie(request);if(!token)return json({error:'SESSÃO EXPIRADA. ENTRE NOVAMENTE.'},401);
  try{
   const auth=await fetch(SUPABASE_URL+'/auth/v1/user',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+token},cache:'no-store'});
