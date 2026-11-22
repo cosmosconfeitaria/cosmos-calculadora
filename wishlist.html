@@ -526,7 +526,8 @@ $('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
   set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.specs||result.description);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);
   if(result.price)set('currentPrice',result.price,true);
   const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
-  form.dataset.productMeta=JSON.stringify({productImageUrl:data.productImageUrl,productBrand:data.productBrand,detectedVoltage:data.detectedVoltage});
+  let previousMeta={};try{previousMeta=JSON.parse(form.dataset.productMeta||'{}')}catch(_){}
+  form.dataset.productMeta=JSON.stringify({...previousMeta,productImageUrl:data.productImageUrl||previousMeta.productImageUrl||'',productBrand:data.productBrand||previousMeta.productBrand||'',detectedVoltage:data.detectedVoltage||previousMeta.detectedVoltage||''});
   if(status)status.textContent='DADOS IMPORTADOS QUANDO DISPONÍVEIS · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:' · CONFIRME A VOLTAGEM 220V NA PÁGINA');
   updateFinancePreview();
  }catch(error){if(status)status.textContent=error.message}
