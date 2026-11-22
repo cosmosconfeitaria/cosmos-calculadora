@@ -60,15 +60,18 @@ function technicalData(row) {
   if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
   else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
   else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
-  const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
-  const priceValue = Number(rawPrice);
+  const parsedPrice = parseDisplayedPrice(row);
+  const priceValue = parsedPrice.cashPrice;
   return {
     title, description, source: String(row.source || row.seller || 'LOJA').slice(0, 100),
     link: directStoreUrl(row.link) || directStoreUrl(row.product_link),
     productId: String(row.product_id || ''),
     thumbnail: typeof (row.thumbnail || row.thumbnail_url || row.thumbnail_link) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url || row.thumbnail_link) ? (row.thumbnail || row.thumbnail_url || row.thumbnail_link) : '',
     priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
-    priceText: String(row.price || '').slice(0, 60),
+    cashPrice: Number.isFinite(parsedPrice.cashPrice) && parsedPrice.cashPrice > 0 ? parsedPrice.cashPrice : null,
+    creditPrice: Number.isFinite(parsedPrice.creditPrice) && parsedPrice.creditPrice > 0 ? parsedPrice.creditPrice : null,
+    installmentPlan: parsedPrice.installmentPlan,
+    priceText: String(row.price || '').slice(0, 120),
     rating, ratingCount: ratingCount ? String(ratingCount) : '',
     model, capacity, power, warranty,
     brand: String(row.brand || '').slice(0, 100),
@@ -159,7 +162,8 @@ export async function POST(request) {
         const merged = technicalData({ ...base, title: product.title || base.title, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, snippet: description, attributes, dimensions });
         const offers = (Array.isArray(product.stores) ? product.stores : []).map(store => {
           const link = directStoreUrl(store.link);
-          const parsedOfferPrice = parseDisplayedPrice(store);\n          const priceValue = parsedOfferPrice.cashPrice;
+          const parsedOfferPrice = parseDisplayedPrice(store);
+          const priceValue = parsedOfferPrice.cashPrice;
           const offerTech = technicalData({ title: [product.title, store.title].filter(Boolean).join(' '), snippet: description, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, attributes });
           const model = offerTech.model || merged.model || base.model;
           const capacity = offerTech.capacity || merged.capacity || base.capacity;
