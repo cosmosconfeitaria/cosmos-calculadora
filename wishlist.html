@@ -439,7 +439,7 @@ async function showDetail(id){
  const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
  $('detailContent').innerHTML=(img?'<img class="detail-product-image" src="'+img+'" alt="">':'')+
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · ESPECIFICAÇÕES: <span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
- '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button></div>'+
+ '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button><button class="silver" id="detailSearchPrices" type="button">FAZER BUSCA DE PREÇOS</button></div>'+
  '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+
  '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
@@ -450,6 +450,7 @@ async function showDetail(id){
  '<div class="subhead">CONCLUIR COMPRA</div><div class="form-grid"><div class="field"><label>DATA DA COMPRA</label><input id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('detailCompare').onclick=()=>showTypeComparison(id);
+ $('detailSearchPrices').onclick=()=>runPriceSearch(id);
  $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
  $('storeRows').onclick=e=>{const b=e.target.closest('[data-remove-store]');if(b)b.closest('.store-row').remove()};
  $('saveStores').onclick=async()=>{const stores=[...document.querySelectorAll('.store-row')].map(r=>Object.fromEntries([...r.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value.trim()]))).filter(s=>s.store||s.url);await patchData(id,{stores});showDetail(id)};
@@ -501,6 +502,26 @@ $('addBtn').addEventListener('click',event=>{event.preventDefault();try{openForm
 $('formClose').addEventListener('click',closeForm);$('cancelForm').addEventListener('click',closeForm);
 $('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
 $('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit))});
+async function runPriceSearch(id){
+ const item=items.find(x=>x.id===id);if(!item)return;
+ const button=$('detailSearchPrices');if(button){button.disabled=true;button.textContent='BUSCANDO...'}
+ try{
+  const d=item.data||{},query=[item.title,d.model,d.subcategory,'220V'].filter(Boolean).join(' ');
+  const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
+  const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString();
+  for(const p of result.products||[]){
+   const price=Number(p.priceValue||0);if(!price||!p.voltageConfirmed)continue;
+   history.push({store:p.source||'GOOGLE SHOPPING',price,shipping:0,url:p.link||'',at:today(),searchBatch:batch,read:false});
+   stores.push({store:p.source||'GOOGLE SHOPPING',price,shipping:0,url:p.link||'',searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageConfirmed:true});
+  }
+  const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
+  const todays=history.filter(h=>h.searchBatch===batch),lowest=todays.reduce((m,h)=>!m||Number(h.price)<m.price?{price:Number(h.price),store:h.store}:m,null);
+  await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:result.ignoredForVoltage||0});
+  if(todays.length){await showDetail(id)}else alert('A BUSCA NÃO ENCONTROU OFERTAS COM VOLTAGEM 220V CONFIRMADA. NENHUM PREÇO FOI SALVO.');
+ }catch(error){alert('NÃO FOI POSSÍVEL FAZER A BUSCA: '+error.message)}
+ finally{if(button){button.disabled=false;button.textContent='FAZER BUSCA DE PREÇOS'}}
+}
 function productPrice(item){
  const d=item.data||{},storePrices=(d.stores||[]).map(x=>Number(x.price||0)+Number(x.shipping||0)).filter(x=>x>0);
  if(storePrices.length)return Math.min(...storePrices);
