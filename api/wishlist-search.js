@@ -27,7 +27,7 @@ function plainText(value) {
   return String(value || '');
 }
 function normalizeModel(value) { return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
-function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\\.)google\\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
+function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\.)google\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
 function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
 function technicalData(row) {
   const title = String(row.title || '').slice(0, 300);
@@ -150,7 +150,7 @@ export async function POST(request) {
           const capacity = offerTech.capacity || merged.capacity || base.capacity;
           const voltageStatus = offerTech.voltageStatus !== 'UNKNOWN' ? offerTech.voltageStatus : merged.voltageStatus;
           return { store: String(store.name || base.source || 'LOJA'), title: String(store.title || product.title || base.title), priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null, shipping: Number(store.shipping_extracted || 0) || 0, link, thumbnail: base.thumbnail, model, capacity, power: offerTech.power || merged.power || base.power, warranty: offerTech.warranty || merged.warranty || base.warranty, rating: merged.rating, ratingCount: merged.ratingCount, dimensions: merged.dimensions, voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT' };
-        }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && offer.capacity.replace(/\\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity)));
+        }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && offer.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity)));
         const bestOffer = offers.slice().sort((a,b)=>(a.priceValue+a.shipping)-(b.priceValue+b.shipping))[0];
         const priceInsights = product.price_insights || {};
         const history = [];
