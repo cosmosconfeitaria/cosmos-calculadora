@@ -33,7 +33,7 @@ function technicalData(row) {
   const description = String(row.snippet || row.description || row.product_description || '').slice(0, 900);
   const features = [plainText(row.extensions), plainText(row.product_highlights), plainText(row.snippets), plainText(row.attributes)].filter(Boolean).join(' · ');
   const evidence = [title, description, features].filter(Boolean).join(' ');
-  const model = (evidence.match(/\b[A-Z]{1,8}[-]?\d{2,5}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELECTRONIC|ELETRÔNICA))?\b/i) || [])[0] || '';
+  const model = extractModel(evidence);
   const capacity = (evidence.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '';
   const power = (evidence.match(/\b\d{2,4}\s?W\b/i) || [])[0] || '';
   const warranty = (evidence.match(/garantia[^.\n]{0,45}\b\d+\s*(?:mes(?:es)?|anos?)\b/i) || [])[0] || '';
@@ -80,6 +80,11 @@ export async function POST(request) {
       error: 'A BUSCA AUTOMÁTICA PRECISA DA CHAVE SERPAPI_API_KEY NAS VARIÁVEIS DE AMBIENTE DA VERCEL. NENHUM PREÇO FOI INVENTADO OU SALVO.'
     }, 503);
     const discover = body?.mode === 'discover';
+    const requestedModel = String(body?.model || extractModel(query) || '').trim();
+    const requestedModelKey = normalizeModel(requestedModel);
+    const requestedCapacity = String(body?.capacity || ((query.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '')).replace(/\s/g, '').replace(',', '.').toUpperCase();
+    const exactModelMatch = product => !requestedModelKey || normalizeModel(product.model) === requestedModelKey;
+    const exactCapacityMatch = product => !requestedCapacity || !product.capacity || product.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity;
     const search = async (engine, q) => {
       const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
@@ -88,7 +93,8 @@ export async function POST(request) {
       if (!response.ok) throw new Error('SEARCH_PROVIDER_' + response.status);
       return response.json();
     };
-    const queries = discover ? [query] : [query + ' 220V', query + ' BIVOLT', query];
+    const searchBase = requestedModel ? '"' + requestedModel + '" ' + query.replace(requestedModel, '').trim() : '"' + query + '"';
+    const queries = [searchBase + ' 220V', searchBase + ' BIVOLT'];
     const rows = [], seen = new Set();
     let source = 'RESULTADOS DE PRODUTOS';
     for (const term of queries) {
@@ -101,12 +107,12 @@ export async function POST(request) {
       if (discover && rows.length >= 8) break;
       if (!discover && rows.some(row => {
         const p = technicalData(row);
-        return p.priceValue && p.link && p.voltageConfirmed;
+        return p.priceValue && p.link && p.voltageConfirmed && exactModelMatch(p) && exactCapacityMatch(p);
       })) break;
     }
     if (rows.length < (discover ? 4 : 3)) {
       try {
-        const general = await search('google', query + (discover ? '' : ' 220V OR BIVOLT'));
+        const general = await search('google', searchBase + (discover ? '' : ' 220V OR BIVOLT'));
         for (const item of (Array.isArray(general.organic_results) ? general.organic_results : [])) {
           if (!item.title || !item.link || seen.has(item.link)) continue;
           rows.push({ title: item.title, link: item.link, snippet: item.snippet || '', thumbnail: item.thumbnail || '', source: item.source || item.displayed_link || 'RESULTADO DA WEB' });
@@ -115,11 +121,11 @@ export async function POST(request) {
         if (rows.length) source = 'RESULTADOS DE PRODUTOS E LOJAS';
       } catch (fallbackError) { console.warn('fallback search unavailable', fallbackError); }
     }
-    const products = rows.map(technicalData).filter(p => p.title && (discover || (p.priceValue && p.link)));
+    const products = rows.map(technicalData).filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p) && (discover || (p.priceValue && p.link)));
     return json({
       searchId: new Date().toISOString(), query, products,
-      ignoredForVoltage: products.filter(p => p.voltageStatus === 'UNKNOWN' || p.voltageStatus === 'INCOMPATIBLE').length,
-      searchWindow: discover ? null : 'CURRENT_OFFERS',
+      ignoredForVoltage: rows.length - products.length,
+      searchWindow: discover ? null : 'CURRENT_OFFERS', requestedModel,
       source
     });
   } catch (error) {
