@@ -16,9 +16,15 @@ function clearCookie() {
 function sameOrigin(request) {
   const origin = request.headers.get('origin');
   if (!origin) return true;
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
-  try { return !!host && new URL(origin).host === host; }
-  catch (_) { return false; }
+  try {
+    const originHost = new URL(origin).host.toLowerCase();
+    const candidates = [
+      request.headers.get('x-forwarded-host') || '',
+      request.headers.get('host') || '',
+      new URL(request.url).host || ''
+    ].flatMap(value => value.split(',')).map(value => value.trim().toLowerCase()).filter(Boolean);
+    return candidates.includes(originHost);
+  } catch (_) { return false; }
 }
 
 export async function POST(request) {
