@@ -561,14 +561,14 @@ async function saveDiscoveryResult(p,status='WISHLIST'){
  const title=String(p.title||'').trim();if(!title)throw new Error('PRODUTO SEM NOME.');
  const same=items.find(x=>x.status===status&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
  if(same)return same.id;
- const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':p.voltageStatus==='CONFIRMED_220V'?'220V':'NÃO CONFIRMADA';
+ const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',searchTerm=String($('productLookup').value||'').toLocaleUpperCase('pt-BR'),productTerm=String(p.title||'').toLocaleUpperCase('pt-BR'),subcategory=$('itemForm').elements.subcategory.value||(SUBCATEGORIES[category]||[]).find(value=>value!=='OUTROS'&&value!=='OUTROS EQUIPAMENTOS'&&(searchTerm+' '+productTerm).includes(value))||'',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':p.voltageStatus==='CONFIRMED_220V'?'220V':'NÃO CONFIRMADA';
  const current=Number(p.priceValue||0)||null;
  const history=items.filter(x=>x.status==='WISHLIST'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')).flatMap(x=>x.data.priceHistory||[]);
  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);
  const recent=history.filter(h=>new Date((h.at||'')+'T12:00:00')>=cutoff&&Number(h.price)>0);
  const historicalLow=recent.length?Math.min(...recent.map(h=>Number(h.price)+Number(h.shipping||0))):null;
  const technical=p.technicalSummary||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
- const data={subcategory:'',voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
+ const data={subcategory,voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
  if(current&&p.link){data.stores.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,searchedAt:today(),title,image:p.thumbnail||'',voltageConfirmed:true});data.priceHistory.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,at:today(),searchBatch:'initial-'+today(),read:false})}
  const {data:row,error}=await client.from('cosmos_wishlist_items').insert({user_id:user.id,title,category,status,importance:'MEDIA',data}).select('id').single();
  if(error)throw error;
