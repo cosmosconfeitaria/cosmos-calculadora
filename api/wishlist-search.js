@@ -60,19 +60,19 @@ export async function POST(request) {
     const payload = await upstream.json();
     const rows = Array.isArray(payload.shopping_results) ? payload.shopping_results : [];
     const products = rows.map(row => {
-      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\\d,.-]/g, '').replace(/\\.(?=\\d{3}(?:\\D|$))/g, '').replace(',', '.');
+      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
       const priceValue = Number(rawPrice);
       const title = String(row.title || '').slice(0, 300);
       const evidence = [title, row.snippet, row.description].filter(Boolean).join(' ');
       let voltageStatus = 'UNKNOWN';
-      if (/\\b(110|127)\\s?V\\b|\\b(110|127)\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
-      else if (/\\bBIVOLT\\b|\\b100\\s?A\\s?240\\s?V\\b/i.test(evidence)) voltageStatus = 'BIVOLT';
-      else if (/\\b220\\s?V\\b|\\b220\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
+      if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
+      else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
+      else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
       return {
         title,
         source: String(row.source || row.seller || 'GOOGLE SHOPPING').slice(0, 100),
-        link: typeof row.link === 'string' && /^https:\\/\\/(?!localhost)/i.test(row.link) ? row.link : '',
-        thumbnail: typeof row.thumbnail === 'string' && /^https:\\/\\//i.test(row.thumbnail) ? row.thumbnail : '',
+        link: typeof row.link === 'string' && /^https:\/\/(?!localhost)/i.test(row.link) ? row.link : '',
+        thumbnail: typeof row.thumbnail === 'string' && /^https:\/\//i.test(row.thumbnail) ? row.thumbnail : '',
         priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
         priceText: String(row.price || '').slice(0, 60),
         rating: row.rating ?? null,
