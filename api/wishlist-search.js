@@ -57,7 +57,8 @@ function technicalData(row) {
     model, capacity, power, warranty,
     brand: String(row.brand || '').slice(0, 100),
     specs: features.slice(0, 1200),
-    dimensions: String(row.dimensions || row.product_dimensions || '').slice(0, 160),
+    dimensions: String(row.dimensions || row.product_dimensions || ((evidence.match(/\\b\\d{2,3}(?:[,.]\\d+)?\\s*[x×]\\s*\\d{2,3}(?:[,.]\\d+)?\\s*[x×]\\s*\\d{2,3}(?:[,.]\\d+)?\\s*(?:cm|mm)\\b/i)||[])[0]) || '').slice(0, 160),
+    priceDate: String(row.price_date || row.valid_from || row.offer_date || '').match(/^\\d{4}-\\d{2}-\\d{2}$/)?.[0] || null,
     voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT'
   };
 }
