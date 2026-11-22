@@ -637,7 +637,7 @@ async function showDetail(id){
  $('detailContent').innerHTML=(img?'<img class="detail-product-image" src="'+img+'" alt="">':'')+
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+'</div><div class="meta">ESPECIFICAÇÕES: <span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="detail-actions"><button class="silver" id="detailCompare" type="button">COMPARAR MODELOS</button><button class="silver" id="detailSearchPrices" type="button">BUSCAR PREÇOS</button></div>'+
- '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+
+ '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.stores?.filter(x=>Number(x.price)>0&&x.url).sort((a,b)=>Number(a.price)-Number(b.price))[0]?'<p class="meta"><a class="small-link" href="'+esc(d.stores.filter(x=>Number(x.price)>0&&x.url).sort((a,b)=>Number(a.price)-Number(b.price))[0].url)+'" target="_blank" rel="noopener">VER LOJA / COMPRAR</a></p>':'')+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+
  '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(sharedSavedAmount)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">RESUMO TÉCNICO</div><p class="meta technical-summary">'+esc(technicalSummaryText(d)||'INFORMAÇÕES TÉCNICAS AINDA NÃO DISPONÍVEIS.')+'</p>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
@@ -689,7 +689,7 @@ $('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
   if(result.price)set('currentPrice',result.price,true);
   const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
   let previousMeta={};try{previousMeta=JSON.parse(form.dataset.productMeta||'{}')}catch(_){}
-  form.dataset.productMeta=JSON.stringify({...previousMeta,productImageUrl:data.productImageUrl||previousMeta.productImageUrl||'',productBrand:data.productBrand||previousMeta.productBrand||'',detectedVoltage:data.detectedVoltage||previousMeta.detectedVoltage||''});
+  form.dataset.productMeta=JSON.stringify({...previousMeta,productImageUrl:data.productImageUrl||previousMeta.productImageUrl||'',productBrand:data.productBrand||previousMeta.productBrand||'',detectedVoltage:data.detectedVoltage||previousMeta.detectedVoltage||'',rating:result.rating||previousMeta.rating||null,ratingCount:result.ratingCount||previousMeta.ratingCount||'',dimensions:result.dimensions||previousMeta.dimensions||''});
   if(status)status.textContent='DADOS IMPORTADOS E RESUMO TÉCNICO SALVO · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:'');
   updateFinancePreview();
  }catch(error){if(status)status.textContent=error.message}
@@ -700,7 +700,7 @@ document.addEventListener('input',event=>{
  if(el.matches('input[type="text"],input:not([type]),textarea')&&el.type!=='url'&&el.name!=='referenceUrl'){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
 });
 async function autoFillTechnicalData(payload){
- const missing=['model','capacity','power','warranty','reviews','specs'].some(k=>!String(payload[k]||'').trim());
+ const missing=['model','capacity','power','warranty','rating','dimensions'].some(k=>!String(payload[k]||'').trim());
  if(!missing||payload.referenceUrl)return payload;
  const status=$('linkImportStatus');if(status)status.textContent='BUSCANDO DADOS TÉCNICOS DO MODELO...';
  try{
@@ -714,7 +714,7 @@ async function autoFillTechnicalData(payload){
    const volts=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});
    const titleMatch=String(p.title||'').toLowerCase().includes(String(payload.model||payload.title||'').toLowerCase().split(' ').slice(0,2).join(' '))||String(payload.title||'').toLowerCase().includes(String(p.model||'').toLowerCase());
    if(volts==='INCOMPATIBLE'||(!titleMatch&&candidates.length>1))continue;
-   for(const key of ['model','capacity','power','warranty','reviews'])if(!String(payload[key]||'').trim()&&p[key])payload[key]=p[key];
+   for(const key of ['model','capacity','power','warranty','rating','ratingCount','dimensions'])if(!String(payload[key]||'').trim()&&p[key])payload[key]=p[key];
    if(!String(payload.specs||'').trim())payload.specs=p.technicalSummary||p.specs||p.description||'';
    if(!payload.productBrand&&p.brand)payload.productBrand=p.brand;
    if(!payload.productImageUrl&&(p.image||p.thumbnail))payload.productImageUrl=p.image||p.thumbnail;
@@ -863,8 +863,8 @@ async function showTypeComparison(id){
  const columns=await Promise.all(group.map(async x=>{const d=x.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);return '<th><div class="comparison-product-head">'+(img?'<img src="'+esc(img)+'" alt="">':'<div class="comparison-product-head-placeholder">✧</div>')+'<strong>'+esc(compactProductTitle(x.title,d.model,d.capacity,d.productBrand))+'</strong></div></th>'}));
  const metrics=[
   {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
-  {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:'max'},
-  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4.5):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:'max'},
+  {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:null},
+  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4.5):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:null},
   {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'},
   {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
   {label:'NOTA MÉDIA',get:x=>Number(x.data.rating)||null,fmt:(v,x)=>v==null?'NÃO INFORMADA':v.toFixed(1).replace('.',',')+'/5',best:'max'}
