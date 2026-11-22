@@ -666,22 +666,23 @@ function showTypeComparison(id){
  const current=items.find(x=>x.id===id);if(!current)return;
  const type=String(current.data?.subcategory||current.data?.productType||'').trim().toLocaleUpperCase('pt-BR');
  if(!type){$('comparisonContent').innerHTML='<div class="notice">DEFINA A SUBCATEGORIA DESTE ITEM PARA COMPARAR MODELOS DO MESMO TIPO.</div>';$('comparisonPanel').classList.remove('hidden');return}
- const group=items.filter(x=>x.status==='WISHLIST'&&String(x.data?.subcategory||x.data?.productType||'').trim().toLocaleUpperCase('pt-BR')===type);
+ const group=items.filter(x=>x.status==='WISHLIST'&&x.category===current.category&&String(x.data?.subcategory||x.data?.productType||'').trim().toLocaleUpperCase('pt-BR')===type);
  const metrics=[
   {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
   {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:'max'},
+  {label:'LOTE ESTIMADO · COOKIES DE 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4):null},fmt:v=>v==null?'NÃO INFORMADA':v+' COOKIES',best:'max'},
   {label:'GARANTIA',get:x=>numericValue(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
   {label:'AVALIAÇÃO / REVIEWS',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'},
   {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA'}
  ];
- const columns=group.map(x=>'<th>'+esc(x.data.model||x.title)+'</th>').join('');
+ const columns=group.map(x=>'<th>'+esc((x.data.model||x.title).toUpperCase())+'</th>').join('');
  const rows=metrics.map(m=>{
   const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;
   return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
  }).join('');
- const details=[['VOLTAGEM',x=>'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['AVALIAÇÕES',x=>x.data.reviews],['QUALIDADE / CONFIABILIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
+ const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['AVALIAÇÕES',x=>x.data.reviews],['QUALIDADE / CONFIABILIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
- $('comparisonContent').innerHTML='<p class="meta">TIPO DE PRODUTO: '+esc(type)+' · CADA COLUNA REPRESENTA UM MODELO. VERDE INDICA O MELHOR VALOR NO CRITÉRIO COMPARÁVEL; VERMELHO, O MENOS FAVORÁVEL. A DECISÃO FINAL CONSIDERA A OPERAÇÃO COSMOS.</p>'+(group.length<2?'<div class="notice">SÓ EXISTE UM(A) '+esc(type)+' CADASTRADO(A) NA WISHLIST. CADASTRE OUTRO PRODUTO COM O MESMO TIPO PARA COMPARAR LADO A LADO.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns+'</tr></thead><tbody>'+rows+extra+'</tbody></table>';
+ $('comparisonContent').innerHTML='<p class="meta">TIPO DE PRODUTO: '+esc(type)+' · CADA COLUNA REPRESENTA UM MODELO. VERDE INDICA O MELHOR VALOR NO CRITÉRIO COMPARÁVEL; VERMELHO, O MENOS FAVORÁVEL. </p><p class="comparison-note">ESTIMATIVA PROPORCIONAL À REFERÊNCIA DE UMA BATEDEIRA DE 4 LITROS, QUE RENDE CERCA DE 30 COOKIES DE 70G. O RENDIMENTO REAL VARIA CONFORME A MASSA, A TIGELA E O LIMITE DE CARGA DO FABRICANTE.</p>'+(group.length<2?'<div class="notice">SÓ EXISTE UM(A) '+esc(type)+' CADASTRADO(A) NA WISHLIST. CADASTRE OUTRO PRODUTO COM O MESMO TIPO PARA COMPARAR LADO A LADO.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns+'</tr></thead><tbody>'+rows+extra+'</tbody></table>';
  $('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('comparisonClose').onclick=()=>$('comparisonPanel').classList.add('hidden');
