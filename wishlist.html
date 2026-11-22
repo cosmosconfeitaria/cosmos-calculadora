@@ -423,7 +423,7 @@ const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'B
 const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function isStoreUrl(value){try{const url=new URL(String(value||''));return url.protocol==='https:'&&!/(^|\\.)google\\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')}catch(_){return false}}
+function isStoreUrl(value){try{const url=new URL(String(value||''));return url.protocol==='https:'&&!/(^|\.)google\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')}catch(_){return false}}
 function finance(d){
  const price=Number(d.targetPrice||0),down=Math.min(price,Number(d.downPayment||0)),parts=Math.max(0,Number(d.installments||0));
  const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null,now=new Date();
