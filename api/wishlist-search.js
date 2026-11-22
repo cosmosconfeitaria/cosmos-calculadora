@@ -49,7 +49,7 @@ function technicalData(row) {
   const features = [plainText(row.extensions), plainText(row.product_highlights), plainText(row.snippets), plainText(row.attributes)].filter(Boolean).join(' · ');
   const evidence = [title, description, features].filter(Boolean).join(' ');
   const model = extractModel(evidence);
-  const capacity = (evidence.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '';
+  const capacityMatch = evidence.match(/\b\d+(?:[,.]\d+)?\s?(?:L|LITROS?)\b/i);\n  const capacity = capacityMatch ? normalizeCapacity(capacityMatch[0]) : '';
   const power = (evidence.match(/\b\d{2,4}\s?W\b/i) || [])[0] || '';
   const warranty = (evidence.match(/garantia[^.\n]{0,45}\b\d+\s*(?:mes(?:es)?|anos?)\b/i) || [])[0] || '';
   const ratingRaw = row.rating ?? row.rating_value ?? row.product_rating ?? '';
@@ -102,9 +102,9 @@ export async function POST(request) {
     const discover = body?.mode === 'discover';
     const requestedModel = String(body?.model || extractModel(query) || '').trim();
     const requestedModelKey = normalizeModel(requestedModel);
-    const requestedCapacity = String(body?.capacity || ((query.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '')).replace(/\s/g, '').replace(',', '.').toUpperCase();
+    const requestedCapacity = normalizeCapacity(body?.capacity || ((query.match(/\b\d+(?:[,.]\d+)?\s?(?:L|LITROS?)\b/i) || [])[0] || ''));
     const exactModelMatch = product => !requestedModelKey || normalizeModel(product.model) === requestedModelKey;
-    const exactCapacityMatch = product => !requestedCapacity || (!!product.capacity && product.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity);
+    const exactCapacityMatch = product => !requestedCapacity || (!!product.capacity && normalizeCapacity(product.capacity) === requestedCapacity);
     const search = async (engine, q) => {
       const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
@@ -165,7 +165,7 @@ export async function POST(request) {
           const capacity = offerTech.capacity || merged.capacity || base.capacity;
           const voltageStatus = offerTech.voltageStatus !== 'UNKNOWN' ? offerTech.voltageStatus : merged.voltageStatus;
           return { store: String(store.name || base.source || 'LOJA'), title: String(store.title || product.title || base.title), priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null, cashPrice: parsedOfferPrice.cashPrice, creditPrice: parsedOfferPrice.creditPrice, installmentPlan: parsedOfferPrice.installmentPlan, shipping: Number(store.shipping_extracted || 0) || 0, link, thumbnail: base.thumbnail, model, capacity, power: offerTech.power || merged.power || base.power, warranty: offerTech.warranty || merged.warranty || base.warranty, rating: merged.rating, ratingCount: merged.ratingCount, dimensions: merged.dimensions, voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT' };
-        }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && offer.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity)));
+        }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && normalizeCapacity(offer.capacity) === requestedCapacity)));
         const bestOffer = offers.slice().sort((a,b)=>(a.priceValue+a.shipping)-(b.priceValue+b.shipping))[0];
         const priceInsights = product.price_insights || {};
         const history = [];
