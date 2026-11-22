@@ -40,6 +40,13 @@ export async function POST(request){
   const textContent=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
   const voltage=(textContent.match(/\b220\s?V\b|\b220\s?VOLTS?\b/i)||[])[0]||'';
   const warranty=(textContent.match(/garantia.{0,35}(?:\d+\s*(?:mes(?:es)?|anos?))/i)||[])[0]||'';
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  const properties=Array.isArray(product.additionalProperty)?product.additionalProperty:[];
+  const prop=(...terms)=>{const found=properties.find(p=>terms.some(t=>String(p.name||'').toLowerCase().includes(t)));return found?clean(found.value):''};
+  const capacity=prop('capacidade','volume','litro','capacidade da tigela')||(textContent.match(/\b\d+(?:[,.]\d+)?\s?L\b/i)||[])[0]||'';
+  const power=prop('potencia','potência')||(textContent.match(/\b\d{2,4}\s?W\b/i)||[])[0]||'';
+  const rating=product.aggregateRating?.ratingValue||'';
+  const reviewCount=product.aggregateRating?.reviewCount||product.aggregateRating?.ratingCount||'';
+  const specs=properties.map(p=>clean((p.name||'')+': '+(p.value||''))).filter(Boolean).join(' · ');
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
