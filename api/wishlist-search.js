@@ -141,7 +141,8 @@ export async function POST(request) {
         const product = productResponse.product_results || {};
         const attributes = product.product_attributes || [];
         const description = [product.about_the_product?.description, plainText(product.about_the_product?.features), plainText(attributes), base.description].filter(Boolean).join(' · ');
-        const merged = technicalData({ ...base, title: product.title || base.title, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, snippet: description, attributes });
+        const dimensions = attributes.filter(attribute => /^(height|width|depth|dimensions?)$/i.test(String(attribute.name || ''))).map(attribute => String(attribute.value || '').trim()).filter(Boolean).join(' × ');
+        const merged = technicalData({ ...base, title: product.title || base.title, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, snippet: description, attributes, dimensions });
         const offers = (Array.isArray(product.stores) ? product.stores : []).map(store => {
           const link = directStoreUrl(store.link);
           const priceValue = Number(store.extracted_price ?? store.price ?? 0);
