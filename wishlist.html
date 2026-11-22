@@ -211,6 +211,8 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 .finance-ok{color:var(--blue)!important;background:#edf3ff!important}.detail-product-image{background:transparent!important;object-fit:contain!important}
 
 /* AJUSTES COSMOS · COMPARATIVO, FILTROS E JANELAS */
+.category-checks{grid-template-columns:repeat(4,minmax(0,1fr))}
+
 .category-filter-box{padding:9px 10px;margin-bottom:13px}
 .category-filter-heading{font-size:9px;margin-bottom:7px}
 .category-checks{gap:5px}
@@ -804,7 +806,7 @@ async function showTypeComparison(id){
  }).sort((a,b)=>b.score-a.score);const winner=rated[0];
  recommendation='<div class="comparison-verdict"><strong>PALPITE COSMOS: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>parece a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis'+(mixers?' · para a rotina atual, uma capacidade próxima de 7,6 L tende a equilibrar aumento de produção e investimento':'')+'. '+(winner.parts<70?'ainda faltam dados técnicos para transformar esse palpite em uma recomendação firme.':'confira a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
  }
- $('comparisonContent').innerHTML=(type?'<div class="meta">TIPO DE PRODUTO: '+esc(type)+'</div>':'')+(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
+ $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
 }
 const closeComparison=()=>{$('comparisonPanel').classList.add('hidden');$('comparisonBackdrop').classList.add('hidden')};$('comparisonClose').onclick=closeComparison;$('comparisonBackdrop').onclick=closeComparison;document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('comparisonPanel').classList.contains('hidden'))closeComparison()});
