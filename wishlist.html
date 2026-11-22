@@ -176,6 +176,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 .chart-controls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chart-controls .silver{font-size:9px;padding:8px 10px}.chart-custom{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.chart-custom input{max-width:145px;font-size:10px!important;padding:8px}.chart-custom .silver{font-size:9px;padding:9px 10px}
 .advanced-fields{grid-column:1/-1;border:1px solid var(--line);padding:10px 12px;background:#fff}.advanced-fields summary{cursor:pointer;color:var(--blue);font-size:10px;letter-spacing:.06em;padding:3px 0}.advanced-fields[open] summary{margin-bottom:12px}.advanced-fields .form-grid{padding:0}
 .manual-price-entry{margin:12px 0;border:1px solid var(--line);padding:10px 12px;background:#fff}.manual-price-entry summary{cursor:pointer;color:var(--blue);font-size:10px;letter-spacing:.05em}.manual-price-entry[open] summary{margin-bottom:10px}
+.finance-ok{color:var(--blue)!important;background:#edf3ff!important}.detail-product-image{background:transparent!important;object-fit:contain!important}
 </style>
 </head>
 <body>
@@ -340,7 +341,7 @@ function closeForm(){$('formPanel').classList.add('hidden');editingId=null}
 async function load(){
  const {data,error}=await client.from('cosmos_wishlist_items').select('*').order('created_at',{ascending:false});
  if(error)throw error;
- items=(data||[]).map(r=>({...r,data:r.data||{}}));render();
+ items=(data||[]).map(r=>({...r,data:r.data||{}}));await render();
 }
 async function imageUrl(path,remote){
  if(!path)return remote||'';
@@ -456,7 +457,7 @@ async function showDetail(id){
  $('detailContent').innerHTML=(img?'<img class="detail-product-image" src="'+img+'" alt="">':'')+
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · ESPECIFICAÇÕES: <span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button><button class="silver" id="detailSearchPrices" type="button">FAZER BUSCA DE PREÇOS</button></div>'+
- '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+
+ '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+'
  '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
  '<details class="manual-price-entry"><summary>OPÇÕES MANUAIS · ADICIONAR LOJA OU REGISTRAR PREÇO</summary><div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
@@ -547,7 +548,7 @@ async function runPriceSearch(id){
   const d=item.data||{},query=[item.title,d.model,d.subcategory,'220V'].filter(Boolean).join(' ');
   const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
-  const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString();
+  const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString(),previousSearchLowest=fresh.lastSearchLowest||null;
   for(const p of result.products||[]){
    const price=Number(p.priceValue||0);if(!price||!p.voltageConfirmed)continue;
    history.push({store:p.source||'GOOGLE SHOPPING',price,shipping:0,url:p.link||'',at:today(),searchBatch:batch,read:false});
@@ -555,7 +556,7 @@ async function runPriceSearch(id){
   }
   const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
   const todays=history.filter(h=>h.searchBatch===batch),lowest=todays.reduce((m,h)=>!m||Number(h.price)<m.price?{price:Number(h.price),store:h.store}:m,null);
-  await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:result.ignoredForVoltage||0});
+  await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:result.ignoredForVoltage||0,previousSearchLowest,lastSearchLowest:lowest?.price||fresh.lastSearchLowest||null});
   if(todays.length){await showDetail(id)}else alert('A BUSCA NÃO ENCONTROU OFERTAS COM VOLTAGEM 220V CONFIRMADA. NENHUM PREÇO FOI SALVO.');
  }catch(error){alert('NÃO FOI POSSÍVEL FAZER A BUSCA: '+error.message)}
  finally{if(button){button.disabled=false;button.textContent='FAZER BUSCA DE PREÇOS'}}
