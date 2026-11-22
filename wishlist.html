@@ -831,7 +831,7 @@ async function runPriceSearch(id){
   const enriched=await Promise.all((result.products||[]).map(async original=>{
    let p={...original};
    if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,source:original.source||detail.source,link:original.link,thumbnail:original.thumbnail||detail.image||''}}}catch(_){}}
-   p.voltageStatus=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});
+   const checkedVoltage=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});p.voltageStatus=checkedVoltage==='UNKNOWN'?(original.voltageStatus||'UNKNOWN'):checkedVoltage;
    return p;
   }));
   const eligible=enriched.flatMap(product=>{const offers=Array.isArray(product.offers)&&product.offers.length?product.offers:[product];return offers.map(offer=>({...product,...offer,source:offer.store||offer.source||product.source,priceValue:Number(offer.priceValue??offer.cashPrice??offer.price),link:offer.link||product.link,voltageStatus:offer.voltageStatus||product.voltageStatus,thumbnail:offer.thumbnail||product.thumbnail,priceHistory:product.priceHistory||[]}));}).filter(p=>Number(p.priceValue)>0&&p.link&&['CONFIRMED_220V','BIVOLT'].includes(p.voltageStatus));
