@@ -44,7 +44,7 @@ export async function POST(request) {
     }, 503);
     const discover = body?.mode === 'discover';
     const search = async (engine, q) => {
-      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey });
+      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey, ...(!discover ? { tbs: 'qdr:m3' } : {}) });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
         headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000), cache: 'no-store'
       });
