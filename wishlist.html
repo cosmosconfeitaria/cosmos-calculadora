@@ -24,14 +24,14 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 @keyframes wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
 .back,.silver,.icon-button{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;cursor:pointer}
 .back{width:42px;height:36px;display:grid;place-items:center;border-radius:8px;text-decoration:none;font-size:18px}
-.eyebrow{font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px}
+.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px}
 h1{font-size:clamp(34px,7vw,56px);line-height:.98;letter-spacing:-1.5px;font-weight:500;margin:0;color:var(--blue)}
-.intro{font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
+.intro{text-transform:uppercase;font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
 .toolbar{display:grid;grid-template-columns:1fr auto auto auto;gap:9px;align-items:center;margin-bottom:14px}
-input,select,textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
-textarea{min-height:80px;resize:vertical;line-height:1.45}
+input,select,textarea{text-transform:uppercase;width:100%;border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
+input::placeholder,textarea::placeholder{ text-transform:uppercase; opacity:.65 } textarea{min-height:80px;resize:vertical;line-height:1.45}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21a}
-label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
+label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
 .field{min-width:0}
 .silver{border-radius:7px;padding:12px 14px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;white-space:nowrap}
 .silver:active,.back:active,.icon-button:active{transform:translateY(2px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}
@@ -47,7 +47,7 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .thumb{width:76px;height:76px;flex:0 0 76px;object-fit:cover;background:var(--cream);border:1px solid var(--line)}
 .thumb.empty{display:grid;place-items:center;font-size:25px;color:#b9b5ae}
 .item h3{font-size:15px;font-weight:500;color:var(--blue);line-height:1.2;margin:0 0 6px;overflow-wrap:anywhere}
-.meta{font-size:10px;color:var(--muted);line-height:1.5}
+.meta{text-transform:uppercase;font-size:10px;color:var(--muted);line-height:1.5}
 .price{font-size:16px;color:var(--ink);margin:12px 0 3px}
 .item-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .item-actions button{font-size:10px;padding:8px 10px}
@@ -60,19 +60,23 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .hidden{display:none!important}
 .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .form-actions .silver{min-width:120px}
-.subhead{font-size:11px;letter-spacing:.08em;color:var(--blue);margin:18px 0 10px;font-weight:500}
+.subhead{text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:var(--blue);margin:18px 0 10px;font-weight:500}
 .calc{background:var(--cream);padding:12px;border:1px solid var(--line);font-size:11px;line-height:1.6}
 .calc strong{font-size:17px;font-weight:500;color:var(--blue)}
 .store-row{display:grid;grid-template-columns:1.1fr 1fr .8fr 1fr auto;gap:7px;margin:8px 0;align-items:end}
 .store-row input{font-size:11px;padding:10px 8px}
 .store-row button{height:36px}
-.notice{border:1px solid #e7c5c5;background:#fff7f6;padding:12px;margin:8px 0;font-size:11px;line-height:1.5;color:var(--ink)}
+.notice{text-transform:uppercase;border:1px solid #e7c5c5;background:#fff7f6;padding:12px;margin:8px 0;font-size:11px;line-height:1.5;color:var(--ink)}
 .notice.unread{border-left:4px solid var(--red)}
 .notice strong{color:var(--blue);font-weight:500}
-.chart-empty{padding:18px;border:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}.price-chart{border:1px solid var(--line);padding:12px;background:#fff}.chart-caption{font-size:9px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}.price-chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-legend-wrap{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.chart-legend{font-size:10px;color:var(--ink);display:inline-flex;align-items:center;gap:5px}.chart-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.chart-footnote{font-size:9px;color:var(--muted);line-height:1.4;margin-top:9px}.popup{position:fixed;z-index:50;right:max(18px,calc((100vw - 900px)/2));top:80px;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
+.chart-empty{padding:18px;border:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}.price-chart{border:1px solid var(--line);padding:12px;background:#fff}.chart-caption{text-transform:uppercase;font-size:9px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}.price-chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-legend-wrap{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.chart-legend{font-size:10px;color:var(--ink);display:inline-flex;align-items:center;gap:5px}.chart-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.chart-footnote{text-transform:uppercase;font-size:9px;color:var(--muted);line-height:1.4;margin-top:9px}.popup{position:fixed;z-index:10000;right:18px;bottom:94px;top:auto;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
 .popup-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.popup-head strong{font-size:12px;font-weight:500}
+.popup-head strong{text-transform:uppercase;font-size:12px;font-weight:500}
 .close{border:0;background:none;color:var(--blue);font-size:20px;cursor:pointer}
+.back{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 34px;border:1px solid #d4d1cc;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 48%,#d8d7d4 100%);box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e,0 3px 5px #0000000b;color:var(--blue);text-decoration:none}.menu-lines{display:flex;flex-direction:column;gap:4px;width:15px}.menu-lines i{display:block;width:15px;height:2px;border-radius:2px;background:var(--blue)}.back:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.floating-inbox{position:fixed;right:18px;bottom:18px;z-index:10001;width:62px;height:62px;border-radius:50%;border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 7px 12px #0002;color:var(--blue);font-size:23px;cursor:pointer}.floating-inbox:active{transform:translateY(3px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}.floating-inbox .dot{right:7px;top:7px;width:10px;height:10px}
+.nav-action{display:inline-flex;align-items:center;text-decoration:none}
+.comparison-table{border-collapse:collapse;min-width:620px;width:100%;font-size:11px}.comparison-table th,.comparison-table td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.comparison-table thead th{background:var(--cream);color:var(--blue);font-weight:500}.comparison-table tbody th{color:var(--muted);font-weight:500;white-space:nowrap}.comparison-table .best-value{background:#e8f4eb;color:#176b37;font-weight:600}.comparison-table .worst-value{background:#fff0ed;color:#b72b20;font-weight:600}
 .archive-list{display:grid;gap:9px}
 .archive-row{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);background:#fff;font-size:11px}
 .archive-row strong{font-weight:500;color:var(--blue)}
@@ -86,26 +90,27 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 </head>
 <body>
 <div class="wrap">
-<header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar">←</a></header>
-<p class="eyebrow">COSMOS TOOLS / BUYING LAB</p>
+<header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
+<p class="eyebrow">COSMOS TOOLS / WISHLIST</p>
 <h1>WISHLIST<span style="color:var(--red)">.</span></h1>
-<p class="intro">uma lista de desejos com planejamento de compra, histórico de preços e conquistas. compare sempre o mesmo modelo e a mesma versão do produto.</p>
+<p class="intro">ORGANIZE SUAS COMPRAS, ACOMPANHE OS PREÇOS E PLANEJE SUAS PRÓXIMAS CONQUISTAS.</p>
 <div class="toolbar">
-<input id="search" list="suggestions" placeholder="buscar item..." autocomplete="off"><datalist id="suggestions"></datalist>
-<button class="silver" id="compareBtn">COMPARAR</button><button class="silver" id="addBtn">+ NOVO ITEM</button>
-<button class="icon-button" id="inboxBtn" aria-label="notificações">✉<span class="dot hidden" id="inboxDot"></span></button>
+<input id="search" list="suggestions" placeholder="BUSCAR ITEM..." autocomplete="off"><datalist id="suggestions"></datalist>
+<a class="silver nav-action" href="conquistas.html">CONQUISTAS</a><button class="silver" id="addBtn">+ NOVO ITEM</button>
 </div>
 <div class="filters">
 <select id="categoryFilter"><option value="TODAS">TODAS AS CATEGORIAS</option><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select>
-<select id="viewFilter"><option value="WISHLIST">WISHLIST ATIVA</option><option value="PURCHASED">CONQUISTAS / ARQUIVO</option><option value="TODOS">TODOS OS ITENS</option></select>
+<select id="viewFilter"><option value="WISHLIST">WISHLIST ATIVA</option><option value="TODOS">TODOS OS ITENS</option></select>
 </div>
 <section id="formPanel" class="panel hidden">
 <div class="section-line" style="margin-top:0"><h2 id="formTitle">NOVO ITEM</h2><button class="close" id="formClose" aria-label="fechar">×</button></div>
 <form id="itemForm">
 <div class="form-grid">
 <div class="field full"><label>NOME DO PRODUTO / MODELO *</label><input name="title" required placeholder="ex.: batedeira planetária ..."></div>
-<div class="field"><label>CATEGORIA</label><select name="category"><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select></div>
+<div class="field"><label>CATEGORIA PRINCIPAL</label><select name="category"><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select></div>
+<div class="field"><label>TIPO DE PRODUTO</label><select name="productType"><option value="BATEDEIRA">BATEDEIRA</option><option value="FORNO">FORNO</option><option value="FREEZER">FREEZER</option><option value="GELADEIRA">GELADEIRA</option><option value="BANCADA">BANCADA</option><option value="MISTURADOR">MISTURADOR</option><option value="ACESSÓRIO">ACESSÓRIO</option><option value="OUTRO">OUTRO</option></select></div>
 <div class="field"><label>IMPORTÂNCIA</label><select name="importance"><option value="BAIXA">BAIXA</option><option value="MEDIA" selected>MÉDIA</option><option value="ALTA">ALTA</option><option value="URGENTE">URGENTE</option></select></div>
+<div class="field"><label>PREÇO ATUAL / REFERÊNCIA (R$)</label><input name="currentPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
 <div class="field"><label>PREÇO-ALVO (R$)</label><input name="targetPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
 <div class="field"><label>DATA PREVISTA DA COMPRA</label><input name="targetDate" type="date"></div>
 <div class="field"><label>APORTE PLANEJADO POR MÊS (R$)</label><input name="monthlyContribution" type="number" min="0" step=".01" placeholder="quanto pretende guardar?"></div>
@@ -134,12 +139,14 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 <div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
 <div class="cards" id="items"></div>
 <section class="panel hidden" id="comparisonPanel"><div class="section-line" style="margin:0"><h2>COMPARAÇÃO LADO A LADO</h2><button class="close" id="comparisonClose">×</button></div><div id="comparisonContent" style="overflow-x:auto;margin-top:12px"></div></section>
-<section class="panel" id="archivePanel">
-<div class="section-line" style="margin:0"><h2>CONQUISTAS</h2><span class="count" id="archiveCount">0 comprados</span></div>
-<div class="archive-list" id="archiveList" style="margin-top:12px"></div>
-</section>
-<footer class="footer-cosmos"><div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div><div class="line-tagline">NOT YOUR REGULAR COOKIE</div><div class="line-est">EST. 2024</div></footer>
+
+<footer class="footer-cosmos">
+    <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
+    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
+    <div class="line-est">EST. 2024</div>
+  </footer>
 </div>
+<button class="floating-inbox" id="inboxBtn" type="button" aria-label="ABRIR CAIXA DE ENTRADA" title="CAIXA DE ENTRADA">✉<span class="dot hidden" id="inboxDot"></span></button>
 <div class="popup hidden" id="inboxPopup"><div class="popup-head"><strong>✉ CAIXA DE ENTRADA</strong><button class="close" id="inboxClose">×</button></div><div id="notices"></div></div>
 <script>
 (function(){
@@ -153,7 +160,7 @@ const $=id=>document.getElementById(id);
 let user=null,items=[],editingId=null,detailId=null,notices=[],compareIds=new Set();
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
-const today=()=>new Date().toISOString().slice(0,10);
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function finance(d){
  const price=Number(d.targetPrice||0),down=Number(d.downPayment||0),parts=Number(d.installments||0);
@@ -217,22 +224,20 @@ async function saveItem(payload){
 }
 function activeItems(){
  const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('categoryFilter').value,view=$('viewFilter').value;
- return items.filter(x=>(view==='TODOS'||x.status===view)&&(cat==='TODAS'||x.category===cat)&&(!term||(x.title+' '+(x.data.model||'')+' '+x.category).toLocaleLowerCase('pt-BR').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
+ return items.filter(x=>(view==='TODOS'||x.status==='WISHLIST')&&(cat==='TODAS'||x.category===cat)&&(!term||(x.title+' '+(x.data.model||'')+' '+x.category).toLocaleLowerCase('pt-BR').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
 }
 async function render(){
- const list=activeItems();$('itemCount').textContent=list.length+' item(ns)';$('listTitle').textContent=$('viewFilter').value==='PURCHASED'?'ITENS ARQUIVADOS':'ITENS DA WISHLIST';
+ const list=activeItems();$('itemCount').textContent=list.length+' item(ns)';$('listTitle').textContent=$('viewFilter').value==='TODOS'?'TODOS OS ITENS':'ITENS DA WISHLIST';
  const suggestions=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
  $('suggestions').innerHTML=suggestions.map(x=>'<option value="'+esc(x)+'"></option>').join('');
  $('items').innerHTML='';
- if(!list.length)$('items').innerHTML='<div class="empty-state">nenhum item por aqui ainda.<br>adicione seu primeiro desejo para começar a planejar.</div>';
+ if(!list.length)$('items').innerHTML='<div class="empty-state">NENHUM ITEM POR AQUI AINDA.<br>ADICIONE SEU PRIMEIRO DESEJO PARA COMEÇAR A PLANEJAR.</div>';
  for(const item of list){
   const d=item.data||{},img=await imageUrl(d.imagePath);
   const card=document.createElement('article');card.className='item';
-  card.innerHTML='<label style="display:flex;align-items:center;gap:5px;margin:0 0 9px"><input type="checkbox" data-compare="'+item.id+'" style="width:15px;height:15px;accent-color:var(--blue)" '+(compareIds.has(item.id)?'checked':'')+'> COMPARAR</label><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(item.importance)+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div></div><div class="price">'+(d.targetPrice?money(d.targetPrice):'preço-alvo não definido')+'</div><div class="meta">'+(d.targetDate?'compra prevista: '+date(d.targetDate):'sem data prevista')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
+  card.innerHTML='<div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(d.productType||'TIPO NÃO DEFINIDO')+' · '+esc(item.importance)+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div></div><div class="price">'+(d.targetPrice?money(d.targetPrice):'preço-alvo não definido')+'</div><div class="meta">'+(d.targetDate?'compra prevista: '+date(d.targetDate):'sem data prevista')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
  }
- const bought=items.filter(x=>x.status==='PURCHASED').sort((a,b)=>(b.data.purchaseDate||'').localeCompare(a.data.purchaseDate||''));
- $('archiveCount').textContent=bought.length+' comprados';$('archiveList').innerHTML=bought.slice(0,5).map(x=>'<div class="archive-row"><span><strong>'+esc(x.title)+'</strong><br><small>comprado em '+date(x.data.purchaseDate)+' · adicionado '+date(x.data.addedAt)+'</small></span><strong>'+money(x.data.paidPrice)+'</strong></div>').join('')||'<div class="meta">suas compras concluídas aparecerão aqui.</div>';
  notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
  $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
 }
@@ -259,7 +264,9 @@ async function showDetail(id){
  const links=(d.stores||[]).map(s=>'<p class="meta"><strong>'+esc(s.store)+'</strong> · '+(s.price?money(Number(s.price)+Number(s.shipping||0))+(s.shipping?' (com frete)':''):'preço não registrado')+' · <a class="small-link" href="'+esc(s.url)+'" target="_blank" rel="noopener">abrir loja</a></p>').join('')||'<p class="meta">adicione links de lojas e comparadores.</p>';
  const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
  $('detailContent').innerHTML=(img?'<img src="'+img+'" style="width:min(220px,100%);max-height:190px;object-fit:contain;background:var(--cream);margin-bottom:12px">':'')+
- '<div class="meta">adicionado: '+date(d.addedAt)+' · voltagem: 220V · importância: '+esc(item.importance)+'</div>'+
+ '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · VOLTAGEM: 220V · TIPO: '+esc(d.productType||'NÃO DEFINIDO')+' · IMPORTÂNCIA: '+esc(item.importance)+'</div>'+
+ '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button></div>'+
+ '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'
  '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
  '<div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
@@ -268,6 +275,7 @@ async function showDetail(id){
  '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div>'+priceChart(d.priceHistory||[])+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="form-grid"><div class="field"><label>DATA DA COMPRA</label><input id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
+ $('detailCompare').onclick=()=>showTypeComparison(id);
  $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
  $('storeRows').onclick=e=>{const b=e.target.closest('[data-remove-store]');if(b)b.closest('.store-row').remove()};
  $('saveStores').onclick=async()=>{const stores=[...document.querySelectorAll('.store-row')].map(r=>Object.fromEntries([...r.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value.trim()]))).filter(s=>s.store||s.url);await patchData(id,{stores});showDetail(id)};
@@ -307,19 +315,45 @@ $('itemForm').addEventListener('submit',async e=>{
 $('addBtn').onclick=()=>openForm();$('formClose').onclick=closeForm;$('cancelForm').onclick=closeForm;
 $('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
 $('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit))});
-$('items').addEventListener('change',e=>{const box=e.target.closest('[data-compare]');if(!box)return;if(box.checked)compareIds.add(box.dataset.compare);else compareIds.delete(box.dataset.compare)});
-$('compareBtn').onclick=()=>{const selected=items.filter(x=>compareIds.has(x.id));if(selected.length<2){alert('selecione pelo menos dois itens para comparar.');return}const fields=[['MODELO',x=>x.data.model],['VOLTAGEM',x=>'220V'],['CAPACIDADE / DIMENSÕES',x=>x.data.capacity],['ESPECIFICAÇÕES',x=>x.data.specs],['GARANTIA',x=>x.data.warranty],['REVIEWS',x=>x.data.reviews],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'—'],['IMPORTÂNCIA',x=>x.importance]];$('comparisonContent').innerHTML='<table style="border-collapse:collapse;min-width:520px;width:100%;font-size:11px"><thead><tr><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">CRITÉRIO</th>'+selected.map(x=>'<th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">'+esc(x.title)+'</th>').join('')+'</tr></thead><tbody>'+fields.map(([label,get])=>'<tr><td style="padding:9px;border-bottom:1px solid var(--line);color:var(--muted)">'+label+'</td>'+selected.map(x=>'<td style="padding:9px;border-bottom:1px solid var(--line)">'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('')+'</tbody></table>';$('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'})};
+function productPrice(item){
+ const d=item.data||{},storePrices=(d.stores||[]).map(x=>Number(x.price||0)+Number(x.shipping||0)).filter(x=>x>0);
+ if(storePrices.length)return Math.min(...storePrices);
+ if(Number(d.currentPrice)>0)return Number(d.currentPrice);
+ return null;
+}
+function numericValue(s){const m=String(s||'').replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):null}
+function showTypeComparison(id){
+ const current=items.find(x=>x.id===id);if(!current)return;
+ const type=String(current.data?.productType||'').trim().toLocaleUpperCase('pt-BR');
+ const group=items.filter(x=>x.status==='WISHLIST'&&String(x.data?.productType||'').trim().toLocaleUpperCase('pt-BR')===type);
+ const metrics=[
+  {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
+  {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:'max'},
+  {label:'GARANTIA',get:x=>numericValue(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
+  {label:'AVALIAÇÃO / REVIEWS',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'},
+  {label:'POTÊNCIA',get:x=>numericValue(x.data.power||x.data.specs),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'}
+ ];
+ const columns=group.map(x=>'<th>'+esc(x.data.model||x.title)+'</th>').join('');
+ const rows=metrics.map(m=>{
+  const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=valid.length?Math[m.best](...valid):null;
+  return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
+ }).join('');
+ const details=[['VOLTAGEM',x=>'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['AVALIAÇÕES',x=>x.data.reviews],['QUALIDADE / CONFIABILIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
+ const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
+ $('comparisonContent').innerHTML='<p class="meta">TIPO DE PRODUTO: '+esc(type)+' · CADA COLUNA REPRESENTA UM MODELO. VERDE INDICA O MELHOR VALOR NO CRITÉRIO COMPARÁVEL; VERMELHO, O MENOS FAVORÁVEL. A DECISÃO FINAL CONSIDERA A OPERAÇÃO COSMOS.</p>'+(group.length<2?'<div class="notice">SÓ EXISTE UM(A) '+esc(type)+' CADASTRADO(A) NA WISHLIST. CADASTRE OUTRO PRODUTO COM O MESMO TIPO PARA COMPARAR LADO A LADO.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns+'</tr></thead><tbody>'+rows+extra+'</tbody></table>';
+ $('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
 $('comparisonClose').onclick=()=>$('comparisonPanel').classList.add('hidden');
 $('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);$('viewFilter').addEventListener('change',render);
 $('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');
 async function init(){
- if(!client){location.replace('index.html');return}
+ if(!client){$('items').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONECTAR AO SUPABASE. RECARREGUE A PÁGINA.</div>';return}
  const {data,error}=await client.auth.getSession(),session=data?.session;
- if(error||!session||String(session.user.email||'').toLowerCase()!==ALLOWED_EMAIL){location.replace('index.html');return}
+ if(error||!session||String(session.user.email||'').toLowerCase()!==ALLOWED_EMAIL){location.replace('index.html?auth=required');return}
  const response=await fetch('/api/session',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session.access_token})});
- if(!response.ok){location.replace('index.html?auth=required');return}
+ if(!response.ok){$('items').innerHTML='<div class="notice">SUA SESSÃO PRECISA SER VALIDADA. VOLTE À PÁGINA INICIAL E ENTRE NOVAMENTE.</div>';return}
  user=session.user;
- try{await load()}catch(err){$('items').innerHTML='<div class="notice">não foi possível carregar os itens: '+esc(err.message)+'. atualize a página ou tente novamente.</div>';console.error('wishlist load error',err)}
+ try{await load()}catch(err){$('items').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CARREGAR OS ITENS: '+esc(err.message)+'. ATUALIZE A PÁGINA OU TENTE NOVAMENTE.</div>';console.error('wishlist load error',err)}
 }
 init();
 })();
