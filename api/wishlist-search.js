@@ -49,7 +49,8 @@ function technicalData(row) {
   const features = [plainText(row.extensions), plainText(row.product_highlights), plainText(row.snippets), plainText(row.attributes)].filter(Boolean).join(' · ');
   const evidence = [title, description, features].filter(Boolean).join(' ');
   const model = extractModel(evidence);
-  const capacityMatch = evidence.match(/\b\d+(?:[,.]\d+)?\s?(?:L|LITROS?)\b/i);\n  const capacity = capacityMatch ? normalizeCapacity(capacityMatch[0]) : '';
+  const capacityMatch = evidence.match(/\b\d+(?:[,.]\d+)?\s?(?:L|LITROS?)\b/i);
+  const capacity = capacityMatch ? normalizeCapacity(capacityMatch[0]) : '';
   const power = (evidence.match(/\b\d{2,4}\s?W\b/i) || [])[0] || '';
   const warranty = (evidence.match(/garantia[^.\n]{0,45}\b\d+\s*(?:mes(?:es)?|anos?)\b/i) || [])[0] || '';
   const ratingRaw = row.rating ?? row.rating_value ?? row.product_rating ?? '';
