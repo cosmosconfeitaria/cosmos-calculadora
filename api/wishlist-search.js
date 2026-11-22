@@ -37,8 +37,10 @@ function technicalData(row) {
   const capacity = (evidence.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '';
   const power = (evidence.match(/\b\d{2,4}\s?W\b/i) || [])[0] || '';
   const warranty = (evidence.match(/garantia[^.\n]{0,45}\b\d+\s*(?:mes(?:es)?|anos?)\b/i) || [])[0] || '';
-  const rating = row.rating ?? row.rating_value ?? '';
-  const reviews = row.reviews ?? row.reviews_count ?? row.rating_count ?? '';
+  const ratingRaw = row.rating ?? row.rating_value ?? row.product_rating ?? '';
+  const ratingNumber = Number(String(ratingRaw).replace(',', '.').match(/[0-9]+(?:\.[0-9]+)?/)?.[0] || '');
+  const rating = Number.isFinite(ratingNumber) && ratingNumber > 0 ? ratingNumber : null;
+  const ratingCount = row.reviews ?? row.reviews_count ?? row.rating_count ?? '';
   let voltageStatus = 'UNKNOWN';
   if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
   else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
@@ -51,10 +53,11 @@ function technicalData(row) {
     thumbnail: typeof (row.thumbnail || row.thumbnail_url || row.thumbnail_link) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url || row.thumbnail_link) ? (row.thumbnail || row.thumbnail_url || row.thumbnail_link) : '',
     priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
     priceText: String(row.price || '').slice(0, 60),
-    rating, reviews: reviews ? String(reviews) : (rating ? String(rating) : ''),
+    rating, ratingCount: ratingCount ? String(ratingCount) : '',
     model, capacity, power, warranty,
     brand: String(row.brand || '').slice(0, 100),
     specs: features.slice(0, 1200),
+    dimensions: String(row.dimensions || row.product_dimensions || '').slice(0, 160),
     voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT'
   };
 }
@@ -84,7 +87,7 @@ export async function POST(request) {
     const requestedModelKey = normalizeModel(requestedModel);
     const requestedCapacity = String(body?.capacity || ((query.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '')).replace(/\s/g, '').replace(',', '.').toUpperCase();
     const exactModelMatch = product => !requestedModelKey || normalizeModel(product.model) === requestedModelKey;
-    const exactCapacityMatch = product => !requestedCapacity || !product.capacity || product.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity;
+    const exactCapacityMatch = product => !requestedCapacity || (!!product.capacity && product.capacity.replace(/\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity);
     const search = async (engine, q) => {
       const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
