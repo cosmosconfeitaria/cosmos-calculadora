@@ -864,7 +864,7 @@ async function showTypeComparison(id){
  const metrics=[
   {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
   {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:null},
-  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4.5):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:null},
+  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:null},
   {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'},
   {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
   {label:'NOTA MÉDIA',get:x=>Number(x.data.rating)||null,fmt:(v,x)=>v==null?'NÃO INFORMADA':v.toFixed(1).replace('.',',')+'/5',best:'max'}
