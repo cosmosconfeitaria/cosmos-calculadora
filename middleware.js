@@ -26,7 +26,7 @@ function redirectToLogin(request, clearCookie) {
 }
 
 export const config = {
-  matcher: ['/calculadora.html', '/flavor-generator.html']
+  matcher: ['/calculadora.html', '/flavor-generator.html', '/wishlist.html']
 };
 
 export default async function middleware(request) {
