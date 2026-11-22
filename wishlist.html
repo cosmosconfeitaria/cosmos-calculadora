@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2263D2">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<title>COSMOS COOKIE LAB · WISHLIST</title>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--red:#D22222;--line:#d4d1cc;--muted:#77736e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--blue);color:var(--blue);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px}
+body.auth-pending .wrap{visibility:hidden}
+body:before,body:after{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background-repeat:repeat;animation:stars 110s linear infinite}
+body:before{opacity:.75;background-image:radial-gradient(1px 1px at 13px 19px,#fff 98%,transparent),radial-gradient(1px 1px at 77px 53px,#dce8ff 98%,transparent),radial-gradient(1px 1px at 141px 117px,#fff 98%,transparent),radial-gradient(1px 1px at 193px 31px,#c8dcff 98%,transparent);background-size:257px 211px}
+body:after{opacity:.35;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent);background-size:293px 239px;animation-direction:reverse;animation-duration:150s}
+@keyframes stars{to{transform:translate3d(6%,5%,0)}}
+.wrap{width:min(900px,calc(100% - 32px));margin:22px auto;padding:22px 24px 28px;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30;min-height:calc(100vh - 44px)}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:8px 0 16px;margin-bottom:30px;gap:12px}
+.brand{font-size:14px;font-weight:500;color:var(--blue)}
+.logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
+.logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);animation:wobble 2.7s ease-in-out infinite;pointer-events:none}
+@keyframes wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
+.back,.silver,.icon-button{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;cursor:pointer}
+.back{width:42px;height:36px;display:grid;place-items:center;border-radius:8px;text-decoration:none;font-size:18px}
+.eyebrow{font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px}
+h1{font-size:clamp(34px,7vw,56px);line-height:.98;letter-spacing:-1.5px;font-weight:500;margin:0;color:var(--blue)}
+.intro{font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
+.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;margin-bottom:14px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
+textarea{min-height:80px;resize:vertical;line-height:1.45}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21a}
+label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
+.field{min-width:0}
+.silver{border-radius:7px;padding:12px 14px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;white-space:nowrap}
+.silver:active,.back:active,.icon-button:active{transform:translateY(2px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}
+.icon-button{width:42px;height:40px;border-radius:8px;position:relative;font-size:17px}
+.dot{position:absolute;right:7px;top:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1px solid white}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.section-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 12px}
+.section-line h2{font-size:12px;letter-spacing:.08em;font-weight:500;margin:0}
+.count{font-size:10px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.item{border:1px solid var(--line);background:#fff;padding:14px;min-width:0;box-shadow:0 2px 0 #dedbd6}
+.item-top{display:flex;gap:12px;align-items:flex-start}
+.thumb{width:76px;height:76px;flex:0 0 76px;object-fit:cover;background:var(--cream);border:1px solid var(--line)}
+.thumb.empty{display:grid;place-items:center;font-size:25px;color:#b9b5ae}
+.item h3{font-size:15px;font-weight:500;color:var(--blue);line-height:1.2;margin:0 0 6px;overflow-wrap:anywhere}
+.meta{font-size:10px;color:var(--muted);line-height:1.5}
+.price{font-size:16px;color:var(--ink);margin:12px 0 3px}
+.item-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.item-actions button{font-size:10px;padding:8px 10px}
+.small-link{color:var(--blue);font-size:10px;text-decoration:underline;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);font-size:9px;color:var(--muted);margin:5px 4px 0 0}
+.empty-state{border:1px dashed #c8c4bd;padding:28px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
+.panel{border:1px solid var(--line);background:#fff;padding:16px;margin:12px 0;box-shadow:0 2px 0 #dedbd6}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.full{grid-column:1/-1}
+.hidden{display:none!important}
+.form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.form-actions .silver{min-width:120px}
+.subhead{font-size:11px;letter-spacing:.08em;color:var(--blue);margin:18px 0 10px;font-weight:500}
+.calc{background:var(--cream);padding:12px;border:1px solid var(--line);font-size:11px;line-height:1.6}
+.calc strong{font-size:17px;font-weight:500;color:var(--blue)}
+.store-row{display:grid;grid-template-columns:1.1fr 1fr .8fr 1fr auto;gap:7px;margin:8px 0;align-items:end}
+.store-row input{font-size:11px;padding:10px 8px}
+.store-row button{height:36px}
+.notice{border:1px solid #e7c5c5;background:#fff7f6;padding:12px;margin:8px 0;font-size:11px;line-height:1.5;color:var(--ink)}
+.notice.unread{border-left:4px solid var(--red)}
+.notice strong{color:var(--blue);font-weight:500}
+.popup{position:fixed;z-index:50;right:max(18px,calc((100vw - 900px)/2));top:80px;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
+.popup-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.popup-head strong{font-size:12px;font-weight:500}
+.close{border:0;background:none;color:var(--blue);font-size:20px;cursor:pointer}
+.archive-list{display:grid;gap:9px}
+.archive-row{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);background:#fff;font-size:11px}
+.archive-row strong{font-weight:500;color:var(--blue)}
+footer{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:34px 12px 18px}
+.footer-cosmos .line-brand{font-size:26px;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+.footer-cosmos .line-tagline{font-size:10px;color:var(--blue)}
+.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;color:var(--red)}
+@media(max-width:620px){.wrap{margin:12px auto;min-height:calc(100vh - 24px);padding:16px 14px 22px}.toolbar{grid-template-columns:1fr auto auto}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.store-row{grid-template-columns:1fr 1fr}.store-row .store-remove{grid-column:2;justify-self:end}.item-top .thumb{width:68px;height:68px;flex-basis:68px}}
+@media(prefers-reduced-motion:reduce){body:before,body:after,.logo-type:after{animation:none}}
+</style>
+</head>
+<body class="auth-pending">
+<div class="wrap">
+<header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar">←</a></header>
+<p class="eyebrow">COSMOS TOOLS / BUYING LAB</p>
+<h1>WISHLIST<span style="color:var(--red)">.</span></h1>
+<p class="intro">uma lista de desejos com planejamento de compra, histórico de preços e conquistas. compare sempre o mesmo modelo e a mesma versão do produto.</p>
+<div class="toolbar">
+<input id="search" list="suggestions" placeholder="buscar item..." autocomplete="off"><datalist id="suggestions"></datalist>
+<button class="silver" id="addBtn">+ NOVO ITEM</button>
+<button class="icon-button" id="inboxBtn" aria-label="notificações">✉<span class="dot hidden" id="inboxDot"></span></button>
+</div>
+<div class="filters">
+<select id="categoryFilter"><option value="TODAS">TODAS AS CATEGORIAS</option><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select>
+<select id="viewFilter"><option value="WISHLIST">WISHLIST ATIVA</option><option value="PURCHASED">CONQUISTAS / ARQUIVO</option><option value="TODOS">TODOS OS ITENS</option></select>
+</div>
+<section id="formPanel" class="panel hidden">
+<div class="section-line" style="margin-top:0"><h2 id="formTitle">NOVO ITEM</h2><button class="close" id="formClose" aria-label="fechar">×</button></div>
+<form id="itemForm">
+<div class="form-grid">
+<div class="field full"><label>NOME DO PRODUTO / MODELO *</label><input name="title" required placeholder="ex.: batedeira planetária ..."></div>
+<div class="field"><label>CATEGORIA</label><select name="category"><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select></div>
+<div class="field"><label>IMPORTÂNCIA</label><select name="importance"><option value="BAIXA">BAIXA</option><option value="MEDIA" selected>MÉDIA</option><option value="ALTA">ALTA</option><option value="URGENTE">URGENTE</option></select></div>
+<div class="field"><label>PREÇO-ALVO (R$)</label><input name="targetPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
+<div class="field"><label>DATA PREVISTA DA COMPRA</label><input name="targetDate" type="date"></div>
+<div class="field"><label>ENTRADA (R$)</label><input name="downPayment" type="number" min="0" step=".01" placeholder="0,00"></div>
+<div class="field"><label>NÚMERO DE PARCELAS SEM JUROS</label><input name="installments" type="number" min="1" max="48" step="1" placeholder="ex.: 10"></div>
+<div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
+<div class="field"><label>VOLTAGEM</label><input value="220V (PADRÃO COSMOS)" disabled></div>
+<div class="field full"><label>ESPECIFICAÇÕES IMPORTANTES</label><textarea name="specs" placeholder="capacidade, dimensões, potência, materiais, garantia..."></textarea></div>
+<div class="field full"><label>OBSERVAÇÕES / ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="notes" placeholder="por que quero comprar, o que preciso avaliar..."></textarea></div>
+<div class="field"><label>IMAGEM DO PRODUTO (JPG, PNG OU WEBP · ATÉ 5 MB)</label><input name="image" type="file" accept="image/jpeg,image/png,image/webp"></div>
+<div class="field"><label>LINK DE REFERÊNCIA</label><input name="referenceUrl" type="url" placeholder="https://..."></div>
+<div class="field full"><div class="calc" id="financePreview">preencha o preço-alvo e a data prevista para calcular seu planejamento.</div></div>
+</div>
+<div class="form-actions"><button class="silver" type="submit">SALVAR ITEM</button><button class="silver" type="button" id="cancelForm">CANCELAR</button></div>
+</form>
+</section>
+<section id="detailPanel" class="panel hidden">
+<div class="section-line" style="margin-top:0"><h2 id="detailTitle">DETALHES</h2><button class="close" id="detailClose" aria-label="fechar">×</button></div>
+<div id="detailContent"></div>
+</section>
+<div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
+<div class="cards" id="items"></div>
+<section class="panel" id="archivePanel">
+<div class="section-line" style="margin:0"><h2>CONQUISTAS</h2><span class="count" id="archiveCount">0 comprados</span></div>
+<div class="archive-list" id="archiveList" style="margin-top:12px"></div>
+</section>
+<footer class="footer-cosmos"><div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div><div class="line-tagline">NOT YOUR REGULAR COOKIE</div><div class="line-est">EST. 2024</div></footer>
+</div>
+<div class="popup hidden" id="inboxPopup"><div class="popup-head"><strong>✉ CAIXA DE ENTRADA</strong><button class="close" id="inboxClose">×</button></div><div id="notices"></div></div>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const ALLOWED_EMAIL='cosmosconfeitaria@gmail.com';
+const BUCKET='cosmos-wishlist-images';
+const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+const $=id=>document.getElementById(id);
+let user=null,items=[],editingId=null,detailId=null,notices=[];
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+const today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function finance(d){
+ const price=Number(d.targetPrice||0),down=Number(d.downPayment||0),parts=Number(d.installments||0);
+ const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null;
+ const now=new Date();let months=due?Math.max(1,(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth()):0;
+ const remaining=Math.max(0,price-down);
+ const cash=months?price/months:0,saveDown=months?down/months:0,install=parts?remaining/parts:0;
+ return {months,cash,saveDown,install,commit:saveDown+install,remaining};
+}
+function calcHtml(d){
+ const f=finance(d);
+ if(!Number(d.targetPrice)||!d.targetDate)return 'adicione preço-alvo e data prevista para calcular a meta mensal.';
+ if(Number(d.installments)>0)return '<strong>'+money(f.saveDown)+'/mês</strong> para juntar a entrada durante '+f.months+' mês(es), mais <strong>'+money(f.install)+'/mês</strong> por '+d.installments+' parcelas sem juros. Compromisso mensal no período das parcelas: <strong>'+money(f.commit)+'</strong>.';
+ return 'para comprar à vista: guardar <strong>'+money(f.cash)+'/mês</strong> durante '+f.months+' mês(es).';
+}
+function updateFinancePreview(){
+ const d=Object.fromEntries(new FormData($('itemForm')).entries());
+ $('financePreview').innerHTML=calcHtml(d);
+}
+function openForm(item){
+ editingId=item?.id||null;$('itemForm').reset();
+ $('formTitle').textContent=item?'EDITAR ITEM':'NOVO ITEM';
+ if(item){
+  const d=item.data||{};
+  Object.entries({title:item.title,category:item.category,importance:item.importance,...d}).forEach(([k,v])=>{const el=$('itemForm').elements[k];if(el&&el.type!=='file'&&v!=null)el.value=v});
+ }
+ $('formPanel').classList.remove('hidden');$('detailPanel').classList.add('hidden');
+ updateFinancePreview();$('formPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeForm(){$('formPanel').classList.add('hidden');editingId=null}
+async function load(){
+ const {data,error}=await client.from('cosmos_wishlist_items').select('*').order('created_at',{ascending:false});
+ if(error)throw error;
+ items=(data||[]).map(r=>({...r,data:r.data||{}}));render();
+}
+async function imageUrl(path){
+ if(!path)return '';
+ const {data,error}=await client.storage.from(BUCKET).createSignedUrl(path,3600);
+ return error?'':data.signedUrl;
+}
+async function uploadImage(file,itemId){
+ if(!file)return null;
+ if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>5242880)throw new Error('imagem inválida. use JPG, PNG ou WEBP de até 5 MB.');
+ const ext=file.name.split('.').pop().toLowerCase(),path=user.id+'/'+itemId+'/'+Date.now()+'.'+ext;
+ const {error}=await client.storage.from(BUCKET).upload(path,file,{contentType:file.type,upsert:true});
+ if(error)throw error;
+ return path;
+}
+async function saveItem(payload){
+ const base=items.find(x=>x.id===editingId);
+ const row={user_id:user.id,title:payload.title,category:payload.category,status:base?.status||'WISHLIST',importance:payload.importance,data:{...(base?.data||{}),...payload,voltage:'220V',addedAt:base?.data?.addedAt||today()}};
+ delete row.data.image;
+ if(base){
+  const {error}=await client.from('cosmos_wishlist_items').update(row).eq('id',base.id);
+  if(error)throw error;
+  return base.id;
+ }
+ const {data,error}=await client.from('cosmos_wishlist_items').insert(row).select('id').single();
+ if(error)throw error;
+ return data.id;
+}
+function activeItems(){
+ const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('categoryFilter').value,view=$('viewFilter').value;
+ return items.filter(x=>(view==='TODOS'||x.status===view)&&(cat==='TODAS'||x.category===cat)&&(!term||(x.title+' '+(x.data.model||'')+' '+x.category).toLocaleLowerCase('pt-BR').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
+}
+async function render(){
+ const list=activeItems();$('itemCount').textContent=list.length+' item(ns)';$('listTitle').textContent=$('viewFilter').value==='PURCHASED'?'ITENS ARQUIVADOS':'ITENS DA WISHLIST';
+ const suggestions=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+ $('suggestions').innerHTML=suggestions.map(x=>'<option value="'+esc(x)+'"></option>').join('');
+ $('items').innerHTML='';
+ if(!list.length)$('items').innerHTML='<div class="empty-state">nenhum item por aqui ainda.<br>adicione seu primeiro desejo para começar a planejar.</div>';
+ for(const item of list){
+  const d=item.data||{},img=await imageUrl(d.imagePath);
+  const card=document.createElement('article');card.className='item';
+  card.innerHTML='<div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(item.importance)+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div></div><div class="price">'+(d.targetPrice?money(d.targetPrice):'preço-alvo não definido')+'</div><div class="meta">'+(d.targetDate?'compra prevista: '+date(d.targetDate):'sem data prevista')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
+  $('items').append(card);
+ }
+ const bought=items.filter(x=>x.status==='PURCHASED').sort((a,b)=>(b.data.purchaseDate||'').localeCompare(a.data.purchaseDate||''));
+ $('archiveCount').textContent=bought.length+' comprados';$('archiveList').innerHTML=bought.slice(0,5).map(x=>'<div class="archive-row"><span><strong>'+esc(x.title)+'</strong><br><small>comprado em '+date(x.data.purchaseDate)+' · adicionado '+date(x.data.addedAt)+'</small></span><strong>'+money(x.data.paidPrice)+'</strong></div>').join('')||'<div class="meta">suas compras concluídas aparecerão aqui.</div>';
+ notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
+ $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
+}
+function storeRows(stores){
+ return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
+}
+async function showDetail(id){
+ const item=items.find(x=>x.id===id);if(!item)return;detailId=id;const d=item.data||{},img=await imageUrl(d.imagePath);
+ const f=finance(d);
+ $('detailTitle').textContent=item.title.toUpperCase();
+ const links=(d.stores||[]).map(s=>'<p class="meta"><strong>'+esc(s.store)+'</strong> · '+money(Number(s.price)+Number(s.shipping||0))+(s.shipping?' (com frete)':'')+' · <a class="small-link" href="'+esc(s.url)+'" target="_blank" rel="noopener">abrir loja</a></p>').join('')||'<p class="meta">adicione links de lojas e comparadores.</p>';
+ const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
+ $('detailContent').innerHTML=(img?'<img src="'+img+'" style="width:min(220px,100%);max-height:190px;object-fit:contain;background:var(--cream);margin-bottom:12px">':'')+
+ '<div class="meta">adicionado: '+date(d.addedAt)+' · voltagem: 220V · importância: '+esc(item.importance)+'</div>'+
+ '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
+ '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
+ '<div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
+ '<div class="subhead">REGISTRAR PREÇO VERIFICADO</div><div class="form-grid"><div class="field"><label>LOJA / FONTE</label><input id="priceStore" placeholder="Zoom, JáCotei, Magalu..."></div><div class="field"><label>PREÇO (R$)</label><input id="priceValue" type="number" min="0" step=".01"></div><div class="field"><label>FRETE (R$)</label><input id="priceShip" type="number" min="0" step=".01" value="0"></div><div class="field"><label>LINK DO PRODUTO</label><input id="priceUrl" type="url" placeholder="https://..."></div></div><div class="form-actions"><button class="silver" id="recordPrice" type="button">REGISTRAR PREÇO</button></div>'+
+ '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
+ '<div class="subhead">CONCLUIR COMPRA</div><div class="form-grid"><div class="field"><label>DATA DA COMPRA</label><input id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div>';
+ $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
+ $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
+ $('storeRows').onclick=e=>{const b=e.target.closest('[data-remove-store]');if(b)b.closest('.store-row').remove()};
+ $('saveStores').onclick=async()=>{const stores=[...document.querySelectorAll('.store-row')].map(r=>Object.fromEntries([...r.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value.trim()]))).filter(s=>s.store||s.url);await patchData(id,{stores});showDetail(id)};
+ $('recordPrice').onclick=async()=>{
+  const store=$('priceStore').value.trim(),price=Number($('priceValue').value),shipping=Number($('priceShip').value||0),url=$('priceUrl').value.trim();
+  if(!store||!price){alert('informe a fonte e o preço.');return}
+  const data={...d},hist=data.priceHistory||[],previous=hist.length?Number(hist[hist.length-1].price):null,drop=previous&&price<previous?((previous-price)/previous)*100:0;
+  hist.push({store,price,shipping,url,at:today(),alert:drop>=5,drop:Number(drop.toFixed(1)),read:false});data.priceHistory=hist;
+  await patchData(id,data);await showDetail(id);
+ };
+ $('markPurchased').onclick=async()=>{
+  const paid=Number($('paidPrice').value);if(!paid){alert('informe o valor realmente pago.');return}
+  const data={...d,purchaseDate:$('purchaseDate').value||today(),paidPrice:paid};
+  const {error}=await client.from('cosmos_wishlist_items').update({status:'PURCHASED',data,updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){alert(error.message);return}await load();$('detailPanel').classList.add('hidden');
+ };
+ $('deleteItem').onclick=async()=>{if(!confirm('excluir este item permanentemente?'))return;const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',id);if(error){alert(error.message);return}if(d.imagePath)await client.storage.from(BUCKET).remove([d.imagePath]);await load();$('detailPanel').classList.add('hidden')};
+}
+async function patchData(id,data){
+ const {error}=await client.from('cosmos_wishlist_items').update({data,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error)throw error;await load();
+}
+function showInbox(){
+ $('inboxPopup').classList.remove('hidden');
+ $('notices').innerHTML=notices.map(n=>'<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title)+'</strong><br>preço em '+esc(n.store)+' caiu '+n.drop+'%: '+money(n.price)+'<br><span class="meta">'+date(n.at)+'</span></div>').join('')||'<p class="meta">nenhuma notificação por enquanto. quedas de 5% ou mais em preços registrados aparecem aqui.</p>';
+ notices.forEach(async n=>{if(!n.read){const item=items.find(x=>x.id===n.id);if(!item)return;const data={...item.data,priceHistory:item.data.priceHistory.map(h=>h.at===n.at&&h.store===n.store?{...h,read:true}:h)};await patchData(n.id,data)}});
+}
+$('itemForm').addEventListener('input',updateFinancePreview);
+$('itemForm').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());const file=form.elements.image.files[0];
+ try{
+  const id=await saveItem(payload);
+  if(file){const path=await uploadImage(file,id);const item=items.find(x=>x.id===id);await patchData(id,{...item.data,imagePath:path})}
+  await load();closeForm();
+ }catch(err){alert('não foi possível salvar: '+err.message)}
+});
+$('addBtn').onclick=()=>openForm();$('formClose').onclick=closeForm;$('cancelForm').onclick=closeForm;
+$('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
+$('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit))});
+$('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);$('viewFilter').addEventListener('change',render);
+$('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');
+async function init(){
+ if(!client){location.replace('index.html');return}
+ const {data,error}=await client.auth.getSession(),session=data?.session;
+ if(error||!session||String(session.user.email||'').toLowerCase()!==ALLOWED_EMAIL){location.replace('index.html');return}
+ const response=await fetch('/api/session',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session.access_token})});
+ if(!response.ok){location.replace('index.html?auth=required');return}
+ user=session.user;
+ try{await load();document.body.classList.remove('auth-pending')}catch(err){alert('não foi possível carregar a wishlist: '+err.message)}
+}
+init();
+})();
+</script>
+</body>
+</html>
