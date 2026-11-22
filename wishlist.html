@@ -471,10 +471,29 @@ function openForm(item){
  updateFinancePreview();$('formPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function closeForm(){$('formPanel').classList.add('hidden');editingId=null}
+let technicalEnrichmentStarted=false;
+async function autoEnrichExistingWishlist(){
+ const pending=items.filter(x=>x.status==='WISHLIST'&&(!x.data?.model||!x.data?.capacity||!x.data?.power||!x.data?.warranty||!x.data?.reviews||!x.data?.specs)&&(!x.data?.technicalLookupAt||Date.now()-new Date(x.data.technicalLookupAt).getTime()>30*86400000));
+ for(const item of pending){
+  const d=item.data||{},model=d.model||((String(item.title).match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL))?\b/i)||[])[0]||'');
+  try{
+   const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:item.title,model,capacity:d.capacity||'',mode:'discover'})});
+   const result=await response.json(),candidate=(result.products||[])[0],update={...d,technicalLookupAt:new Date().toISOString()};
+   if(candidate){
+    for(const key of ['model','capacity','power','warranty','reviews'])if(!String(update[key]||'').trim()&&candidate[key])update[key]=candidate[key];
+    if(!String(update.specs||'').trim()||/^VOLTAGEM:/i.test(update.specs))update.specs=candidate.description||candidate.specs||update.specs;
+    if(!update.productBrand&&candidate.brand)update.productBrand=candidate.brand;
+    if(!update.productImageUrl&&candidate.thumbnail)update.productImageUrl=candidate.thumbnail;
+   }
+   await client.from('cosmos_wishlist_items').update({data:update,updated_at:new Date().toISOString()}).eq('id',item.id);
+  }catch(error){console.warn('technical enrichment skipped',item.title,error)}
+ }
+}
 async function load(){
  const {data,error}=await client.from('cosmos_wishlist_items').select('*').order('created_at',{ascending:false});
  if(error)throw error;
  items=(data||[]).map(r=>({...r,data:r.data||{}}));await render();
+ if(!technicalEnrichmentStarted){technicalEnrichmentStarted=true;await autoEnrichExistingWishlist();await load();}
 }
 async function imageUrl(path,remote){
  if(!path)return remote||'';
@@ -583,7 +602,7 @@ function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
 }
 async function showDetail(id){
- const item=items.find(x=>x.id===id);if(!item)return;detailId=id;$('comparisonPanel').classList.add('hidden');const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
+ const item=items.find(x=>x.id===id);if(!item)return;detailId=id;$('comparisonPanel').classList.add('hidden');const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl),savingGroup=items.filter(x=>x.category===item.category&&String(x.data?.subcategory||x.data?.productType||'').trim().toUpperCase()===String(d.subcategory||d.productType||'').trim().toUpperCase()),sharedSavedAmount=(savingGroup.find(x=>Number(x.data?.savedAmount)>0)?.data?.savedAmount)||d.savedAmount||0;
  const f=finance(d);
  $('detailTitle').textContent=item.title.toUpperCase();
  const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · '+esc(h.voltageStatus==='BIVOLT'?'BIVOLT':h.voltageStatus==='CONFIRMED_220V'?'220V':h.voltageStatus==='INCOMPATIBLE'?'110V / 127V':'VOLTAGEM NÃO IDENTIFICADA')+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
