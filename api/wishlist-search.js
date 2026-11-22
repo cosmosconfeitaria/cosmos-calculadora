@@ -21,6 +21,41 @@ function json(data, status = 200) {
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, private' }
   });
 }
+function plainText(value) {
+  if (Array.isArray(value)) return value.map(plainText).join(' · ');
+  if (value && typeof value === 'object') return Object.values(value).map(plainText).join(' · ');
+  return String(value || '');
+}
+function technicalData(row) {
+  const title = String(row.title || '').slice(0, 300);
+  const description = String(row.snippet || row.description || row.product_description || '').slice(0, 900);
+  const features = [plainText(row.extensions), plainText(row.product_highlights), plainText(row.snippets), plainText(row.attributes)].filter(Boolean).join(' · ');
+  const evidence = [title, description, features].filter(Boolean).join(' ');
+  const model = (evidence.match(/\b[A-Z]{1,8}[-]?\d{2,5}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELECTRONIC|ELETRÔNICA))?\b/i) || [])[0] || '';
+  const capacity = (evidence.match(/\b\d+(?:[,.]\d+)?\s?L\b/i) || [])[0] || '';
+  const power = (evidence.match(/\b\d{2,4}\s?W\b/i) || [])[0] || '';
+  const warranty = (evidence.match(/garantia[^.\n]{0,45}\b\d+\s*(?:mes(?:es)?|anos?)\b/i) || [])[0] || '';
+  const rating = row.rating ?? row.rating_value ?? '';
+  const reviews = row.reviews ?? row.reviews_count ?? row.rating_count ?? '';
+  let voltageStatus = 'UNKNOWN';
+  if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
+  else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
+  else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
+  const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
+  const priceValue = Number(rawPrice);
+  return {
+    title, description, source: String(row.source || row.seller || 'LOJA').slice(0, 100),
+    link: typeof (row.link || row.product_link) === 'string' && /^https:\/\/(?!localhost)/i.test(row.link || row.product_link) ? (row.link || row.product_link) : '',
+    thumbnail: typeof (row.thumbnail || row.thumbnail_url || row.thumbnail_link) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url || row.thumbnail_link) ? (row.thumbnail || row.thumbnail_url || row.thumbnail_link) : '',
+    priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
+    priceText: String(row.price || '').slice(0, 60),
+    rating, reviews: reviews ? String(reviews) : (rating ? String(rating) : ''),
+    model, capacity, power, warranty,
+    brand: String(row.brand || '').slice(0, 100),
+    specs: features.slice(0, 1200),
+    voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT'
+  };
+}
 export async function POST(request) {
   if (!sameOrigin(request)) return json({ error: 'ORIGEM NÃO AUTORIZADA.' }, 403);
   const token = readCookie(request);
@@ -40,65 +75,53 @@ export async function POST(request) {
     if (!query) return json({ error: 'INFORME O MODELO PARA BUSCAR.' }, 400);
     const apiKey = process.env.SERPAPI_API_KEY;
     if (!apiKey) return json({
-      error: 'A BUSCA AUTOMÁTICA AINDA PRECISA DA CHAVE SERPAPI_API_KEY NAS VARIÁVEIS DE AMBIENTE DA VERCEL. NENHUM PREÇO FOI INVENTADO OU SALVO.'
+      error: 'A BUSCA AUTOMÁTICA PRECISA DA CHAVE SERPAPI_API_KEY NAS VARIÁVEIS DE AMBIENTE DA VERCEL. NENHUM PREÇO FOI INVENTADO OU SALVO.'
     }, 503);
     const discover = body?.mode === 'discover';
     const search = async (engine, q) => {
-      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey, ...(!discover ? { tbs: 'qdr:y' } : {}) });
+      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
-        headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000), cache: 'no-store'
+        headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(12000), cache: 'no-store'
       });
       if (!response.ok) throw new Error('SEARCH_PROVIDER_' + response.status);
       return response.json();
     };
-    const searchQuery = query;
-    const shopping = await search('google_shopping', searchQuery);
-    let rows = Array.isArray(shopping.shopping_results) ? shopping.shopping_results : [];
-    let source = 'GOOGLE SHOPPING';
-    // A descoberta aceita resultados mais amplos e páginas de produto sem preço.
-    if (rows.length < 4) {
+    const queries = discover ? [query] : [query + ' 220V', query + ' BIVOLT', query];
+    const rows = [], seen = new Set();
+    let source = 'RESULTADOS DE PRODUTOS';
+    for (const term of queries) {
+      const shopping = await search('google_shopping', term);
+      for (const row of (Array.isArray(shopping.shopping_results) ? shopping.shopping_results : [])) {
+        const link = row.link || row.product_link || '';
+        const key = link || String(row.title || '').toLowerCase();
+        if (key && !seen.has(key)) { seen.add(key); rows.push(row); }
+      }
+      if (discover && rows.length >= 8) break;
+      if (!discover && rows.some(row => {
+        const p = technicalData(row);
+        return p.priceValue && p.link && p.voltageConfirmed;
+      })) break;
+    }
+    if (rows.length < (discover ? 4 : 3)) {
       try {
-        const general = await search('google', searchQuery);
-        const organic = Array.isArray(general.organic_results) ? general.organic_results : [];
-        const seen = new Set(rows.map(x => x.link).filter(Boolean));
-        for (const item of organic) {
+        const general = await search('google', query + (discover ? '' : ' 220V OR BIVOLT'));
+        for (const item of (Array.isArray(general.organic_results) ? general.organic_results : [])) {
           if (!item.title || !item.link || seen.has(item.link)) continue;
-          rows.push({ title: item.title, link: item.link, snippet: item.snippet || '',
-            thumbnail: item.thumbnail || '', source: item.source || item.displayed_link || 'RESULTADO DA WEB' });
+          rows.push({ title: item.title, link: item.link, snippet: item.snippet || '', thumbnail: item.thumbnail || '', source: item.source || item.displayed_link || 'RESULTADO DA WEB' });
           seen.add(item.link);
         }
-        if (organic.length) source = 'GOOGLE SHOPPING + RESULTADOS DA WEB';
+        if (rows.length) source = 'RESULTADOS DE PRODUTOS E LOJAS';
       } catch (fallbackError) { console.warn('fallback search unavailable', fallbackError); }
     }
-    const products = rows.map(row => {
-      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
-      const priceValue = Number(rawPrice);
-      const title = String(row.title || '').slice(0, 300);
-      const description = String(row.snippet || row.description || '').slice(0, 700);
-      const evidence = [title, description].filter(Boolean).join(' ');
-      let voltageStatus = 'UNKNOWN';
-      if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
-      else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
-      else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
-      return {
-        title, description,
-        source: String(row.source || row.seller || 'GOOGLE SHOPPING').slice(0, 100),
-        link: typeof row.link === 'string' && /^https:\/\/(?!localhost)/i.test(row.link) ? row.link : '',
-        thumbnail: typeof (row.thumbnail || row.thumbnail_url) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url) ? (row.thumbnail || row.thumbnail_url) : '',
-        priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
-        priceText: String(row.price || '').slice(0, 60),
-        rating: row.rating ?? null, reviews: row.reviews ?? null,
-        voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT'
-      };
-    }).filter(p => p.title && (discover || (p.priceValue && p.link)));
+    const products = rows.map(technicalData).filter(p => p.title && (discover || (p.priceValue && p.link)));
     return json({
       searchId: new Date().toISOString(), query, products,
       ignoredForVoltage: products.filter(p => p.voltageStatus === 'UNKNOWN' || p.voltageStatus === 'INCOMPATIBLE').length,
-      searchWindow: discover ? null : '12_MONTHS',
+      searchWindow: discover ? null : 'CURRENT_OFFERS',
       source
     });
   } catch (error) {
     console.error('wishlist search failed', error);
-    return json({ error: 'NÃO FOI POSSÍVEL CONSULTAR AS FONTES AGORA.' }, 502);
+    return json({ error: 'NÃO FOI POSSÍVEL CONSULTAR AS FONTES AGORA. TENTE NOVAMENTE EM INSTANTES.' }, 502);
   }
 }
