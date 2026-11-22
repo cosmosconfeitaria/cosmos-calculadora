@@ -174,6 +174,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 @media(max-width:480px){.finance-main{align-items:flex-start;flex-direction:column;gap:5px}.finance-main strong{font-size:21px}.finance-gap{align-items:flex-start;flex-direction:column;gap:4px}}
 
 .chart-controls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chart-controls .silver{font-size:9px;padding:8px 10px}.chart-custom{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.chart-custom input{max-width:145px;font-size:10px!important;padding:8px}.chart-custom .silver{font-size:9px;padding:9px 10px}
+.advanced-fields{grid-column:1/-1;border:1px solid var(--line);padding:10px 12px;background:#fff}.advanced-fields summary{cursor:pointer;color:var(--blue);font-size:10px;letter-spacing:.06em;padding:3px 0}.advanced-fields[open] summary{margin-bottom:12px}.advanced-fields .form-grid{padding:0}
 </style>
 </head>
 <body>
@@ -214,7 +215,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <div class="field"><label>ENTRADA (R$)</label><input name="downPayment" type="number" min="0" step=".01" placeholder="0,00"></div>
 <div class="field"><label>FORMA DE PAGAMENTO</label><select name="paymentMethod"><option value="PIX / À VISTA">PIX / À VISTA</option><option value="CARTÃO DE CRÉDITO">CARTÃO DE CRÉDITO</option><option value="A COMBINAR">A COMBINAR</option></select></div>
 <div class="field"><label>QUANTIDADE DE PARCELAS SEM JUROS</label><input name="installments" type="number" min="0" max="48" step="1" placeholder="INFORME SE QUISER SIMULAR"></div>
-<div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
+<details class="advanced-fields"><summary>COMPLEMENTAR DADOS TÉCNICOS</summary><div class="form-grid"><div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
 <div class="field"><label>CAPACIDADE / DIMENSÕES</label><input name="capacity" placeholder="ex.: tigela 7,6 L"></div>
 <div class="field"><label>GARANTIA</label><input name="warranty" placeholder="EX.: 12 MESES"></div>
 <div class="field"><label>POTÊNCIA</label><input name="power" placeholder="EX.: 500 W"></div>
@@ -224,9 +225,9 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <div class="field full"><label>ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="fit" placeholder="capacidade real para nossos lotes, frequência de uso, espaço..."></textarea></div>
 <div class="field"><label>VOLTAGEM</label><input value="220V (PADRÃO COSMOS)" disabled></div>
 <div class="field full"><label>ESPECIFICAÇÕES IMPORTANTES</label><textarea name="specs" placeholder="capacidade, dimensões, potência, materiais, garantia..."></textarea></div>
-<div class="field full"><label>OBSERVAÇÕES / ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="notes" placeholder="por que quero comprar, o que preciso avaliar..."></textarea></div>
+<div class="field full"><label>OBSERVAÇÕES / ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="notes" placeholder="por que quero comprar, o que preciso avaliar..."></textarea></div></div></details>
 <div class="field"><label>IMAGEM DO PRODUTO (JPG, PNG OU WEBP · ATÉ 5 MB)</label><div class="file-picker"><input class="file-native" id="itemImage" name="image" type="file" accept="image/jpeg,image/png,image/webp"><label class="file-button" for="itemImage">ESCOLHER ARQUIVO</label><img id="filePreview" class="file-preview" alt="" hidden><span class="file-name" id="fileName">NENHUM ARQUIVO SELECIONADO</span></div></div>
-<div class="field"><label>LINK DE REFERÊNCIA</label><input class="reference-url" name="referenceUrl" type="url" placeholder="https://..."></div>
+<div class="field"><label>LINK DE REFERÊNCIA</label><input class="reference-url" name="referenceUrl" type="url" placeholder="https://..."></div><div class="field full"><p class="meta" id="linkImportStatus">AO INSERIR UM LINK DE LOJA COMPATÍVEL, VAMOS TENTAR IMPORTAR AUTOMATICAMENTE OS DADOS DO PRODUTO.</p></div>
 <div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input name="savedAmount" type="number" min="0" step=".01" placeholder="QUANTO JÁ CONSEGUIU JUNTAR?"></div><div class="field full"><div class="calc" id="financePreview">PREENCHA O PREÇO-ALVO E A DATA PREVISTA PARA VISUALIZAR SEU PLANEJAMENTO.</div></div>
 </div>
 <div class="form-actions"><button class="silver" type="submit">SALVAR ITEM</button><button class="silver" type="button" id="cancelForm">CANCELAR</button></div>
@@ -340,8 +341,8 @@ async function load(){
  if(error)throw error;
  items=(data||[]).map(r=>({...r,data:r.data||{}}));render();
 }
-async function imageUrl(path){
- if(!path)return '';
+async function imageUrl(path,remote){
+ if(!path)return remote||'';
  const {data,error}=await client.storage.from(BUCKET).createSignedUrl(path,3600);
  return error?'':data.signedUrl;
 }
@@ -354,7 +355,9 @@ async function uploadImage(file,itemId){
  return path;
 }
 async function saveItem(payload){
- const base=items.find(x=>x.id===editingId);
+ const normalizedTitle=String(payload.title||'').trim().toLocaleLowerCase('pt-BR');
+ const wantedType=payload.subcategory||'';
+ const base=items.find(x=>x.id===editingId)||items.find(x=>x.status==='WISHLIST'&&x.category===payload.category&&String(x.title||'').trim().toLocaleLowerCase('pt-BR')===normalizedTitle&&(x.data?.subcategory||x.data?.productType||'')===wantedType);
  const row={user_id:user.id,title:payload.title,category:payload.category,status:base?.status||'WISHLIST',importance:payload.importance,data:{...(base?.data||{}),...payload,subcategory:payload.subcategory||base?.data?.subcategory||base?.data?.productType||'',voltage:'220V',addedAt:base?.data?.addedAt||today()}};
  delete row.data.image;delete row.data.productType;
  if(base){
@@ -408,7 +411,7 @@ async function render(){
  $('items').innerHTML='';
  if(!list.length)$('items').innerHTML='<div class="empty-state">NENHUM ITEM POR AQUI AINDA.<br>ADICIONE SEU PRIMEIRO DESEJO PARA COMEÇAR A PLANEJAR.</div>';
  for(const item of list){
-  const d=item.data||{},img=await imageUrl(d.imagePath);
+  const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
   const card=document.createElement('article');card.className='item';
   card.innerHTML='<div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(d.subcategory||d.productType||'TIPO NÃO DEFINIDO')+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'<div style="margin-top:7px"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div></div></div><div class="target-price-card"><span>PREÇO-ALVO</span><strong>'+(d.targetPrice?money(d.targetPrice):'NÃO DEFINIDO')+'</strong></div><div class="meta">'+(d.targetDate?'COMPRA PREVISTA: '+date(d.targetDate):'SEM DATA PREVISTA')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
@@ -444,7 +447,7 @@ function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
 }
 async function showDetail(id){
- const item=items.find(x=>x.id===id);if(!item)return;detailId=id;const d=item.data||{},img=await imageUrl(d.imagePath);
+ const item=items.find(x=>x.id===id);if(!item)return;detailId=id;const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
  const f=finance(d);
  $('detailTitle').textContent=item.title.toUpperCase();
  const links=(d.stores||[]).map(s=>'<p class="meta store-link-row"><strong>'+esc(s.store)+'</strong> · '+(s.price?money(Number(s.price)+Number(s.shipping||0))+(s.shipping?' (com frete)':''):'preço não registrado')+' · <a class="small-link" href="'+esc(s.url)+'" target="_blank" rel="noopener">abrir loja</a></p>').join('')||'<p class="meta">adicione links de lojas e comparadores.</p>';
@@ -501,12 +504,28 @@ $('itemForm').addEventListener('input',event=>{
  updateFinancePreview();
 });
 $('itemImage').addEventListener('change',updateFileName);
+$('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
+ const url=event.target.value.trim();if(!url)return;
+ const status=$('linkImportStatus');if(status)status.textContent='LENDO INFORMAÇÕES DO PRODUTO...';
+ try{
+  const response=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||'NÃO FOI POSSÍVEL LER O LINK.');
+  const form=$('itemForm'),set=(name,value,overwrite=false)=>{const el=form.elements[name];if(el&&value&&(overwrite||!el.value))el.value=value};
+  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.description);
+  if(result.price)set('currentPrice',result.price,true);
+  const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
+  form.dataset.productMeta=JSON.stringify(data);
+  if(status)status.textContent='DADOS IMPORTADOS QUANDO DISPONÍVEIS · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:' · CONFIRME A VOLTAGEM 220V NA PÁGINA');
+  updateFinancePreview();
+ }catch(error){if(status)status.textContent=error.message}
+});
+
 document.addEventListener('input',event=>{
  const el=event.target;
  if(el.matches('input[type="text"],input:not([type]),textarea')&&el.type!=='url'&&el.name!=='referenceUrl'){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
 });
 $('itemForm').addEventListener('submit',async e=>{
- e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());const file=form.elements.image.files[0];
+ e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());try{Object.assign(payload,JSON.parse(form.dataset.productMeta||'{}'))}catch(_){}const file=form.elements.image.files[0];
  if(!payload.title||!payload.title.trim()){alert('INFORME O NOME DO PRODUTO.');return}
  const submit=form.querySelector('button[type="submit"]');if(submit){submit.disabled=true;submit.textContent='SALVANDO...'}
  try{
