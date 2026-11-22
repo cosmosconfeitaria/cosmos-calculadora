@@ -39,6 +39,27 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .icon-button{width:42px;height:40px;border-radius:8px;position:relative;font-size:17px}
 .dot{position:absolute;right:7px;top:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1px solid white}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.wishlist-toolbar{grid-template-columns:minmax(0,1fr) auto;gap:9px;margin-bottom:14px}
+.wishlist-toolbar input{font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.02em;padding:13px 12px;border-radius:10px;background:#fff;color:var(--blue);text-transform:uppercase}
+.wishlist-toolbar input::placeholder{color:#8a8884;opacity:1}
+.wishlist-toolbar .silver{font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.02em;padding:13px 14px}
+.category-filter-box{border:1px solid var(--line);background:#fff;padding:13px 14px;margin:0 0 18px}
+.category-filter-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--blue);margin-bottom:11px}
+.category-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.category-check{display:flex;align-items:center;gap:8px;min-width:0;margin:0;padding:8px 9px;border:1px solid var(--line);background:#fff;color:var(--blue);font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.02em;cursor:pointer}
+.category-check input,.subcategory-option input{width:14px;height:14px;flex:0 0 14px;margin:0;accent-color:var(--blue)}
+.category-check:has(input:checked){background:#eef3fc;border-color:var(--blue)}
+.subcategory-filters{display:grid;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.subcategory-group{position:relative;min-width:0}
+.subcategory-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #d4d1cc;border-radius:10px;background:#fff;color:var(--blue);padding:11px 12px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.02em;text-align:left;cursor:pointer;box-shadow:none}
+.subcategory-trigger .chevron{font-size:13px;line-height:1}
+.subcategory-menu{position:absolute;z-index:50;top:calc(100% + 4px);left:0;width:100%;max-height:245px;overflow-y:auto;background-color:rgba(246,244,241,.96);background-image:radial-gradient(ellipse at 17% 20%,rgba(155,145,130,.075),transparent 38%),radial-gradient(ellipse at 82% 72%,rgba(255,255,255,.58),transparent 42%),linear-gradient(135deg,rgba(255,255,255,.28),rgba(190,180,165,.035) 48%,rgba(255,255,255,.2));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(28,38,55,.16),inset 0 1px 2px rgba(255,255,255,.7);border:0;padding:5px 0}
+.subcategory-menu[hidden]{display:none}
+.subcategory-option{display:flex;align-items:center;gap:9px;padding:8px 13px;margin:0;color:var(--blue);font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;cursor:pointer}
+.subcategory-option:hover{background:rgba(34,99,210,.09)}
+.subcategory-option input{width:13px;height:13px;flex-basis:13px}
+.achievements-entry{margin-top:22px;padding:14px 16px}
+.achievements-entry .meta{margin-top:5px}
 .section-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 12px}
 .section-line h2{font-size:12px;letter-spacing:.08em;font-weight:500;margin:0}
 .count{font-size:10px;color:var(--muted)}
@@ -85,7 +106,7 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 .footer-cosmos .line-brand{font-size:26px;letter-spacing:-.7px;line-height:1;color:var(--blue)}
 .footer-cosmos .line-tagline{font-size:10px;color:var(--blue)}
 .footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;color:var(--red)}
-@media(max-width:620px){.wrap{margin:12px auto;min-height:calc(100vh - 24px);padding:16px 14px 22px}.toolbar{grid-template-columns:1fr auto auto}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.store-row{grid-template-columns:1fr 1fr}.store-row .store-remove{grid-column:2;justify-self:end}.item-top .thumb{width:68px;height:68px;flex-basis:68px}}
+@media(max-width:620px){.wrap{margin:12px auto;min-height:calc(100vh - 24px);padding:16px 14px 22px}.toolbar{grid-template-columns:1fr auto}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.store-row{grid-template-columns:1fr 1fr}.store-row .store-remove{grid-column:2;justify-self:end}.item-top .thumb{width:68px;height:68px;flex-basis:68px}.category-checks{grid-template-columns:1fr 1fr}.achievements-entry .section-line{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){body:before,body:after,.logo-type:after{animation:none}}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
 .brand{font-size:14px;font-weight:500;letter-spacing:-.35px;color:var(--blue)}
@@ -110,22 +131,32 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <div class="wrap">
 <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
 <p class="eyebrow">COSMOS TOOLS / WISHLIST</p>
-<h1>WISHLIST<span style="color:var(--red)">.</span></h1>
+<h1>WISHLIST</h1>
 <p class="intro">ORGANIZE SUAS COMPRAS, ACOMPANHE OS PREÇOS E PLANEJE SUAS PRÓXIMAS CONQUISTAS.</p>
-<div class="toolbar">
-<input id="search" list="suggestions" placeholder="BUSCAR ITEM..." autocomplete="off"><datalist id="suggestions"></datalist>
-<a class="silver nav-action" href="conquistas.html">CONQUISTAS</a><button class="silver" id="addBtn">+ NOVO ITEM</button>
+<div class="toolbar wishlist-toolbar">
+<input id="search" list="suggestions" placeholder="BUSCAR ITEM..." autocomplete="off" aria-label="BUSCAR ITEM"><datalist id="suggestions"></datalist>
+<button class="silver" id="addBtn" type="button">+ NOVO ITEM</button>
 </div>
-<div class="filters">
-<select id="categoryFilter"><option value="TODAS">TODAS AS CATEGORIAS</option><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select>
-<select id="viewFilter"><option value="WISHLIST">WISHLIST ATIVA</option><option value="TODOS">TODOS OS ITENS</option></select>
+<section class="category-filter-box" aria-label="FILTROS POR CATEGORIA">
+<div class="category-filter-heading">CATEGORIAS <span class="count">SELECIONE UMA OU MAIS</span></div>
+<div class="category-checks" id="categoryChecks">
+<label class="category-check"><input type="checkbox" value="EQUIPAMENTOS"><span>EQUIPAMENTOS</span></label>
+<label class="category-check"><input type="checkbox" value="REFORMA"><span>REFORMA</span></label>
+<label class="category-check"><input type="checkbox" value="ACESSÓRIOS"><span>ACESSÓRIOS</span></label>
+<label class="category-check"><input type="checkbox" value="UTENSÍLIOS"><span>UTENSÍLIOS</span></label>
+<label class="category-check"><input type="checkbox" value="TECNOLOGIA"><span>TECNOLOGIA</span></label>
+<label class="category-check"><input type="checkbox" value="EMBALAGENS"><span>EMBALAGENS</span></label>
+<label class="category-check"><input type="checkbox" value="OUTROS"><span>OUTROS</span></label>
 </div>
+<div id="subcategoryFilters" class="subcategory-filters hidden"></div>
+</section>
 <section id="formPanel" class="panel hidden">
 <div class="section-line" style="margin-top:0"><h2 id="formTitle">NOVO ITEM</h2><button class="close" id="formClose" aria-label="fechar">×</button></div>
 <form id="itemForm">
 <div class="form-grid">
 <div class="field full"><label>NOME DO PRODUTO / MODELO *</label><input name="title" required placeholder="ex.: batedeira planetária ..."></div>
 <div class="field"><label>CATEGORIA PRINCIPAL</label><select name="category"><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select></div>
+<div class="field"><label>SUBCATEGORIA</label><select name="subcategory" id="itemSubcategory"><option value="">SELECIONE A CATEGORIA PRINCIPAL</option></select></div>
 <div class="field"><label>TIPO DE PRODUTO</label><select name="productType"><option value="">SELECIONE O TIPO</option><option value="BATEDEIRA">BATEDEIRA</option><option value="FORNO">FORNO</option><option value="FREEZER">FREEZER</option><option value="GELADEIRA">GELADEIRA</option><option value="BANCADA">BANCADA</option><option value="MISTURADOR">MISTURADOR</option><option value="ACESSÓRIO">ACESSÓRIO</option><option value="OUTRO">OUTRO</option></select></div>
 <div class="field"><label>IMPORTÂNCIA</label><select name="importance"><option value="BAIXA">BAIXA</option><option value="MEDIA" selected>MÉDIA</option><option value="ALTA">ALTA</option><option value="URGENTE">URGENTE</option></select></div>
 <div class="field"><label>PREÇO ATUAL / REFERÊNCIA (R$)</label><input name="currentPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
@@ -158,6 +189,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 </section>
 <div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
 <div class="cards" id="items"></div>
+<section class="panel achievements-entry"><div class="section-line" style="margin:0"><div><h2>CONQUISTAS</h2><div class="meta">ITENS QUE JÁ FIZERAM PARTE DA OPERAÇÃO COSMOS</div></div><a class="silver nav-action" href="conquistas.html">VER CONQUISTAS</a></div></section>
 <section class="panel hidden" id="comparisonPanel"><div class="section-line" style="margin:0"><h2>COMPARAÇÃO LADO A LADO</h2><button class="close" id="comparisonClose">×</button></div><div id="comparisonContent" style="overflow-x:auto;margin-top:12px"></div></section>
 
 <footer class="footer-cosmos">
@@ -176,8 +208,8 @@ const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
 const ALLOWED_EMAIL='cosmosconfeitaria@gmail.com';
 const BUCKET='cosmos-wishlist-images';
 const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
-window.addEventListener('error',event=>{const el=$('items');if(el)el.innerHTML='<div class="notice">ERRO NA PÁGINA: '+esc(event.message||'FALHA INESPERADA')+'. ATUALIZE E TENTE NOVAMENTE.</div>';});
-window.addEventListener('unhandledrejection',event=>{const el=$('items');if(el)el.innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONCLUIR A AÇÃO: '+esc(event.reason?.message||event.reason||'ERRO INESPERADO')+'</div>';});
+window.addEventListener('error',event=>{const el=document.getElementById('items');if(el)el.innerHTML='<div class="notice">ERRO NA PÁGINA: '+String(event.message||'FALHA INESPERADA').replace(/[&<>]/g,'')+'. ATUALIZE E TENTE NOVAMENTE.</div>';});
+window.addEventListener('unhandledrejection',event=>{const el=document.getElementById('items');if(el)el.innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONCLUIR A AÇÃO: '+String(event.reason?.message||event.reason||'ERRO INESPERADO').replace(/[&<>]/g,'')+'</div>';});
 const $=id=>document.getElementById(id);
 let user=null,items=[],editingId=null,detailId=null,notices=[],compareIds=new Set();
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -202,13 +234,31 @@ function updateFinancePreview(){
  const d=Object.fromEntries(new FormData($('itemForm')).entries());
  $('financePreview').innerHTML=calcHtml(d);
 }
+const SUBCATEGORIES={
+ 'EQUIPAMENTOS':['BATEDEIRAS','FORNOS','FREEZERS','GELADEIRAS','MISTURADORES','PROCESSADORES','BALANÇAS','CLIMATIZAÇÃO','OUTROS EQUIPAMENTOS'],
+ 'REFORMA':['ELÉTRICA','HIDRÁULICA','MARCENARIA','PINTURA','ILUMINAÇÃO','REVESTIMENTOS','MÓVEIS PLANEJADOS','OUTROS'],
+ 'ACESSÓRIOS':['PEÇAS DE REPOSIÇÃO','ACESSÓRIOS DE EQUIPAMENTOS','ORGANIZAÇÃO','OUTROS'],
+ 'UTENSÍLIOS':['FORMAS E ASSADEIRAS','ESPÁTULAS E RASPADORES','MEDIDORES E BALANÇAS','PENEIRAS E CORTADORES','PANELAS E TIGELAS','OUTROS'],
+ 'TECNOLOGIA':['COMPUTADORES','CELULARES E TABLETS','FOTOGRAFIA E VÍDEO','ILUMINAÇÃO PARA CONTEÚDO','SOFTWARE E ASSINATURAS','OUTROS'],
+ 'EMBALAGENS':['CAIXAS','SACOLAS E SACOS','POTES E MARMITINHAS','ETIQUETAS E ADESIVOS','PAPEL E PROTEÇÃO','OUTROS'],
+ 'OUTROS':['CURSOS','LIVROS','SERVIÇOS','MOBILIÁRIO','OUTROS']
+};
+function updateItemSubcategory(selected){
+ const category=$('itemForm').elements.category.value,select=$('itemSubcategory'),values=SUBCATEGORIES[category]||[];
+ const keep=selected??select.value;
+ select.innerHTML='<option value="">SELECIONE A SUBCATEGORIA</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+ if(values.includes(keep))select.value=keep;
+}
 function openForm(item){
  editingId=item?.id||null;$('itemForm').reset();
  $('formTitle').textContent=item?'EDITAR ITEM':'NOVO ITEM';
  if(item){
   const d=item.data||{};
-  Object.entries({title:item.title,category:item.category,importance:item.importance,...d}).forEach(([k,v])=>{const el=$('itemForm').elements[k];if(el&&el.type!=='file'&&v!=null)el.value=v});
- }
+  Object.entries({title:item.title,category:item.category,importance:item.importance,...d}).forEach(([k,v])=>{const el=$('itemForm').elements[k];if(el&&el.type!=='file'&&v!=null&&el.type!=='select-one')el.value=v});
+  $('itemForm').elements.category.value=item.category||'EQUIPAMENTOS';
+  updateItemSubcategory(d.subcategory||'');
+  if(d.productType)$('itemForm').elements.productType.value=d.productType;
+ }else updateItemSubcategory('');
  $('formPanel').classList.remove('hidden');$('detailPanel').classList.add('hidden');
  updateFinancePreview();$('formPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -244,12 +294,42 @@ async function saveItem(payload){
  if(error)throw error;
  return data.id;
 }
+function selectedCategories(){return [...document.querySelectorAll('#categoryChecks input:checked')].map(el=>el.value)}
+function selectedSubcategories(){
+ const result={};
+ document.querySelectorAll('.subcategory-group').forEach(group=>{
+  const category=group.dataset.category,values=[...group.querySelectorAll('input:checked')].map(el=>el.value);
+  if(values.length)result[category]=values;
+ });
+ return result;
+}
+function renderSubcategoryFilters(){
+ const selected=selectedCategories(),host=$('subcategoryFilters');
+ host.innerHTML='';
+ if(!selected.length){host.classList.add('hidden');return}
+ host.classList.remove('hidden');
+ selected.forEach(category=>{
+  const group=document.createElement('div');group.className='subcategory-group';group.dataset.category=category;
+  const options=SUBCATEGORIES[category]||['OUTROS'];
+  group.innerHTML='<button type="button" class="subcategory-trigger" aria-expanded="false"><span>'+esc(category)+' · SUBCATEGORIAS</span><span class="chevron">⌄</span></button><div class="subcategory-menu" hidden>'+options.map(value=>'<label class="subcategory-option"><input type="checkbox" value="'+esc(value)+'"><span>'+esc(value)+'</span></label>').join('')+'</div>';
+  const trigger=group.querySelector('.subcategory-trigger'),menu=group.querySelector('.subcategory-menu');
+  trigger.addEventListener('click',()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))});
+  group.addEventListener('change',render);
+  host.append(group);
+ });
+}
 function activeItems(){
- const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),cat=$('categoryFilter').value,view=$('viewFilter').value;
- return items.filter(x=>(view==='TODOS'||x.status==='WISHLIST')&&(cat==='TODAS'||x.category===cat)&&(!term||(x.title+' '+(x.data.model||'')+' '+x.category).toLocaleLowerCase('pt-BR').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
+ const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),cats=selectedCategories(),subs=selectedSubcategories();
+ return items.filter(x=>{
+  const categoryMatch=!cats.length||cats.includes(x.category);
+  const categorySubfilters=cats.filter(c=>(subs[c]||[]).length);
+  const subcategoryMatch=!categorySubfilters.length||categorySubfilters.some(c=>c===x.category&&(subs[c]||[]).includes(x.data?.subcategory));
+  const searchMatch=!term||(x.title+' '+(x.data.model||'')+' '+x.category+' '+(x.data.subcategory||'')).toLocaleLowerCase('pt-BR').includes(term);
+  return x.status==='WISHLIST'&&categoryMatch&&subcategoryMatch&&searchMatch;
+ }).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
 }
 async function render(){
- const list=activeItems();$('itemCount').textContent=list.length+' item(ns)';$('listTitle').textContent=$('viewFilter').value==='TODOS'?'TODOS OS ITENS':'ITENS DA WISHLIST';
+ const list=activeItems();$('itemCount').textContent=list.length+' item(ns)';
  const suggestions=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
  $('suggestions').innerHTML=suggestions.map(x=>'<option value="'+esc(x)+'"></option>').join('');
  $('items').innerHTML='';
@@ -328,13 +408,16 @@ function showInbox(){
 $('itemForm').addEventListener('input',updateFinancePreview);
 $('itemForm').addEventListener('submit',async e=>{
  e.preventDefault();const form=e.currentTarget,payload=Object.fromEntries(new FormData(form).entries());const file=form.elements.image.files[0];
+ if(!payload.title||!payload.title.trim()){alert('INFORME O NOME DO PRODUTO.');return}
+ const submit=form.querySelector('button[type="submit"]');if(submit){submit.disabled=true;submit.textContent='SALVANDO...'}
  try{
   const id=await saveItem(payload);
   if(file){const path=await uploadImage(file,id);await load();const item=items.find(x=>x.id===id);await patchData(id,{...item.data,imagePath:path})}
   await load();closeForm();
- }catch(err){alert('não foi possível salvar: '+err.message)}
+ }catch(err){console.error('erro ao salvar item',err);alert('NÃO FOI POSSÍVEL SALVAR: '+err.message)}finally{if(submit){submit.disabled=false;submit.textContent='SALVAR ITEM'}}
 });
-$('addBtn').onclick=()=>openForm();$('formClose').onclick=closeForm;$('cancelForm').onclick=closeForm;
+$('addBtn').addEventListener('click',event=>{event.preventDefault();try{openForm(null)}catch(error){console.error('não foi possível abrir novo item',error);alert('NÃO FOI POSSÍVEL ABRIR O FORMULÁRIO: '+error.message)}});
+$('formClose').addEventListener('click',closeForm);$('cancelForm').addEventListener('click',closeForm);
 $('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
 $('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit))});
 function productPrice(item){
@@ -366,9 +449,13 @@ function showTypeComparison(id){
  $('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('comparisonClose').onclick=()=>$('comparisonPanel').classList.add('hidden');
-$('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);$('viewFilter').addEventListener('change',render);
+$('search').addEventListener('input',render);
+$('categoryChecks').addEventListener('change',()=>{renderSubcategoryFilters();render()});
+$('itemForm').elements.category.addEventListener('change',()=>updateItemSubcategory(''));
+
 $('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');
 async function init(){
+ renderSubcategoryFilters();
  if(!client){$('items').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONECTAR AO SUPABASE. RECARREGUE A PÁGINA.</div>';return}
  const {data,error}=await client.auth.getSession(),session=data?.session;
  if(error||!session||String(session.user.email||'').toLowerCase()!==ALLOWED_EMAIL){location.replace('index.html?auth=required');return}
