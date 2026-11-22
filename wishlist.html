@@ -28,7 +28,7 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .eyebrow{font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px}
 h1{font-size:clamp(34px,7vw,56px);line-height:.98;letter-spacing:-1.5px;font-weight:500;margin:0;color:var(--blue)}
 .intro{font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
-.toolbar{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;margin-bottom:14px}
+.toolbar{display:grid;grid-template-columns:1fr auto auto auto;gap:9px;align-items:center;margin-bottom:14px}
 input,select,textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
 textarea{min-height:80px;resize:vertical;line-height:1.45}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21a}
@@ -93,7 +93,7 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 <p class="intro">uma lista de desejos com planejamento de compra, histórico de preços e conquistas. compare sempre o mesmo modelo e a mesma versão do produto.</p>
 <div class="toolbar">
 <input id="search" list="suggestions" placeholder="buscar item..." autocomplete="off"><datalist id="suggestions"></datalist>
-<button class="silver" id="addBtn">+ NOVO ITEM</button>
+<button class="silver" id="compareBtn">COMPARAR</button><button class="silver" id="addBtn">+ NOVO ITEM</button>
 <button class="icon-button" id="inboxBtn" aria-label="notificações">✉<span class="dot hidden" id="inboxDot"></span></button>
 </div>
 <div class="filters">
@@ -112,6 +112,11 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 <div class="field"><label>ENTRADA (R$)</label><input name="downPayment" type="number" min="0" step=".01" placeholder="0,00"></div>
 <div class="field"><label>NÚMERO DE PARCELAS SEM JUROS</label><input name="installments" type="number" min="1" max="48" step="1" placeholder="ex.: 10"></div>
 <div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
+<div class="field"><label>CAPACIDADE / DIMENSÕES</label><input name="capacity" placeholder="ex.: tigela 7,6 L"></div>
+<div class="field"><label>GARANTIA</label><input name="warranty" placeholder="ex.: 12 meses"></div>
+<div class="field"><label>AVALIAÇÃO / RESUMO DE REVIEWS</label><input name="reviews" placeholder="nota, pontos positivos e negativos"></div>
+<div class="field"><label>ASSISTÊNCIA / PEÇAS DE REPOSIÇÃO</label><input name="support" placeholder="rede autorizada, peças..."></div>
+<div class="field full"><label>ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="fit" placeholder="capacidade real para nossos lotes, frequência de uso, espaço..."></textarea></div>
 <div class="field"><label>VOLTAGEM</label><input value="220V (PADRÃO COSMOS)" disabled></div>
 <div class="field full"><label>ESPECIFICAÇÕES IMPORTANTES</label><textarea name="specs" placeholder="capacidade, dimensões, potência, materiais, garantia..."></textarea></div>
 <div class="field full"><label>OBSERVAÇÕES / ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="notes" placeholder="por que quero comprar, o que preciso avaliar..."></textarea></div>
@@ -128,6 +133,7 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 </section>
 <div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
 <div class="cards" id="items"></div>
+<section class="panel hidden" id="comparisonPanel"><div class="section-line" style="margin:0"><h2>COMPARAÇÃO LADO A LADO</h2><button class="close" id="comparisonClose">×</button></div><div id="comparisonContent" style="overflow-x:auto;margin-top:12px"></div></section>
 <section class="panel" id="archivePanel">
 <div class="section-line" style="margin:0"><h2>CONQUISTAS</h2><span class="count" id="archiveCount">0 comprados</span></div>
 <div class="archive-list" id="archiveList" style="margin-top:12px"></div>
@@ -144,7 +150,7 @@ const ALLOWED_EMAIL='cosmosconfeitaria@gmail.com';
 const BUCKET='cosmos-wishlist-images';
 const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const $=id=>document.getElementById(id);
-let user=null,items=[],editingId=null,detailId=null,notices=[];
+let user=null,items=[],editingId=null,detailId=null,notices=[],compareIds=new Set();
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
 const today=()=>new Date().toISOString().slice(0,10);
@@ -222,7 +228,7 @@ async function render(){
  for(const item of list){
   const d=item.data||{},img=await imageUrl(d.imagePath);
   const card=document.createElement('article');card.className='item';
-  card.innerHTML='<div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(item.importance)+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div></div><div class="price">'+(d.targetPrice?money(d.targetPrice):'preço-alvo não definido')+'</div><div class="meta">'+(d.targetDate?'compra prevista: '+date(d.targetDate):'sem data prevista')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
+  card.innerHTML='<label style="display:flex;align-items:center;gap:5px;margin:0 0 9px"><input type="checkbox" data-compare="'+item.id+'" style="width:15px;height:15px;accent-color:var(--blue)" '+(compareIds.has(item.id)?'checked':'')+'> COMPARAR</label><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title)+'</h3><div class="meta">'+esc(item.category)+' · '+esc(item.importance)+'<br>adicionado em '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div></div><div class="price">'+(d.targetPrice?money(d.targetPrice):'preço-alvo não definido')+'</div><div class="meta">'+(d.targetDate?'compra prevista: '+date(d.targetDate):'sem data prevista')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
  }
  const bought=items.filter(x=>x.status==='PURCHASED').sort((a,b)=>(b.data.purchaseDate||'').localeCompare(a.data.purchaseDate||''));
@@ -254,7 +260,7 @@ async function showDetail(id){
  $('recordPrice').onclick=async()=>{
   const store=$('priceStore').value.trim(),price=Number($('priceValue').value),shipping=Number($('priceShip').value||0),url=$('priceUrl').value.trim();
   if(!store||!price){alert('informe a fonte e o preço.');return}
-  const data={...d},hist=data.priceHistory||[],previous=hist.length?Number(hist[hist.length-1].price):null,drop=previous&&price<previous?((previous-price)/previous)*100:0;
+  const data={...d},hist=data.priceHistory||[],previousEntries=hist.filter(h=>String(h.store||'').trim().toLocaleLowerCase('pt-BR')===store.toLocaleLowerCase('pt-BR')),previousEntry=previousEntries.length?previousEntries[previousEntries.length-1]:null,previous=previousEntry?Number(previousEntry.price)+Number(previousEntry.shipping||0):null,currentTotal=price+shipping,drop=previous&&currentTotal<previous?((previous-currentTotal)/previous)*100:0;
   hist.push({store,price,shipping,url,at:today(),alert:drop>=5,drop:Number(drop.toFixed(1)),read:false});data.priceHistory=hist;
   await patchData(id,data);await showDetail(id);
  };
@@ -287,6 +293,9 @@ $('itemForm').addEventListener('submit',async e=>{
 $('addBtn').onclick=()=>openForm();$('formClose').onclick=closeForm;$('cancelForm').onclick=closeForm;
 $('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
 $('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit))});
+$('items').addEventListener('change',e=>{const box=e.target.closest('[data-compare]');if(!box)return;if(box.checked)compareIds.add(box.dataset.compare);else compareIds.delete(box.dataset.compare)});
+$('compareBtn').onclick=()=>{const selected=items.filter(x=>compareIds.has(x.id));if(selected.length<2){alert('selecione pelo menos dois itens para comparar.');return}const fields=[['MODELO',x=>x.data.model],['VOLTAGEM',x=>'220V'],['CAPACIDADE / DIMENSÕES',x=>x.data.capacity],['ESPECIFICAÇÕES',x=>x.data.specs],['GARANTIA',x=>x.data.warranty],['REVIEWS',x=>x.data.reviews],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'—'],['IMPORTÂNCIA',x=>x.importance]];$('comparisonContent').innerHTML='<table style="border-collapse:collapse;min-width:520px;width:100%;font-size:11px"><thead><tr><th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">CRITÉRIO</th>'+selected.map(x=>'<th style="text-align:left;padding:9px;border-bottom:1px solid var(--line)">'+esc(x.title)+'</th>').join('')+'</tr></thead><tbody>'+fields.map(([label,get])=>'<tr><td style="padding:9px;border-bottom:1px solid var(--line);color:var(--muted)">'+label+'</td>'+selected.map(x=>'<td style="padding:9px;border-bottom:1px solid var(--line)">'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('')+'</tbody></table>';$('comparisonPanel').classList.remove('hidden');$('comparisonPanel').scrollIntoView({behavior:'smooth',block:'start'})};
+$('comparisonClose').onclick=()=>$('comparisonPanel').classList.add('hidden');
 $('search').addEventListener('input',render);$('categoryFilter').addEventListener('change',render);$('viewFilter').addEventListener('change',render);
 $('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');
 async function init(){
