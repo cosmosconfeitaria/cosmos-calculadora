@@ -38,8 +38,10 @@ function parseDisplayedPrice(row) {
   const cashMatch=cashContext||valid[0]||null;
   const creditMatch=matches.find(m=>/cr[eé]dito|cart[aã]o/i.test(text.slice(Math.max(0,m.index-30),m.index+24))&&!installment.test(text.slice(Math.max(0,m.index-14),m.index+2)));
   const installmentText=(text.match(/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s juros|com\s juros))?/i)||[])[0]||'';
-  const fallback=(!text||(!matches.length&&!installment.test(text)))?Number(row.extracted_price??row.price_value??0):null;
-  return { cashPrice:cashMatch?parse(cashMatch[1]):(Number.isFinite(fallback)&&fallback>0?fallback:null), creditPrice:creditMatch?parse(creditMatch[1]):null, installmentPlan:installmentText };
+  const installmentMatch=text.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
+  const installmentTotal=installmentMatch?Number(installmentMatch[2].replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'))*Number(installmentMatch[1]):null;
+  const fallback=(!text||(!matches.length&&!installment.test(text)))?Number(row.extracted_price??row.price_value??row.price??0):null;
+  return { cashPrice:cashMatch?parse(cashMatch[1]):(Number.isFinite(fallback)&&fallback>0?fallback:null), creditPrice:creditMatch?parse(creditMatch[1]):(Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:null), installmentPlan:installmentText };
 }
 function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\.)google\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
 function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
