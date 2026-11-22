@@ -42,9 +42,10 @@ export async function POST(request) {
     if (!apiKey) return json({
       error: 'A BUSCA AUTOMÁTICA AINDA PRECISA DA CHAVE SERPAPI_API_KEY NAS VARIÁVEIS DE AMBIENTE DA VERCEL. NENHUM PREÇO FOI INVENTADO OU SALVO.'
     }, 503);
+    const discover = body?.mode === 'discover';
     const params = new URLSearchParams({
       engine: 'google_shopping',
-      q: query + ' 220V',
+      q: discover ? query : query + ' 220V',
       google_domain: 'google.com.br',
       gl: 'br',
       hl: 'pt-br',
@@ -59,28 +60,33 @@ export async function POST(request) {
     const payload = await upstream.json();
     const rows = Array.isArray(payload.shopping_results) ? payload.shopping_results : [];
     const products = rows.map(row => {
-      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
+      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\\d,.-]/g, '').replace(/\\.(?=\\d{3}(?:\\D|$))/g, '').replace(',', '.');
       const priceValue = Number(rawPrice);
       const title = String(row.title || '').slice(0, 300);
-      const voltageConfirmed = /\b220\s?V\b|\b220\s?VOLTS?\b/i.test(title);
+      const evidence = [title, row.snippet, row.description].filter(Boolean).join(' ');
+      let voltageStatus = 'UNKNOWN';
+      if (/\\b(110|127)\\s?V\\b|\\b(110|127)\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
+      else if (/\\bBIVOLT\\b|\\b100\\s?A\\s?240\\s?V\\b/i.test(evidence)) voltageStatus = 'BIVOLT';
+      else if (/\\b220\\s?V\\b|\\b220\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
       return {
         title,
         source: String(row.source || row.seller || 'GOOGLE SHOPPING').slice(0, 100),
-        link: typeof row.link === 'string' && /^https:\/\/(?!localhost)/i.test(row.link) ? row.link : '',
-        thumbnail: typeof row.thumbnail === 'string' && /^https:\/\//i.test(row.thumbnail) ? row.thumbnail : '',
+        link: typeof row.link === 'string' && /^https:\\/\\/(?!localhost)/i.test(row.link) ? row.link : '',
+        thumbnail: typeof row.thumbnail === 'string' && /^https:\\/\\//i.test(row.thumbnail) ? row.thumbnail : '',
         priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
         priceText: String(row.price || '').slice(0, 60),
         rating: row.rating ?? null,
         reviews: row.reviews ?? null,
-        voltageConfirmed
+        voltageStatus,
+        voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT'
       };
     }).filter(p => p.title && p.priceValue && p.link);
     const confirmed = products.filter(p => p.voltageConfirmed);
     return json({
       searchId: new Date().toISOString(),
       query,
-      products: confirmed,
-      ignoredForVoltage: products.length - confirmed.length,
+      products: discover ? products : confirmed,
+      ignoredForVoltage: products.filter(p => p.voltageStatus === 'UNKNOWN' || p.voltageStatus === 'INCOMPATIBLE').length,
       source: 'GOOGLE SHOPPING VIA SERPAPI'
     });
   } catch (error) {
