@@ -85,7 +85,7 @@ export async function POST(request) {
     return json({
       searchId: new Date().toISOString(),
       query,
-      products: discover ? products : confirmed,
+      products,
       ignoredForVoltage: products.filter(p => p.voltageStatus === 'UNKNOWN' || p.voltageStatus === 'INCOMPATIBLE').length,
       source: 'GOOGLE SHOPPING VIA SERPAPI'
     });
