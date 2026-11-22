@@ -27,6 +27,7 @@ function plainText(value) {
   return String(value || '');
 }
 function normalizeModel(value) { return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\\.)google\\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
 function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
 function technicalData(row) {
   const title = String(row.title || '').slice(0, 300);
@@ -49,7 +50,8 @@ function technicalData(row) {
   const priceValue = Number(rawPrice);
   return {
     title, description, source: String(row.source || row.seller || 'LOJA').slice(0, 100),
-    link: typeof (row.link || row.product_link) === 'string' && /^https:\/\/(?!localhost)/i.test(row.link || row.product_link) ? (row.link || row.product_link) : '',
+    link: directStoreUrl(row.link) || directStoreUrl(row.product_link),
+    productId: String(row.product_id || ''),
     thumbnail: typeof (row.thumbnail || row.thumbnail_url || row.thumbnail_link) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url || row.thumbnail_link) ? (row.thumbnail || row.thumbnail_url || row.thumbnail_link) : '',
     priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
     priceText: String(row.price || '').slice(0, 60),
@@ -97,6 +99,12 @@ export async function POST(request) {
       if (!response.ok) throw new Error('SEARCH_PROVIDER_' + response.status);
       return response.json();
     };
+    const productLookup = async productId => {
+      const params = new URLSearchParams({ engine: 'google_product', product_id: String(productId), offer_view: 'true', gl: 'br', hl: 'pt-br', api_key: apiKey });
+      const response = await fetch('https://serpapi.com/search.json?' + params.toString(), { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(12000), cache: 'no-store' });
+      if (!response.ok) throw new Error('PRODUCT_LOOKUP_' + response.status);
+      return response.json();
+    };
     const searchBase = requestedModel ? '"' + requestedModel + '" ' + query.replace(requestedModel, '').trim() : '"' + query + '"';
     const queries = [searchBase + ' 220V', searchBase + ' BIVOLT'];
     const rows = [], seen = new Set();
@@ -125,7 +133,49 @@ export async function POST(request) {
         if (rows.length) source = 'RESULTADOS DE PRODUTOS E LOJAS';
       } catch (fallbackError) { console.warn('fallback search unavailable', fallbackError); }
     }
-    const products = rows.map(technicalData).filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p) && (discover || (p.priceValue && p.link)));
+    const rawProducts = rows.map(technicalData).filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p));
+    const products = await Promise.all(rawProducts.slice(0, 10).map(async base => {
+      if (!base.productId) return base;
+      try {
+        const productResponse = await productLookup(base.productId);
+        const product = productResponse.product_results || {};
+        const attributes = product.product_attributes || [];
+        const description = [product.about_the_product?.description, plainText(product.about_the_product?.features), plainText(attributes), base.description].filter(Boolean).join(' · ');
+        const merged = technicalData({ ...base, title: product.title || base.title, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, snippet: description, attributes });
+        const offers = (Array.isArray(product.stores) ? product.stores : []).map(store => {
+          const link = directStoreUrl(store.link);
+          const priceValue = Number(store.extracted_price ?? store.price ?? 0);
+          const offerTech = technicalData({ title: [product.title, store.title].filter(Boolean).join(' '), snippet: description, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, attributes });
+          const model = offerTech.model || merged.model || base.model;
+          const capacity = offerTech.capacity || merged.capacity || base.capacity;
+          const voltageStatus = offerTech.voltageStatus !== 'UNKNOWN' ? offerTech.voltageStatus : merged.voltageStatus;
+          return { store: String(store.name || base.source || 'LOJA'), title: String(store.title || product.title || base.title), priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null, shipping: Number(store.shipping_extracted || 0) || 0, link, thumbnail: base.thumbnail, model, capacity, power: offerTech.power || merged.power || base.power, warranty: offerTech.warranty || merged.warranty || base.warranty, rating: merged.rating, ratingCount: merged.ratingCount, dimensions: merged.dimensions, voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT' };
+        }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && offer.capacity.replace(/\\s/g, '').replace(',', '.').toUpperCase() === requestedCapacity)));
+        const bestOffer = offers.slice().sort((a,b)=>(a.priceValue+a.shipping)-(b.priceValue+b.shipping))[0];
+        const priceInsights = product.price_insights || {};
+        const history = [];
+        if (String(priceInsights.currency || '').toUpperCase() === 'BRL') {
+          for (const storeHistory of (priceInsights.stores || [])) {
+            const offer = offers.find(o => normalizeModel(o.store) === normalizeModel(storeHistory.name) || normalizeModel(o.store).includes(normalizeModel(storeHistory.name)) || normalizeModel(storeHistory.name).includes(normalizeModel(o.store)));
+            if (!offer) continue;
+            for (const point of (storeHistory.prices || [])) {
+              const parsed = new Date(point.date);
+              const price = Number(point.price);
+              if (!Number.isFinite(parsed.getTime()) || !Number.isFinite(price) || price <= 0) continue;
+              history.push({ store: offer.store, price, priceDate: parsed.toISOString().slice(0,10), url: offer.link, shipping: 0, voltageStatus: offer.voltageStatus, title: offer.title });
+            }
+          }
+        }
+        return { ...merged, link: bestOffer?.link || base.link, source: bestOffer?.store || base.source, priceValue: bestOffer?.priceValue || base.priceValue, priceText: bestOffer ? 'R$ ' + bestOffer.priceValue.toLocaleString('pt-BR',{minimumFractionDigits:2}) : base.priceText, voltageStatus: bestOffer?.voltageStatus || merged.voltageStatus, voltageConfirmed: bestOffer?.voltageConfirmed || merged.voltageConfirmed, offers, priceHistory: history };
+      } catch (lookupError) { console.warn('google product enrichment unavailable', base.title, lookupError); return base; }
+    }));
+    const filteredProducts = products.filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p) && (discover || (p.priceValue && p.link)));
+    return json({
+      searchId: new Date().toISOString(), query, products: filteredProducts,
+      ignoredForVoltage: rows.length - filteredProducts.length,
+      searchWindow: discover ? null : 'CURRENT_OFFERS', requestedModel,
+      source
+    });
     return json({
       searchId: new Date().toISOString(), query, products,
       ignoredForVoltage: rows.length - products.length,
