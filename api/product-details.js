@@ -38,7 +38,8 @@ export async function POST(request){
   const image=Array.isArray(product.image)?product.image[0]:typeof product.image==='object'?product.image.url:product.image;
   const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
   const pageText=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
-  const creditMatch=pageText.match(/(?:no\s+cr[eé]dito|cart[aã]o)[^R$]{0,30}R\$\s*([\d.,]+)/i);
+  const creditCandidate=pageText.match(/(?:no\s+cr[eé]dito|cart[aã]o)[^R$]{0,30}R\$\s*([\d.,]+)/i);
+  const creditMatch=creditCandidate&&!/\b\d{1,2}\s*x\b/i.test(creditCandidate[0])?creditCandidate:null;
   const installmentMatch=pageText.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
   const installmentPlan=installmentMatch?installmentMatch[0]:'';
   const installmentTotal=installmentMatch?moneyValue(installmentMatch[2])*Number(installmentMatch[1]):null;
