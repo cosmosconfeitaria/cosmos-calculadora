@@ -28,12 +28,12 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 h1{font-size:clamp(34px,7vw,56px);line-height:.98;letter-spacing:-1.5px;font-weight:500;margin:0;color:var(--blue)}
 .intro{text-transform:uppercase;font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
 .toolbar{display:grid;grid-template-columns:1fr auto auto auto;gap:9px;align-items:center;margin-bottom:14px}
-input,select,textarea{text-transform:uppercase;width:100%;border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
+input,select,textarea{text-transform:uppercase;width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
 input::placeholder,textarea::placeholder{ text-transform:uppercase; opacity:.65 } textarea{min-height:80px;resize:vertical;line-height:1.45}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21a}
 label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
 .field{min-width:0}
-.silver{border-radius:7px;padding:12px 14px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;white-space:nowrap}
+.silver{border-radius:8px;padding:12px 14px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.35px;text-transform:uppercase;white-space:nowrap}
 .silver:active,.back:active,.icon-button:active{transform:translateY(2px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}
 .icon-button{width:42px;height:40px;border-radius:8px;position:relative;font-size:17px}
 .dot{position:absolute;right:7px;top:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1px solid white}
@@ -53,7 +53,7 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .item-actions button{font-size:10px;padding:8px 10px}
 .small-link{color:var(--blue);font-size:10px;text-decoration:underline;overflow-wrap:anywhere}
 .pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);font-size:9px;color:var(--muted);margin:5px 4px 0 0}
-.empty-state{border:1px dashed #c8c4bd;padding:28px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
+.empty-state{text-transform:uppercase;border:1px dashed #c8c4bd;padding:28px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
 .panel{border:1px solid var(--line);background:#fff;padding:16px;margin:12px 0;box-shadow:0 2px 0 #dedbd6}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .full{grid-column:1/-1}
@@ -61,7 +61,7 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .form-actions .silver{min-width:120px}
 .subhead{text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:var(--blue);margin:18px 0 10px;font-weight:500}
-.calc{background:var(--cream);padding:12px;border:1px solid var(--line);font-size:11px;line-height:1.6}
+.calc{text-transform:uppercase;background:var(--cream);padding:12px;border:1px solid var(--line);font-size:11px;line-height:1.6}
 .calc strong{font-size:17px;font-weight:500;color:var(--blue)}
 .store-row{display:grid;grid-template-columns:1.1fr 1fr .8fr 1fr auto;gap:7px;margin:8px 0;align-items:end}
 .store-row input{font-size:11px;padding:10px 8px}
@@ -118,7 +118,9 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 <div class="field"><label>NÚMERO DE PARCELAS SEM JUROS</label><input name="installments" type="number" min="1" max="48" step="1" placeholder="ex.: 10"></div>
 <div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
 <div class="field"><label>CAPACIDADE / DIMENSÕES</label><input name="capacity" placeholder="ex.: tigela 7,6 L"></div>
-<div class="field"><label>GARANTIA</label><input name="warranty" placeholder="ex.: 12 meses"></div>
+<div class="field"><label>GARANTIA</label><input name="warranty" placeholder="EX.: 12 MESES"></div>
+<div class="field"><label>POTÊNCIA</label><input name="power" placeholder="EX.: 500 W"></div>
+<div class="field"><label>QUALIDADE / CONFIABILIDADE</label><input name="quality" placeholder="MATERIAIS, DURABILIDADE, DEFEITOS RECORRENTES..."></div>
 <div class="field"><label>AVALIAÇÃO / RESUMO DE REVIEWS</label><input name="reviews" placeholder="nota, pontos positivos e negativos"></div>
 <div class="field"><label>ASSISTÊNCIA / PEÇAS DE REPOSIÇÃO</label><input name="support" placeholder="rede autorizada, peças..."></div>
 <div class="field full"><label>ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="fit" placeholder="capacidade real para nossos lotes, frequência de uso, espaço..."></textarea></div>
@@ -266,7 +268,7 @@ async function showDetail(id){
  $('detailContent').innerHTML=(img?'<img src="'+img+'" style="width:min(220px,100%);max-height:190px;object-fit:contain;background:var(--cream);margin-bottom:12px">':'')+
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · VOLTAGEM: 220V · TIPO: '+esc(d.productType||'NÃO DEFINIDO')+' · IMPORTÂNCIA: '+esc(item.importance)+'</div>'+
  '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button></div>'+
- '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'
+ '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+
  '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
  '<div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
