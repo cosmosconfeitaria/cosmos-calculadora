@@ -71,20 +71,20 @@ export async function POST(request) {
       } catch (fallbackError) { console.warn('fallback search unavailable', fallbackError); }
     }
     const products = rows.map(row => {
-      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\\d,.-]/g, '').replace(/\\.(?=\\d{3}(?:\\D|$))/g, '').replace(',', '.');
+      const rawPrice = String(row.extracted_price ?? row.price ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
       const priceValue = Number(rawPrice);
       const title = String(row.title || '').slice(0, 300);
       const description = String(row.snippet || row.description || '').slice(0, 700);
       const evidence = [title, description].filter(Boolean).join(' ');
       let voltageStatus = 'UNKNOWN';
-      if (/\\b(110|127)\\s?V\\b|\\b(110|127)\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
-      else if (/\\bBIVOLT\\b|\\b100\\s?A\\s?240\\s?V\\b/i.test(evidence)) voltageStatus = 'BIVOLT';
-      else if (/\\b220\\s?V\\b|\\b220\\s?VOLTS?\\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
+      if (/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'INCOMPATIBLE';
+      else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
+      else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
       return {
         title, description,
         source: String(row.source || row.seller || 'GOOGLE SHOPPING').slice(0, 100),
-        link: typeof row.link === 'string' && /^https:\\/\\/(?!localhost)/i.test(row.link) ? row.link : '',
-        thumbnail: typeof (row.thumbnail || row.thumbnail_url) === 'string' && /^https:\\/\\//i.test(row.thumbnail || row.thumbnail_url) ? (row.thumbnail || row.thumbnail_url) : '',
+        link: typeof row.link === 'string' && /^https:\/\/(?!localhost)/i.test(row.link) ? row.link : '',
+        thumbnail: typeof (row.thumbnail || row.thumbnail_url) === 'string' && /^https:\/\//i.test(row.thumbnail || row.thumbnail_url) ? (row.thumbnail || row.thumbnail_url) : '',
         priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
         priceText: String(row.price || '').slice(0, 60),
         rating: row.rating ?? null, reviews: row.reviews ?? null,
