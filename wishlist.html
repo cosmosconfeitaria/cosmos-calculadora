@@ -301,7 +301,7 @@ function finance(d){
  const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null,now=new Date();
  const months=due?Math.max(1,(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth()):0;
  const remaining=Math.max(0,price-down),planned=Number(d.monthlyContribution||0),saved=Number(d.savedAmount||0),method=d.paymentMethod||'PIX / À VISTA';
- const saveTarget=method==='CARTÃO DE CRÉDITO'?down:(method==='A COMBINAR'&&down>0?down:price),monthlyNeed=months?saveTarget/months:0,installment=parts>0?remaining/parts:0;
+ const saveTarget=method==='CARTÃO DE CRÉDITO'?down:(method==='A COMBINAR'&&down>0?down:price),monthlyNeed=months?Math.max(0,saveTarget-saved)/months:0,installment=parts>0?remaining/parts:0;
  return {months,monthlyNeed,installment,remaining,planned,saved,down,price,method,parts,saveTarget};
 }
 function calcHtml(d){
@@ -320,11 +320,6 @@ function calcHtml(d){
   if(f.parts>0)html+='<div class="finance-line"><span>SIMULAÇÃO · '+f.parts+'X SEM JUROS</span><b>'+money(f.installment)+'/MÊS</b></div>';
  }
  html+='<div class="finance-line"><span>PRAZO DISPONÍVEL</span><b>'+f.months+' '+monthLabel+'</b></div>';
-  const startDate=new Date((d.addedAt||today())+'T12:00:00'),dueDate=new Date(d.targetDate+'T12:00:00');
- const totalMonths=Math.max(1,Math.ceil((dueDate-startDate)/(1000*60*60*24*30.4375)));
- const elapsed=Math.max(0,Math.min(totalMonths,totalMonths-f.months)),expected=f.saveTarget*(elapsed/totalMonths),percent=f.saveTarget?Math.min(100,f.saved/f.saveTarget*100):0;
- const pace=f.saveTarget?(f.saved>=expected?'NO RITMO OU À FRENTE':'ABAIXO DO RITMO PREVISTO'):'NENHUMA ENTRADA DEFINIDA',neededNow=f.months&&f.saveTarget?Math.max(0,(f.saveTarget-f.saved)/f.months):0;
- html+='<div class="finance-progress"><div class="finance-line"><span>PROGRESSO GUARDADO</span><b>'+money(f.saved)+' DE '+(f.saveTarget?money(f.saveTarget):'SEM ENTRADA')+'</b></div>'+(f.saveTarget?'<div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div>':'')+'<div class="finance-line"><span>AVALIAÇÃO DO RITMO</span><b>'+pace+'</b></div>'+(f.saveTarget?'<div class="finance-line"><span>PARA CHEGAR AO PRAZO A PARTIR DE AGORA</span><b>'+money(neededNow)+'/MÊS</b></div>':'')+'</div>';
  return html;
 }
 function updateFinancePreview(){
