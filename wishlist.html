@@ -125,6 +125,19 @@ footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,
 footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
 @media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
 
+
+/* SELETORES COSMOS: MESMO COMPONENTE DA CALCULADORA DE RECEITAS */
+.key-flavor-select{position:relative;width:100%;min-width:0}
+.key-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;opacity:0!important;pointer-events:none!important}
+.key-select-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #d4d1cc;border-radius:10px;background:#fff;color:var(--blue);padding:13px 12px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.02em;text-align:left;cursor:pointer;box-shadow:none}
+.key-select-trigger .chevron{font-size:13px;line-height:1;transition:transform .15s ease}
+.key-select-trigger[aria-expanded="true"] .chevron{transform:rotate(180deg)}
+.key-flavor-menu{position:absolute;z-index:50;top:calc(100% + 4px);left:0;width:100%;max-height:245px;overflow-y:auto;overscroll-behavior:contain;background-color:rgba(246,244,241,.94);background-image:radial-gradient(ellipse at 17% 20%,rgba(155,145,130,.075),transparent 38%),radial-gradient(ellipse at 82% 72%,rgba(255,255,255,.58),transparent 42%),linear-gradient(135deg,rgba(255,255,255,.28),rgba(190,180,165,.035) 48%,rgba(255,255,255,.2));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(28,38,55,.16),inset 0 1px 2px rgba(255,255,255,.7);border:0;border-radius:0;padding:5px 0}
+.key-flavor-menu[hidden]{display:none}
+.key-flavor-option{display:block;width:100%;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--blue);padding:8px 13px;text-align:left;font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.015em;cursor:pointer}
+.key-flavor-option:hover,.key-flavor-option[aria-selected="true"]{background:rgba(34,99,210,.09);color:var(--blue)}
+.key-flavor-option:focus-visible{outline:1px solid var(--blue);outline-offset:-2px}
+
 </style>
 </head>
 <body>
@@ -235,7 +248,7 @@ function updateFinancePreview(){
  $('financePreview').innerHTML=calcHtml(d);
 }
 const SUBCATEGORIES={
- 'EQUIPAMENTOS':['BATEDEIRAS','FORNOS','FREEZERS','GELADEIRAS','MISTURADORES','PROCESSADORES','BALANÇAS','CLIMATIZAÇÃO','OUTROS EQUIPAMENTOS'],
+ 'EQUIPAMENTOS':['BATEDEIRA','FORNO','FREEZER','GELADEIRA','MISTURADOR','PROCESSADOR','BALANÇA','CLIMATIZAÇÃO','OUTROS EQUIPAMENTOS'],
  'REFORMA':['ELÉTRICA','HIDRÁULICA','MARCENARIA','PINTURA','ILUMINAÇÃO','REVESTIMENTOS','MÓVEIS PLANEJADOS','OUTROS'],
  'ACESSÓRIOS':['PEÇAS DE REPOSIÇÃO','ACESSÓRIOS DE EQUIPAMENTOS','ORGANIZAÇÃO','OUTROS'],
  'UTENSÍLIOS':['FORMAS E ASSADEIRAS','ESPÁTULAS E RASPADORES','MEDIDORES E BALANÇAS','PENEIRAS E CORTADORES','PANELAS E TIGELAS','OUTROS'],
@@ -254,7 +267,7 @@ function openForm(item){
  $('formTitle').textContent=item?'EDITAR ITEM':'NOVO ITEM';
  if(item){
   const d=item.data||{};
-  Object.entries({title:item.title,category:item.category,importance:item.importance,...d}).forEach(([k,v])=>{const el=$('itemForm').elements[k];if(el&&el.type!=='file'&&v!=null&&el.type!=='select-one')el.value=v});
+  Object.entries({title:item.title,category:item.category,importance:item.importance,...d}).forEach(([k,v])=>{const el=$('itemForm').elements[k];if(el&&el.type!=='file'&&v!=null)el.value=v});
   $('itemForm').elements.category.value=item.category||'EQUIPAMENTOS';
   updateItemSubcategory(d.subcategory||'');
   if(d.productType)$('itemForm').elements.productType.value=d.productType;
@@ -304,7 +317,7 @@ function selectedSubcategories(){
  return result;
 }
 function renderSubcategoryFilters(){
- const selected=selectedCategories(),host=$('subcategoryFilters');
+ const selected=selectedCategories(),host=$('subcategoryFilters'),previous=selectedSubcategories();
  host.innerHTML='';
  if(!selected.length){host.classList.add('hidden');return}
  host.classList.remove('hidden');
@@ -313,6 +326,7 @@ function renderSubcategoryFilters(){
   const options=SUBCATEGORIES[category]||['OUTROS'];
   group.innerHTML='<button type="button" class="subcategory-trigger" aria-expanded="false"><span>'+esc(category)+' · SUBCATEGORIAS</span><span class="chevron">⌄</span></button><div class="subcategory-menu" hidden>'+options.map(value=>'<label class="subcategory-option"><input type="checkbox" value="'+esc(value)+'"><span>'+esc(value)+'</span></label>').join('')+'</div>';
   const trigger=group.querySelector('.subcategory-trigger'),menu=group.querySelector('.subcategory-menu');
+  group.querySelectorAll('input[type="checkbox"]').forEach(input=>{input.checked=(previous[category]||[]).includes(input.value)});
   trigger.addEventListener('click',()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))});
   group.addEventListener('change',render);
   host.append(group);
@@ -322,8 +336,8 @@ function activeItems(){
  const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),cats=selectedCategories(),subs=selectedSubcategories();
  return items.filter(x=>{
   const categoryMatch=!cats.length||cats.includes(x.category);
-  const categorySubfilters=cats.filter(c=>(subs[c]||[]).length);
-  const subcategoryMatch=!categorySubfilters.length||categorySubfilters.some(c=>c===x.category&&(subs[c]||[]).includes(x.data?.subcategory));
+  const selectedSubs=subs[x.category]||[];
+  const subcategoryMatch=!selectedSubs.length||selectedSubs.includes(x.data?.subcategory||x.data?.productType);
   const searchMatch=!term||(x.title+' '+(x.data.model||'')+' '+x.category+' '+(x.data.subcategory||'')).toLocaleLowerCase('pt-BR').includes(term);
   return x.status==='WISHLIST'&&categoryMatch&&subcategoryMatch&&searchMatch;
  }).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
@@ -467,5 +481,37 @@ async function init(){
 init();
 })();
 </script>
+
+<script>
+/* SELETORES COSMOS: REPLICA O COMPONENTE DA CALCULADORA */
+(function(){
+ function setupSelectMenu(select){
+  if(!select||select.dataset.cosmosSelectReady)return;
+  select.dataset.cosmosSelectReady='1';
+  const control=document.createElement('div');control.className='key-flavor-select';
+  const trigger=document.createElement('button');trigger.type='button';trigger.className='key-select-trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-label',select.getAttribute('aria-label')||select.name||'SELECIONAR');
+  const triggerText=document.createElement('span'),chevron=document.createElement('span');chevron.className='chevron';chevron.textContent='⌄';trigger.append(triggerText,chevron);
+  const menu=document.createElement('div');menu.className='key-flavor-menu';menu.setAttribute('role','listbox');menu.hidden=true;
+  select.parentNode.insertBefore(control,select);control.append(select,trigger,menu);select.classList.add('key-select-native');
+  const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+  function sync(){
+   const option=select.options[select.selectedIndex]||select.options[0];triggerText.textContent=option?option.textContent:'SELECIONE';
+   menu.innerHTML='';
+   Array.from(select.options).forEach(opt=>{
+    const item=document.createElement('button');item.type='button';item.className='key-flavor-option';item.setAttribute('role','option');item.textContent=opt.textContent;item.setAttribute('aria-selected',String(opt.value===select.value));
+    item.addEventListener('click',()=>{select.value=opt.value;select.dispatchEvent(new Event('change',{bubbles:true}));sync();close();trigger.focus()});menu.append(item);
+   });
+  }
+  trigger.addEventListener('click',()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden)sync()});
+  select.addEventListener('change',sync);
+  document.addEventListener('click',e=>{if(!control.contains(e.target))close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){close();trigger.focus()}});
+  new MutationObserver(sync).observe(select,{childList:true,subtree:true,attributes:true});
+  sync();
+ }
+ document.querySelectorAll('#itemForm select').forEach(setupSelectMenu);
+})();
+</script>
+
 </body>
 </html>
