@@ -115,11 +115,14 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <div class="toolbar" style="grid-template-columns:1fr">
 <a class="silver nav-action" href="wishlist.html">VOLTAR À WISHLIST</a>
 </div>
-<div class="section-line"><h2>ITENS ADQUIRIDOS</h2><span class="count" id="achievementCount">0 CONQUISTAS</span></div>
+<div class="section-line"><h2>CONQUISTAS</h2><span class="count" id="achievementCount">0 CONQUISTAS</span></div>
 <div class="cards" id="achievementItems"><div class="empty-state">CARREGANDO SUAS CONQUISTAS...</div></div>
+<div class="section-line"><h2>FAVORITOS</h2><span class="count" id="favoriteCount">0 FAVORITOS</span></div>
+<p class="meta">PRODUTOS QUE VOCÊ FAVORITOU, MAS AINDA NÃO ADICIONOU À WISHLIST.</p>
+<div class="cards" id="favoriteItems"><div class="empty-state">CARREGANDO SEUS FAVORITOS...</div></div>
 <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
-    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
+    <div class="line-tagline">NOT YOUR AVERAGE COOKIE</div>
     <div class="line-est">EST. 2024</div>
   </footer>
 </div>
@@ -146,8 +149,14 @@ async function init(){
  $('achievementCount').textContent=rows.length+' CONQUISTA(S)';
  $('achievementItems').innerHTML=rows.map(row=>{
   const d=row.data||{};
-  return '<article class="item"><div class="item-top"><div class="thumb empty">★</div><div style="min-width:0"><h3>'+esc(row.title)+'</h3><div class="meta">'+esc(row.category)+' · '+esc(d.productType||'')+' · '+esc(d.model||'')+'</div><span class="pill">220V</span></div></div><div class="price">'+money(d.paidPrice)+'</div><div class="meta">ADICIONADO À WISHLIST: '+date(d.addedAt)+'<br>COMPRADO EM: '+date(d.purchaseDate)+'</div>'+(d.targetPrice?'<div class="meta">PREÇO-ALVO: '+money(d.targetPrice)+'</div>':'')+(d.referenceUrl?'<p><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+'</article>';
+  return '<article class="item"><div class="item-top"><div class="thumb empty">★</div><div style="min-width:0"><h3>'+esc(row.title)+'</h3><div class="meta">'+esc(row.category)+' · '+esc(d.productType||d.subcategory||'')+' · '+esc(d.model||'')+'</div><span class="pill">220V</span></div></div><div class="price">'+money(d.paidPrice)+'</div><div class="meta">ADICIONADO À WISHLIST: '+date(d.addedAt)+'<br>COMPRADO EM: '+date(d.purchaseDate)+'</div>'+(d.targetPrice?'<div class="meta">PREÇO-ALVO: '+money(d.targetPrice)+'</div>':'')+(d.referenceUrl?'<p><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+'</article>';
  }).join('')||'<div class="empty-state">AINDA NÃO HÁ CONQUISTAS REGISTRADAS.<br>QUANDO VOCÊ MARCAR UM ITEM COMO COMPRADO NA WISHLIST, ELE APARECERÁ AQUI.</div>';
+ const favorites=await client.from('cosmos_wishlist_items').select('*').eq('status','FAVORITE').order('created_at',{ascending:false});
+ if(favorites.error){$('favoriteItems').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CARREGAR OS FAVORITOS: '+esc(favorites.error.message)+'</div>';return}
+ const favRows=favorites.data||[];$('favoriteCount').textContent=favRows.length+' FAVORITO(S)';
+ $('favoriteItems').innerHTML=favRows.map(row=>{const d=row.data||{};return '<article class="item"><div class="item-top"><div class="thumb empty">☆</div><div style="min-width:0"><h3>'+esc(row.title)+'</h3><div class="meta">'+esc(row.category)+' · '+esc(d.model||'')+'</div><span class="pill">'+esc(d.voltage||'220V')+'</span></div></div>'+(d.currentPrice?'<div class="price">'+money(d.currentPrice)+'</div>':'')+(d.referenceUrl?'<p><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR ANÚNCIO</a></p>':'')+'<div class="item-actions"><button class="silver" type="button" data-promote="'+row.id+'">ADICIONAR À WISHLIST</button><button class="silver" type="button" data-remove="'+row.id+'">REMOVER</button></div></article>'}).join('')||'<div class="empty-state">NENHUM FAVORITO SALVO POR ENQUANTO.</div>';
+ $('favoriteItems').onclick=async event=>{const promote=event.target.closest('[data-promote]'),remove=event.target.closest('[data-remove]');if(promote){const {error}=await client.from('cosmos_wishlist_items').update({status:'WISHLIST',updated_at:new Date().toISOString()}).eq('id',promote.dataset.promote);if(error){alert(error.message);return}init()}if(remove){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',remove.dataset.remove);if(error){alert(error.message);return}init()}};
+
 }
 init();
 })();
