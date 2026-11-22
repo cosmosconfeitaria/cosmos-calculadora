@@ -34,8 +34,9 @@ function parseDisplayedPrice(row) {
   const parse=v=>Number(String(v).replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));
   const installment=/\b\d{1,2}\s*x\s*(?:de|\s)/i;
   const valid=matches.filter(m=>!installment.test(text.slice(Math.max(0,m.index-14),m.index+2)));
-  const cashContext=valid.find(m=>/por\s*$/i.test(text.slice(Math.max(0,m.index-12),m.index))||/à\s?vista/i.test(text.slice(m.index,m.index+35)));
-  const cashMatch=cashContext||valid[0]||null;
+  const promotionalPrice=valid.find(m=>/por\s*$/i.test(text.slice(Math.max(0,m.index-12),m.index)));
+  const cashContext=valid.find(m=>/à\s?vista/i.test(text.slice(m.index,m.index+35)));
+  const cashMatch=promotionalPrice||cashContext||valid[0]||null;
   const creditMatch=matches.find(m=>/cr[eé]dito|cart[aã]o/i.test(text.slice(Math.max(0,m.index-30),m.index+24))&&!installment.test(text.slice(Math.max(0,m.index-14),m.index+2)));
   const installmentText=(text.match(/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s juros|com\s juros))?/i)||[])[0]||'';
   const installmentMatch=text.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
