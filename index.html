@@ -195,7 +195,7 @@ $('accountLogout').addEventListener('click',async()=>{
 });
 if(client)client.auth.onAuthStateChange((_event,session)=>{
  Promise.resolve().then(async()=>{
-  if(_event==='SIGNED_IN'||_event==='INITIAL_SESSION'){
+  if(_event==='INITIAL_SESSION'){
    serverSessionReady=session?await syncServerSession(session):false;
    showSession(session?.user||null);
    if(serverSessionReady&&new URLSearchParams(window.location.search).get('auth')==='required')window.location.replace('wishlist.html');
