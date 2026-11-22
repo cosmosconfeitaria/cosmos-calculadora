@@ -15,6 +15,7 @@ function sameOrigin(request){const origin=request.headers.get('origin');if(!orig
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store, private'}})}
 function cookie(request){const p=(request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE_NAME+'='));return p?decodeURIComponent(p.slice(COOKIE_NAME.length+1)):''}
 function clean(s){return String(s||'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()}
+function moneyValue(value){if(value==null||value==='')return null;const raw=String(value).replace(/[^0-9,.-]/g,'');const normalized=raw.includes(',')?raw.replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'):raw;const n=Number(normalized);return Number.isFinite(n)&&n>0?n:null}
 function meta(html,key){for(const tag of html.matchAll(/<meta\b[^>]*>/gi)){const attrs={};for(const m of tag[0].matchAll(/([\w:-]+)\s*=\s*["']([^"']*)["']/g))attrs[m[1].toLowerCase()]=m[2];if((attrs.property||attrs.name)===key)return clean(attrs.content)}return ''}
 function findProductJson(value,out=[]){if(!value||typeof value!=='object')return out;if(Array.isArray(value)){for(const v of value)findProductJson(v,out);return out}const type=value['@type'];if(type==='Product'||(Array.isArray(type)&&type.includes('Product')))out.push(value);for(const v of Object.values(value))if(v&&typeof v==='object')findProductJson(v,out);return out}
 export async function POST(request){
@@ -36,10 +37,13 @@ export async function POST(request){
   const brand=typeof product.brand==='string'?product.brand:product.brand?.name||'';
   const image=Array.isArray(product.image)?product.image[0]:typeof product.image==='object'?product.image.url:product.image;
   const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
+  const pageText=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
+  const creditMatch=pageText.match(/(?:no\s+cr[eé]dito|cart[aã]o)[^R$]{0,30}R\$\s*([\d.,]+)/i);
+  const installmentPlan=(pageText.match(/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+/i)||[])[0]||'';
   const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
   const description=product.description||meta(html,'og:description')||meta(html,'description');
   const titleModel=(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}\s+(?:PLUS|PRO|MAX|DIGITAL|ELETRÔNICA|ELETRONICA)\b/i)||[])[0]||'';const sku=titleModel||product.sku||product.mpn||product.model||meta(html,'product:retailer_item_id')||meta(html,'og:sku')||(String(description||'').match(/modelo\s*[:\-]\s*([A-Z0-9-]+)/i)||[])[1]||(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}(?:\s+[A-Z0-9]+)?\b/)||[])[0]||'';
-  const textContent=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
+  const textContent=pageText;
   const voltage=(textContent.match(/\b(?:BIVOLT|110\s?V|127\s?V|220\s?V|100\s?A\s?240\s?V)\b/i)||[])[0]||'';
   const warranty=(textContent.match(/garantia.{0,35}(?:\d+\s*(?:mes(?:es)?|anos?))/i)||[])[0]||'';
   const properties=Array.isArray(product.additionalProperty)?product.additionalProperty:[];
@@ -54,6 +58,6 @@ export async function POST(request){
   for(const term of featureTerms){const match=textContent.match(new RegExp('.{0,65}'+term+'.{0,100}','i'));if(match){const line=clean(match[0]);if(line.length>12&&!featureLines.some(x=>x.toLowerCase()===line.toLowerCase()))featureLines.push(line)}}
   const specs=[...propertySpecs,...featureLines].filter((line,i,all)=>all.findIndex(x=>x.toLowerCase()===line.toLowerCase())===i).slice(0,18).join('\n');
   const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+specs),description&&('DESCRIÇÃO DO FABRICANTE: '+clean(description))].filter(Boolean).join('\n');
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice:moneyValue(price),creditPrice:creditMatch?moneyValue(creditMatch[1]):null,installmentPlan,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
