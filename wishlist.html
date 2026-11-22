@@ -414,7 +414,7 @@ async function patchData(id,data){
  const {error}=await client.from('cosmos_wishlist_items').update({data,updated_at:new Date().toISOString()}).eq('id',id);
  if(error)throw error;await load();
 }
-function showInbox(){
+async function showInbox(){
  $('inboxPopup').classList.remove('hidden');
  $('notices').innerHTML=notices.map(n=>'<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title)+'</strong><br>preço em '+esc(n.store)+' caiu '+n.drop+'%: '+money(n.price)+'<br><span class="meta">'+date(n.at)+'</span></div>').join('')||'<p class="meta">nenhuma notificação por enquanto. quedas de 5% ou mais em preços registrados aparecem aqui.</p>';
  for(const item of items){if((item.data.priceHistory||[]).some(h=>h.alert&&!h.read)){const data={...item.data,priceHistory:item.data.priceHistory.map(h=>h.alert?{...h,read:true}:h)};await patchData(item.id,data)}}
