@@ -265,24 +265,40 @@ const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function finance(d){
- const price=Number(d.targetPrice||0),down=Number(d.downPayment||0),parts=Number(d.installments||0);
- const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null;
- const now=new Date();let months=due?Math.max(1,(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth()):0;
- const remaining=Math.max(0,price-down);
- const cash=months?price/months:0,saveDown=months?down/months:0,install=parts?remaining/parts:0,planned=Number(d.monthlyContribution||0);
- return {months,cash,saveDown,install,commit:saveDown+install,remaining,planned};
+ const price=Number(d.targetPrice||0),down=Math.min(price,Number(d.downPayment||0)),parts=Math.max(0,Number(d.installments||0));
+ const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null,now=new Date();
+ const months=due?Math.max(1,(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth()):0;
+ const remaining=Math.max(0,price-down),planned=Number(d.monthlyContribution||0),saved=Number(d.savedAmount||0),method=d.paymentMethod||'PIX / À VISTA';
+ const saveTarget=method==='CARTÃO DE CRÉDITO'&&down>0?down:price,monthlyNeed=months?saveTarget/months:0,installment=parts>0?remaining/parts:0;
+ return {months,monthlyNeed,installment,remaining,planned,saved,down,price,method,parts,saveTarget};
 }
 function calcHtml(d){
- const f=finance(d),monthsLabel=f.months===1?'MÊS':'MESES';
- if(!Number(d.targetPrice)||!d.targetDate)return '<span class="finance-empty">PREENCHA O PREÇO-ALVO E A DATA PREVISTA PARA VISUALIZAR SEU PLANEJAMENTO.</span>';
- const method=d.paymentMethod||'PIX / À VISTA';
- if(Number(d.installments)>0&&method==='CARTÃO DE CRÉDITO'){
-  const details='<div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(method)+'</b></div><div class="finance-line"><span>PARCELAMENTO</span><b>'+esc(d.installments)+'X SEM JUROS</b></div>';
-  const contribution=f.planned?'<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>':'';
-  return '<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div>'+details+'<div class="finance-main"><span>GUARDAR PARA A ENTRADA</span><strong>'+money(f.saveDown)+'/MÊS</strong></div><div class="finance-line"><span>PARCELA ESTIMADA</span><b>'+money(f.install)+'/MÊS · '+esc(d.installments)+'X</b></div><div class="finance-line"><span>COMPROMISSO MENSAL NAS PARCELAS</span><b>'+money(f.commit)+'</b></div>'+contribution;
+ const f=finance(d),monthLabel=f.months===1?'MÊS':'MESES';
+ if(!f.price||!d.targetDate)return '<span class="finance-empty">PREENCHA O PREÇO-ALVO E A DATA PREVISTA PARA VISUALIZAR SEU PLANEJAMENTO.</span>';
+ let html='<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div><div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(f.method)+'</b></div>';
+ if(f.method==='PIX / À VISTA'){
+  html+='<div class="finance-main"><span>VALOR A JUNTAR PARA PAGAR À VISTA</span><strong>'+money(f.monthlyNeed)+'/MÊS</strong></div>';
+ }else if(f.method==='CARTÃO DE CRÉDITO'){
+  if(f.down>0)html+='<div class="finance-main"><span>GUARDAR PARA A ENTRADA · '+money(f.down)+'</span><strong>'+money(f.monthlyNeed)+'/MÊS</strong></div>';
+  else html+='<div class="finance-main"><span>VALOR TOTAL A PARCELAR</span><strong>'+money(f.remaining)+'</strong></div>';
+  html+='<div class="finance-line"><span>VALOR RESTANTE APÓS ENTRADA</span><b>'+money(f.remaining)+'</b></div>';
+  html+=f.parts>0?'<div class="finance-line"><span>SIMULAÇÃO · '+f.parts+'X SEM JUROS</span><b>'+money(f.installment)+'/MÊS</b></div>':'<div class="finance-line"><span>SIMULAÇÃO DE PARCELAS</span><b>NÃO DEFINIDA</b></div>';
+ }else{
+  html+='<div class="finance-main"><span>VALOR TOTAL A PLANEJAR</span><strong>'+money(f.price)+'</strong></div><div class="finance-line"><span>VALOR RESTANTE APÓS ENTRADA</span><b>'+money(f.remaining)+'</b></div>';
+  if(f.parts>0)html+='<div class="finance-line"><span>SIMULAÇÃO · '+f.parts+'X SEM JUROS</span><b>'+money(f.installment)+'/MÊS</b></div>';
  }
- const difference=Math.max(0,f.cash-f.planned);
- return '<div class="finance-kicker">PLANEJAMENTO DE COMPRA</div><div class="finance-line"><span>FORMA DE PAGAMENTO</span><b>'+esc(method)+'</b></div><div class="finance-main"><span>'+(method==='PIX / À VISTA'?'PARA COMPRAR À VISTA · GUARDAR':'VALOR A RESERVAR')+'</span><strong>'+money(f.cash)+'/MÊS</strong></div><div class="finance-line"><span>PRAZO</span><b>'+f.months+' '+monthsLabel+'</b></div>'+(method==='CARTÃO DE CRÉDITO'?'<div class="finance-line"><span>PARCELAMENTO</span><b>NÃO DEFINIDO</b></div>':'')+(f.planned?'<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>':'')+(f.planned&&difference>0?'<div class="finance-gap"><span>FALTAM POR MÊS PARA CUMPRIR O PRAZO</span><strong>'+money(difference)+'</strong></div>':f.planned?'<div class="finance-ok">APORTE PLANEJADO SUFICIENTE PARA CUMPRIR O PRAZO.</div>':'');
+ html+='<div class="finance-line"><span>PRAZO DISPONÍVEL</span><b>'+f.months+' '+monthLabel+'</b></div>';
+ if(f.planned){
+  html+='<div class="finance-line"><span>APORTE PLANEJADO</span><b>'+money(f.planned)+'/MÊS</b></div>';
+  const gap=Math.max(0,f.monthlyNeed-f.planned);
+  html+=gap>0?'<div class="finance-gap"><span>FALTAM POR MÊS PARA CUMPRIR O PRAZO</span><strong>'+money(gap)+'</strong></div>':'<div class="finance-ok">APORTE PLANEJADO SUFICIENTE PARA CUMPRIR O PRAZO.</div>';
+ }
+ const startDate=new Date((d.addedAt||today())+'T12:00:00'),dueDate=new Date(d.targetDate+'T12:00:00');
+ const totalMonths=Math.max(1,Math.ceil((dueDate-startDate)/(1000*60*60*24*30.4375)));
+ const elapsed=Math.max(0,Math.min(totalMonths,totalMonths-f.months)),expected=f.saveTarget*(elapsed/totalMonths),percent=f.saveTarget?Math.min(100,f.saved/f.saveTarget*100):0;
+ const pace=f.saved>=expected?'NO RITMO OU À FRENTE':'ABAIXO DO RITMO PREVISTO',neededNow=f.months?Math.max(0,(f.saveTarget-f.saved)/f.months):0;
+ html+='<div class="finance-progress"><div class="finance-line"><span>PROGRESSO GUARDADO</span><b>'+money(f.saved)+' DE '+money(f.saveTarget)+'</b></div><div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div><div class="finance-line"><span>AVALIAÇÃO DO RITMO</span><b>'+pace+'</b></div><div class="finance-line"><span>PARA CHEGAR AO PRAZO A PARTIR DE AGORA</span><b>'+money(neededNow)+'/MÊS</b></div></div>';
+ return html;
 }
 function updateFinancePreview(){
  const d=Object.fromEntries(new FormData($('itemForm')).entries());
