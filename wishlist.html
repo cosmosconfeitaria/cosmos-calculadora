@@ -452,15 +452,16 @@ async function render(){
 function priceChart(history,range='365',customFrom='',customTo=''){
  const rows=(history||[]).filter(h=>Number(h.price||0)>0),now=new Date();
  let from=new Date(now),to=new Date(now),step='month',rangeLabel='ÚLTIMOS 12 MESES';
- if(range==='90'){from.setDate(from.getDate()-90);step='day';rangeLabel='ÚLTIMOS 90 DIAS'}
- else if(range==='30'){from.setDate(from.getDate()-30);step='day';rangeLabel='ÚLTIMOS 30 DIAS'}
+ if(range==='90'){from.setMonth(from.getMonth()-3);step='day';rangeLabel='ÚLTIMOS 3 MESES'}
+ else if(range==='60'){from.setDate(from.getDate()-60);step='day';rangeLabel='ÚLTIMOS 60 DIAS'}
+ else if(range==='30'){from.setMonth(from.getMonth()-1);step='day';rangeLabel='ÚLTIMO MÊS'}
  else if(range==='custom'){from=customFrom?new Date(customFrom+'T00:00:00'):new Date(now.getFullYear()-1,now.getMonth(),now.getDate());to=customTo?new Date(customTo+'T23:59:59'):now;step='week';rangeLabel='PERÍODO PERSONALIZADO'}
  else{from.setFullYear(from.getFullYear()-1)}
  const filtered=rows.filter(h=>{const d=new Date((h.at||'')+'T12:00:00');return d>=from&&d<=to});
  const buckets=new Map();
  filtered.forEach(h=>{const d=new Date(h.at+'T12:00:00');let key,label;if(step==='month'){key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');label=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}else if(step==='week'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);key=d.toISOString().slice(0,10);label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}else{key=h.at;label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}const value=Number(h.price)+Number(h.shipping||0);const old=buckets.get(key);if(!old||value<old.value)buckets.set(key,{key,label,value})});
  const points=[...buckets.values()].sort((a,b)=>a.key.localeCompare(b.key));
- const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">12 MESES</button><button type="button" class="silver" data-chart-range="90">90 DIAS</button><button type="button" class="silver" data-chart-range="30">30 DIAS</button><button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
+ const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">1 ANO</button><button type="button" class="silver" data-chart-range="90">3 MESES</button><button type="button" class="silver" data-chart-range="30">1 MÊS</button><button type="button" class="silver" data-chart-range="60">60 DIAS</button><button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
  let graph='<div class="chart-empty">AINDA NÃO HÁ PREÇOS REGISTRADOS NESTE PERÍODO. FAÇA UMA BUSCA PARA COMEÇAR A CONSTRUIR O HISTÓRICO.</div>';
  if(points.length){
   const values=points.map(p=>p.value),min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min),W=720,H=250,L=65,R=18,T=18,B=42,iw=W-L-R,ih=H-T-B;
@@ -473,6 +474,7 @@ function priceChart(history,range='365',customFrom='',customTo=''){
  }
  return '<div class="price-chart"><div class="chart-caption">EVOLUÇÃO DO MENOR PREÇO GERAL · '+rangeLabel+'</div>'+controls+graph+'</div>';
 }
+function progressOverview(d){const goal=Number(d.targetPrice||0),saved=Number(d.savedAmount||0),percent=goal>0?Math.min(100,Math.round(saved/goal*100)):0;return '<div class="progress-overview"><div class="progress-overview-head"><span>VALOR GUARDADO · '+money(saved)+' DE '+(goal?money(goal):'PREÇO AINDA NÃO DEFINIDO')+'</span><strong>'+percent+'%</strong></div><div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div><div class="meta">'+(goal?money(Math.max(0,goal-saved))+' RESTANTES PARA A COMPRA':'A REFERÊNCIA DE PREÇO SERÁ CALCULADA APÓS AS PRIMEIRAS BUSCAS')+'</div></div>'}
 function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
 }
@@ -480,37 +482,25 @@ async function showDetail(id){
  const item=items.find(x=>x.id===id);if(!item)return;detailId=id;const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
  const f=finance(d);
  $('detailTitle').textContent=item.title.toUpperCase();
- const links=(d.stores||[]).map(s=>'<p class="meta store-link-row"><strong>'+esc(s.store)+'</strong> · '+(s.price?money(Number(s.price)+Number(s.shipping||0))+(s.shipping?' (com frete)':''):'preço não registrado')+' · <a class="small-link" href="'+esc(s.url)+'" target="_blank" rel="noopener">abrir loja</a></p>').join('')||'<p class="meta">USE FAZER BUSCA DE PREÇOS PARA LOCALIZAR OFERTAS AUTOMATICAMENTE.</p>';
  const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
  $('detailContent').innerHTML=(img?'<img class="detail-product-image" src="'+img+'" alt="">':'')+
- '<div class="meta">ADICIONADO: '+date(d.addedAt)+' · ESPECIFICAÇÕES: <span class="pill">220V</span>'+(d.model?'<span class="pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
+ '<div class="meta">ADICIONADO: '+date(d.addedAt)+'</div><div class="meta">ESPECIFICAÇÕES: '+esc(d.specs||('220V'+(d.model?' · '+d.model:'')))+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR PREÇOS E MODELOS</button><button class="silver" id="detailSearchPrices" type="button">FAZER BUSCA DE PREÇOS</button></div>'+
  '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+
- '<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
- '<div class="subhead">ESPECIFICAÇÕES</div><p class="meta">'+esc(d.specs||'não informado')+'</p><div class="subhead">OBSERVAÇÕES</div><p class="meta">'+esc(d.notes||'—')+'</p>'+
- '<details class="manual-price-entry"><summary>OPÇÕES MANUAIS · ADICIONAR LOJA OU REGISTRAR PREÇO</summary><div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
- '<div class="subhead">REGISTRAR PREÇO VERIFICADO</div><div class="form-grid"><div class="field"><label>LOJA / FONTE</label><input id="priceStore" placeholder="Zoom, JáCotei, Magalu..."></div><div class="field"><label>PREÇO (R$)</label><input id="priceValue" type="number" min="0" step=".01"></div><div class="field"><label>FRETE (R$)</label><input id="priceShip" type="number" min="0" step=".01" value="0"></div><div class="field"><label>LINK DO PRODUTO</label><input id="priceUrl" type="url" placeholder="https://..."></div></div><div class="form-actions"><button class="silver" id="recordPrice" type="button">REGISTRAR PREÇO</button></div></details>'+
+ '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
+ '<div class="subhead">RESUMO TÉCNICO</div><p class="meta technical-summary">'+esc(d.specs||'INFORMAÇÕES TÉCNICAS AINDA NÃO DISPONÍVEIS.')+'</p>'+
+ '+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
  '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="purchase-block"><div class="purchase-grid"><div class="field"><label>DATA DA COMPRA</label><input class="date-input" id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('detailCompare').onclick=()=>showTypeComparison(id);
  $('detailContent').addEventListener('click',event=>{
-  const rangeButton=event.target.closest('[data-chart-range]');if(rangeButton){const range=rangeButton.dataset.chartRange;const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],range);if(range==='custom'){const from=$('chartFrom'),to=$('chartTo');if(from&&!from.value)from.value=new Date(new Date().setFullYear(new Date().getFullYear()-1)).toISOString().slice(0,10);if(to&&!to.value)to.value=today();}}
-  if(event.target.closest('#applyChartDates')){const from=$('chartFrom')?.value||'',to=$('chartTo')?.value||'';const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],'custom',from,to);}
+  const rangeButton=event.target.closest('[data-chart-range]');if(rangeButton){const range=rangeButton.dataset.chartRange;const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],range);if(range==='custom'){const from=$('chartFrom'),to=$('chartTo');if(from&&!from.value)from.value=new Date(new Date().setFullYear(new Date().getFullYear()-1)).toISOString().slice(0,10);if(to&&!to.value)to.value=today();}initDatePickers(area||document);}
+  if(event.target.closest('#applyChartDates')){const from=$('chartFrom')?.value||'',to=$('chartTo')?.value||'';const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],'custom',from,to);initDatePickers(area||document);}
  });
 
  $('detailSearchPrices').onclick=()=>runPriceSearch(id);
- $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
- $('storeRows').onclick=e=>{const b=e.target.closest('[data-remove-store]');if(b)b.closest('.store-row').remove()};
- $('saveStores').onclick=async()=>{const stores=[...document.querySelectorAll('.store-row')].map(r=>Object.fromEntries([...r.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value.trim()]))).filter(s=>s.store||s.url);await patchData(id,{stores});showDetail(id)};
- $('recordPrice').onclick=async()=>{
-  const store=$('priceStore').value.trim(),price=Number($('priceValue').value),shipping=Number($('priceShip').value||0),url=$('priceUrl').value.trim();
-  if(!store||!price){alert('informe a fonte e o preço.');return}
-  const data={...d},hist=data.priceHistory||[],previousEntries=hist.filter(h=>String(h.store||'').trim().toLocaleLowerCase('pt-BR')===store.toLocaleLowerCase('pt-BR')),previousEntry=previousEntries.length?previousEntries[previousEntries.length-1]:null,previous=previousEntry?Number(previousEntry.price)+Number(previousEntry.shipping||0):null,currentTotal=price+shipping,drop=previous&&currentTotal<previous?((previous-currentTotal)/previous)*100:0;
-  hist.push({store,price,shipping,url,at:today(),alert:drop>=5,drop:Number(drop.toFixed(1)),read:false});data.priceHistory=hist;
-  await patchData(id,data);await showDetail(id);
- };
  $('markPurchased').onclick=async()=>{
   const paid=Number($('paidPrice').value);if(!paid){alert('informe o valor realmente pago.');return}
   const data={...d,purchaseDate:$('purchaseDate').value||today(),paidPrice:paid};
@@ -528,6 +518,8 @@ async function showInbox(){
  $('notices').innerHTML=notices.map(n=>'<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title)+'</strong><br>preço em '+esc(n.store)+' caiu '+n.drop+'%: '+money(n.price)+'<br><span class="meta">'+date(n.at)+'</span></div>').join('')||'<p class="meta">nenhuma notificação por enquanto. quedas de 5% ou mais em preços registrados aparecem aqui.</p>';
  for(const item of items){if((item.data.priceHistory||[]).some(h=>h.alert&&!h.read)){const data={...item.data,priceHistory:item.data.priceHistory.map(h=>h.alert?{...h,read:true}:h)};await patchData(item.id,data)}}
 }
+function initDatePickers(root=document){if(!window.flatpickr)return;root.querySelectorAll('input.date-input,input[type="date"]').forEach(el=>{if(el._flatpickr)return;flatpickr(el,{locale:flatpickr.l10ns.pt,dateFormat:'Y-m-d',altInput:true,altFormat:'d/m/Y',allowInput:true,disableMobile:true,onDayCreate:(dObj,dStr,fp,dayElem)=>{const day=dayElem.dateObj.getDay();if(day===0||day===6)dayElem.classList.add('weekend-day')}})})}
+initDatePickers();
 $('itemForm').addEventListener('change',()=>updateFinancePreview());
 $('itemForm').addEventListener('input',event=>{
  const el=event.target;
@@ -542,12 +534,12 @@ $('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
   const response=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'NÃO FOI POSSÍVEL LER O LINK.');
   const form=$('itemForm'),set=(name,value,overwrite=false)=>{const el=form.elements[name];if(el&&value&&(overwrite||!el.value))el.value=value};
-  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.specs||result.description);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);
+  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.technicalSummary||result.specs||result.description,true);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);
   if(result.price)set('currentPrice',result.price,true);
   const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
   let previousMeta={};try{previousMeta=JSON.parse(form.dataset.productMeta||'{}')}catch(_){}
   form.dataset.productMeta=JSON.stringify({...previousMeta,productImageUrl:data.productImageUrl||previousMeta.productImageUrl||'',productBrand:data.productBrand||previousMeta.productBrand||'',detectedVoltage:data.detectedVoltage||previousMeta.detectedVoltage||''});
-  if(status)status.textContent='DADOS IMPORTADOS QUANDO DISPONÍVEIS · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:' · CONFIRME A VOLTAGEM 220V NA PÁGINA');
+  if(status)status.textContent='DADOS IMPORTADOS E RESUMO TÉCNICO SALVO · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:'');
   updateFinancePreview();
  }catch(error){if(status)status.textContent=error.message}
 });
