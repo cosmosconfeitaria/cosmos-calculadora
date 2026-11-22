@@ -479,7 +479,7 @@ async function showDetail(id){
  const item=items.find(x=>x.id===id);if(!item)return;detailId=id;const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
  const f=finance(d);
  $('detailTitle').textContent=item.title.toUpperCase();
- const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
+ const history=(d.priceHistory||[]).slice().reverse().map(h=>'<p class="meta">'+date(h.at)+' · '+esc(h.store)+' · '+esc(h.voltageStatus||'VOLTAGEM NÃO IDENTIFICADA')+' · <strong>'+money(h.price)+'</strong>'+(h.alert?' · QUEDA RELEVANTE':'')+'</p>').join('')||'<p class="meta">nenhum preço registrado ainda.</p>';
  $('detailContent').innerHTML=(img?'<img class="detail-product-image" src="'+img+'" alt="">':'')+
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+'</div><div class="meta">ESPECIFICAÇÕES: <span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="form-actions"><button class="silver" id="detailCompare" type="button">COMPARAR MODELOS</button><button class="silver" id="detailSearchPrices" type="button">FAZER BUSCA DE PREÇOS</button></div>'+
@@ -487,7 +487,7 @@ async function showDetail(id){
  '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR QUE VOCÊ JÁ JUNTOU (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(d.savedAmount||0)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">RESUMO TÉCNICO</div><p class="meta technical-summary">'+esc(d.specs||'INFORMAÇÕES TÉCNICAS AINDA NÃO DISPONÍVEIS.')+'</p>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
- '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
+ '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><p class="meta">BUSCA EM ANÚNCIOS E PÁGINAS ATUALIZADAS NO ÚLTIMO ANO. O HISTÓRICO DE PREÇOS REAL DA COSMOS COMEÇA A SER REGISTRADO A CADA BUSCA, NÃO É UMA RECONSTRUÇÃO DE PREÇOS ANTIGOS.</p><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="purchase-block"><div class="purchase-grid"><div class="field"><label>DATA DA COMPRA</label><input class="date-input" id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('detailCompare').onclick=()=>showTypeComparison(id);
@@ -578,7 +578,7 @@ async function saveDiscoveryResult(p,status='WISHLIST'){
 async function toggleDiscoveryFavorite(p,button){
  const title=String(p.title||'').trim(),existing=items.find(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
  try{
-  if(existing){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',existing.id);if(error)throw error;button.classList.remove('active');button.textContent='☆'}
+  if(existing){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',existing.id);if(error)throw error;button.classList.remove('active');button.textContent='★'}
   else{await saveDiscoveryResult(p,'FAVORITE');button.classList.add('active');button.textContent='★'}
   await load();
  }catch(error){alert('NÃO FOI POSSÍVEL ATUALIZAR O FAVORITO: '+error.message)}
@@ -610,12 +610,12 @@ async function searchWishlistProducts(){
    const status=p.voltageStatus||voltageStatus(p),bad=status==='INCOMPATIBLE',confirmed=p.voltageConfirmed||status==='CONFIRMED_220V'||status==='BIVOLT';
    const card=document.createElement('article');card.className='product-result';
    const img=document.createElement('img');img.alt='';if(p.thumbnail)img.src=p.thumbnail;else img.style.visibility='hidden';
-   const body=document.createElement('div'),title=document.createElement('strong');title.textContent=p.title||'PRODUTO SEM NOME';
+   const body=document.createElement('div'),title=document.createElement('strong');title.textContent=(p.title||'PRODUTO SEM NOME').toUpperCase();
    const meta=document.createElement('div');meta.className='meta';meta.textContent=p.source||'GOOGLE';
    const price=document.createElement('div');price.className='price';price.textContent=p.priceText||(p.priceValue?'R$ '+Number(p.priceValue).toLocaleString('pt-BR',{minimumFractionDigits:2}):'PREÇO NÃO INFORMADO · CONSULTAR ANÚNCIO');
    const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT · INCLUI 220V':'220V IDENTIFICADO'):bad?'110V/127V · INCOMPATÍVEL':'VOLTAGEM NÃO CONFIRMADA';
    const actions=document.createElement('div');actions.className='result-actions';
-   const star=document.createElement('button');star.type='button';star.className='favorite-star'+(items.some(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===String(p.title||'').toLocaleLowerCase('pt-BR'))?' active':'');star.textContent=star.classList.contains('active')?'★':'☆';star.title='FAVORITAR';star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));actions.append(star);
+   const star=document.createElement('button');star.type='button';star.className='favorite-star'+(items.some(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===String(p.title||'').toLocaleLowerCase('pt-BR'))?' active':'');star.textContent='★';star.title='FAVORITAR';star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));actions.append(star);
    if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';actions.append(link)}
    const add=document.createElement('button');add.type='button';add.textContent=bad?'INCOMPATÍVEL':confirmed?'ADICIONAR À WISHLIST':'VOLTAGEM NÃO CONFIRMADA';add.disabled=bad||!confirmed;
    add.addEventListener('click',async()=>{if(!confirmed)return;add.disabled=true;try{await saveDiscoveryResult(p,'WISHLIST');await load();closeForm();}catch(error){alert('NÃO FOI POSSÍVEL ADICIONAR: '+error.message);add.disabled=false}});
