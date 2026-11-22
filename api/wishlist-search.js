@@ -26,6 +26,8 @@ function plainText(value) {
   if (value && typeof value === 'object') return Object.values(value).map(plainText).join(' · ');
   return String(value || '');
 }
+function normalizeModel(value) { return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
 function technicalData(row) {
   const title = String(row.title || '').slice(0, 300);
   const description = String(row.snippet || row.description || row.product_description || '').slice(0, 900);
