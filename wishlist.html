@@ -173,6 +173,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 .key-select-trigger{font-size:11px!important}
 @media(max-width:480px){.finance-main{align-items:flex-start;flex-direction:column;gap:5px}.finance-main strong{font-size:21px}.finance-gap{align-items:flex-start;flex-direction:column;gap:4px}}
 
+.chart-controls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chart-controls .silver{font-size:9px;padding:8px 10px}.chart-custom{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.chart-custom input{max-width:145px;font-size:10px!important;padding:8px}.chart-custom .silver{font-size:9px;padding:9px 10px}
 </style>
 </head>
 <body>
@@ -415,18 +416,29 @@ async function render(){
  notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
  $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
 }
-function priceChart(history){
- const rows=history||[];
- if(!rows.length)return '<div class="chart-empty">o gráfico aparecerá assim que houver preços registrados. registre ofertas de lojas diferentes para acompanhar a evolução ao longo dos meses.</div>';
- const now=new Date(),months=Array.from({length:12},(_,i)=>{const d=new Date(now.getFullYear(),now.getMonth()-11+i,1);return {key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}}),stores=[...new Set(rows.map(x=>x.store))];
- const values=rows.map(x=>Number(x.price||0)+Number(x.shipping||0)).filter(x=>x>0),min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min),W=720,H=270,L=62,R=18,T=18,B=42,innerW=W-L-R,innerH=H-T-B;
- const y=v=>T+(max===min?innerH/2:(max-v)/spread)*innerH,x=i=>L+i*(innerW/11);
- const palette=['#2263D2','#D22222','#3B7D5B','#9A68A6','#D18A22','#2D2D2D'];
- const lines=stores.map((store,si)=>{const points=months.map((m,i)=>{const vals=rows.filter(h=>h.store===store&&String(h.at||'').slice(0,7)===m.key).map(h=>Number(h.price||0)+Number(h.shipping||0)).filter(v=>v>0);return vals.length?{i,v:Math.min(...vals)}:null}).filter(Boolean);if(!points.length)return '';return '<polyline fill="none" stroke="'+palette[si%palette.length]+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="'+points.map(p=>x(p.i)+','+y(p.v)).join(' ')+'"/>'+points.map(p=>'<circle cx="'+x(p.i)+'" cy="'+y(p.v)+'" r="4" fill="'+palette[si%palette.length]+'" stroke="#fff" stroke-width="1.5"><title>'+esc(store)+' · '+months[p.i].label+': '+money(p.v)+'</title></circle>').join('')}).join('');
- const ticks=Array.from({length:4},(_,i)=>{const v=max-(spread*i/3),yy=T+innerH*i/3;return '<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#e8e5e0"/><text x="'+(L-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#77736e">'+money(v).replace(',00','')+'</text>'}).join('');
- const labels=months.map((m,i)=>'<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" font-size="10" fill="#77736e">'+m.label+'</text>').join('');
- const legend=stores.map((store,i)=>'<span class="chart-legend"><i style="background:'+palette[i%palette.length]+'"></i>'+esc(store)+'</span>').join('');
- return '<div class="price-chart"><div class="chart-caption">MENOR PREÇO REGISTRADO POR MÊS · ÚLTIMOS 12 MESES · COM FRETE QUANDO INFORMADO</div><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Gráfico de evolução dos preços por loja">'+ticks+labels+lines+'</svg><div class="chart-legend-wrap">'+legend+'</div><div class="chart-footnote">os pontos mostram o menor valor registrado em cada mês para cada fonte. meses sem registro ficam sem ponto; não são estimativas.</div></div>';
+function priceChart(history,range='365',customFrom='',customTo=''){
+ const rows=(history||[]).filter(h=>Number(h.price||0)>0),now=new Date();
+ let from=new Date(now),to=new Date(now),step='month',rangeLabel='ÚLTIMOS 12 MESES';
+ if(range==='90'){from.setDate(from.getDate()-90);step='day';rangeLabel='ÚLTIMOS 90 DIAS'}
+ else if(range==='30'){from.setDate(from.getDate()-30);step='day';rangeLabel='ÚLTIMOS 30 DIAS'}
+ else if(range==='custom'){from=customFrom?new Date(customFrom+'T00:00:00'):new Date(now.getFullYear()-1,now.getMonth(),now.getDate());to=customTo?new Date(customTo+'T23:59:59'):now;step='week';rangeLabel='PERÍODO PERSONALIZADO'}
+ else{from.setFullYear(from.getFullYear()-1)}
+ const filtered=rows.filter(h=>{const d=new Date((h.at||'')+'T12:00:00');return d>=from&&d<=to});
+ const buckets=new Map();
+ filtered.forEach(h=>{const d=new Date(h.at+'T12:00:00');let key,label;if(step==='month'){key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');label=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}else if(step==='week'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);key=d.toISOString().slice(0,10);label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}else{key=h.at;label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}const value=Number(h.price)+Number(h.shipping||0);const old=buckets.get(key);if(!old||value<old.value)buckets.set(key,{key,label,value})});
+ const points=[...buckets.values()].sort((a,b)=>a.key.localeCompare(b.key));
+ const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">12 MESES</button><button type="button" class="silver" data-chart-range="90">90 DIAS</button><button type="button" class="silver" data-chart-range="30">30 DIAS</button><button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
+ let graph='<div class="chart-empty">AINDA NÃO HÁ PREÇOS REGISTRADOS NESTE PERÍODO. FAÇA UMA BUSCA PARA COMEÇAR A CONSTRUIR O HISTÓRICO.</div>';
+ if(points.length){
+  const values=points.map(p=>p.value),min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min),W=720,H=250,L=65,R=18,T=18,B=42,iw=W-L-R,ih=H-T-B;
+  const x=i=>points.length===1?L+iw/2:L+i*iw/(points.length-1),y=v=>T+(max===min?ih/2:(max-v)/spread)*ih;
+  const line='<polyline fill="none" stroke="#2263D2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="'+points.map((p,i)=>x(i)+','+y(p.value)).join(' ')+'"/>';
+  const dots=points.map((p,i)=>'<circle cx="'+x(i)+'" cy="'+y(p.value)+'" r="4" fill="#D22222" stroke="#fff" stroke-width="1.5"><title>'+p.label+': '+money(p.value)+'</title></circle>').join('');
+  const ticks=Array.from({length:4},(_,i)=>{const v=max-spread*i/3,yy=T+ih*i/3;return '<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#e8e5e0"/><text x="'+(L-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#77736e">'+money(v).replace(',00','')+'</text>'}).join('');
+  const stride=Math.max(1,Math.ceil(points.length/8)),labels=points.map((p,i)=>i%stride===0||i===points.length-1?'<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" font-size="10" fill="#77736e">'+esc(p.label)+'</text>':'').join('');
+  graph='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Menor preço encontrado em cada período">'+ticks+labels+line+dots+'</svg><div class="chart-footnote">CADA PONTO MOSTRA O MENOR PREÇO LOCALIZADO ENTRE TODAS AS LOJAS NO PERÍODO, COM FRETE QUANDO REGISTRADO. A LINHA NÃO REPRESENTA UMA LOJA ESPECÍFICA.</div>';
+ }
+ return '<div class="price-chart"><div class="chart-caption">EVOLUÇÃO DO MENOR PREÇO GERAL · '+rangeLabel+'</div>'+controls+graph+'</div>';
 }
 function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
@@ -446,10 +458,15 @@ async function showDetail(id){
  '<div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
  '<div class="subhead">REGISTRAR PREÇO VERIFICADO</div><div class="form-grid"><div class="field"><label>LOJA / FONTE</label><input id="priceStore" placeholder="Zoom, JáCotei, Magalu..."></div><div class="field"><label>PREÇO (R$)</label><input id="priceValue" type="number" min="0" step=".01"></div><div class="field"><label>FRETE (R$)</label><input id="priceShip" type="number" min="0" step=".01" value="0"></div><div class="field"><label>LINK DO PRODUTO</label><input id="priceUrl" type="url" placeholder="https://..."></div></div><div class="form-actions"><button class="silver" id="recordPrice" type="button">REGISTRAR PREÇO</button></div>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
- '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div>'+priceChart(d.priceHistory||[])+
+ '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="form-grid"><div class="field"><label>DATA DA COMPRA</label><input id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('detailCompare').onclick=()=>showTypeComparison(id);
+ $('detailContent').addEventListener('click',event=>{
+  const rangeButton=event.target.closest('[data-chart-range]');if(rangeButton){const range=rangeButton.dataset.chartRange;const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],range);if(range==='custom'){const from=$('chartFrom'),to=$('chartTo');if(from&&!from.value)from.value=new Date(new Date().setFullYear(new Date().getFullYear()-1)).toISOString().slice(0,10);if(to&&!to.value)to.value=today();}}
+  if(event.target.closest('#applyChartDates')){const from=$('chartFrom')?.value||'',to=$('chartTo')?.value||'';const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],'custom',from,to);}
+ });
+
  $('detailSearchPrices').onclick=()=>runPriceSearch(id);
  $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
  $('storeRows').onclick=e=>{const b=e.target.closest('[data-remove-store]');if(b)b.closest('.store-row').remove()};
