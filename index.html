@@ -121,7 +121,14 @@ async function syncServerSession(session){
    headers:{'Content-Type':'application/json'},
    body:JSON.stringify({access_token:session.access_token})
   });
-  return response.ok;
+  if(!response.ok){
+   const detail=await response.text().catch(()=> '');
+   console.error('Validação da sessão recusada:',response.status,detail);
+   window.__cosmosSessionError='HTTP '+response.status;
+   return false;
+  }
+  window.__cosmosSessionError='';
+  return true;
  }catch(error){
   console.error('Não foi possível validar a sessão no servidor:',error);
   return false;
@@ -143,7 +150,11 @@ async function refresh(){
  const session=data.session||null;
  serverSessionReady=session?await syncServerSession(session):false;
  showSession(session?.user||null);
- if(session&&!serverSessionReady)$('accountStatus').textContent='NÃO FOI POSSÍVEL VALIDAR A SESSÃO. TENTE ENTRAR NOVAMENTE.';
+ if(session&&serverSessionReady&&new URLSearchParams(window.location.search).get('auth')==='required'){
+  window.location.replace('wishlist.html');
+  return;
+ }
+ if(session&&!serverSessionReady)$('accountStatus').textContent='NÃO FOI POSSÍVEL VALIDAR A SESSÃO'+(window.__cosmosSessionError?' ('+window.__cosmosSessionError+')':'')+'. TENTE NOVAMENTE.';
 }
 $('accountLogin').addEventListener('click',async()=>{
  if(!client){$('accountStatus').textContent='NÃO FOI POSSÍVEL CONECTAR À CONTA.';return}
@@ -157,7 +168,16 @@ $('accountLogin').addEventListener('click',async()=>{
  }else{
   serverSessionReady=await syncServerSession(data.session);
   showSession(data.session?.user||null);
-  $('accountStatus').textContent=serverSessionReady?'':'LOGIN REALIZADO, MAS NÃO FOI POSSÍVEL VALIDAR O ACESSO. TENTE NOVAMENTE.';
+  if(serverSessionReady){
+   panel.hidden=true;
+   $('accountPassword').value='';
+   $('accountStatus').textContent='';
+   if(new URLSearchParams(window.location.search).get('auth')==='required'){
+    window.location.replace('wishlist.html');
+   }
+  }else{
+   $('accountStatus').textContent='LOGIN REALIZADO, MAS A VALIDAÇÃO DO SERVIDOR FALHOU'+(window.__cosmosSessionError?' ('+window.__cosmosSessionError+')':'')+'. TENTE NOVAMENTE.';
+  }
  }
 });
 $('accountLogout').addEventListener('click',async()=>{
@@ -175,8 +195,15 @@ $('accountLogout').addEventListener('click',async()=>{
 });
 if(client)client.auth.onAuthStateChange((_event,session)=>{
  Promise.resolve().then(async()=>{
-  serverSessionReady=session?await syncServerSession(session):false;
-  showSession(session?.user||null);
+  if(_event==='SIGNED_IN'||_event==='INITIAL_SESSION'){
+   serverSessionReady=session?await syncServerSession(session):false;
+   showSession(session?.user||null);
+   if(serverSessionReady&&new URLSearchParams(window.location.search).get('auth')==='required')window.location.replace('wishlist.html');
+  }else if(_event==='SIGNED_OUT'){
+   serverSessionReady=false;
+   await syncServerSession(null);
+   showSession(null);
+  }
  });
 });
 if(new URLSearchParams(window.location.search).get('auth')==='required'){
