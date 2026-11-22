@@ -548,7 +548,7 @@ async function render(){
  $('items').innerHTML='';
  if(!list.length)$('items').innerHTML='<div class="empty-state">NENHUM ITEM POR AQUI AINDA.<br>ADICIONE SEU PRIMEIRO DESEJO PARA COMEÇAR A PLANEJAR.</div>';
  for(const item of list){
-  const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
+  const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl),savingGroup=items.filter(x=>x.category===item.category&&String(x.data?.subcategory||x.data?.productType||'').trim().toUpperCase()===String(d.subcategory||d.productType||'').trim().toUpperCase()),sharedSavedAmount=(savingGroup.find(x=>Number(x.data?.savedAmount)>0)?.data?.savedAmount)||d.savedAmount||0;
   const card=document.createElement('article');card.className='item';
   card.innerHTML='<button class="item-delete" type="button" data-delete="'+item.id+'" aria-label="excluir '+esc(item.title)+'" title="EXCLUIR ITEM">×</button><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title.toUpperCase())+'</h3><div class="meta">ADICIONADO EM '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'<div style="margin-top:7px"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance==='MEDIA'?'MÉDIA':(item.importance||'MÉDIA'))+'</span></div></div></div><div class="target-price-card"><span>PREÇO-ALVO</span><strong>'+(d.targetPrice?money(d.targetPrice):'NÃO DEFINIDO')+'</strong></div><div class="meta">'+(d.targetDate?'COMPRA PREVISTA: '+date(d.targetDate):'SEM DATA PREVISTA')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
@@ -564,9 +564,7 @@ function priceChart(history,range='365',customFrom='',customTo=''){
  else if(range==='custom'){from=customFrom?new Date(customFrom+'T00:00:00'):new Date(now.getFullYear()-1,now.getMonth(),now.getDate());to=customTo?new Date(customTo+'T23:59:59'):now;step='week';rangeLabel='PERÍODO PERSONALIZADO'}
  else{from.setFullYear(from.getFullYear()-1)}
  const filtered=rows.filter(h=>{const d=new Date((h.at||'')+'T12:00:00');return d>=from&&d<=to});
- const buckets=new Map();
- filtered.forEach(h=>{const d=new Date(h.at+'T12:00:00');let key,label;if(step==='month'){key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');label=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}else if(step==='week'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);key=d.toISOString().slice(0,10);label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}else{key=h.at;label=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}const value=Number(h.price)+Number(h.shipping||0);const old=buckets.get(key);if(!old||value<old.value)buckets.set(key,{key,label,value})});
- const points=[...buckets.values()].sort((a,b)=>a.key.localeCompare(b.key));
+ const points=filtered.map((h,i)=>{const d=new Date((h.at||'')+'T12:00:00');return {key:(h.at||'')+'-'+String(i).padStart(4,'0'),label:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),value:Number(h.price)+Number(h.shipping||0),store:h.store||'LOJA'}}).sort((a,b)=>a.key.localeCompare(b.key));
  const controls='<div class="chart-controls"><button type="button" class="silver" data-chart-range="365">1 ANO</button><button type="button" class="silver" data-chart-range="90">3 MESES</button><button type="button" class="silver" data-chart-range="30">1 MÊS</button><button type="button" class="silver" data-chart-range="custom">PERSONALIZAR</button></div><div class="chart-custom '+(range==='custom'?'':'hidden')+'"><input class="date-input" type="date" id="chartFrom" aria-label="DATA INICIAL" value="'+(range==='custom'?esc(customFrom):'')+'"><input class="date-input" type="date" id="chartTo" aria-label="DATA FINAL" value="'+(range==='custom'?esc(customTo):'')+'"><button type="button" class="silver" id="applyChartDates">APLICAR</button></div>';
  let graph='<div class="chart-empty">AINDA NÃO HÁ PREÇOS REGISTRADOS NESTE PERÍODO. FAÇA UMA BUSCA PARA COMEÇAR A CONSTRUIR O HISTÓRICO.</div>';
  if(points.length){
@@ -576,7 +574,7 @@ function priceChart(history,range='365',customFrom='',customTo=''){
   const dots=points.map((p,i)=>'<circle cx="'+x(i)+'" cy="'+y(p.value)+'" r="4" fill="#D22222" stroke="#fff" stroke-width="1.5"><title>'+p.label+': '+money(p.value)+'</title></circle>').join('');
   const ticks=Array.from({length:4},(_,i)=>{const v=max-spread*i/3,yy=T+ih*i/3;return '<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#e8e5e0"/><text x="'+(L-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#77736e">'+money(v).replace(',00','')+'</text>'}).join('');
   const stride=Math.max(1,Math.ceil(points.length/8)),labels=points.map((p,i)=>i%stride===0||i===points.length-1?'<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" font-size="10" fill="#77736e">'+esc(p.label)+'</text>':'').join('');
-  graph='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Menor preço encontrado em cada período">'+ticks+labels+line+dots+'</svg><div class="chart-footnote">CADA PONTO MOSTRA O MENOR PREÇO LOCALIZADO ENTRE TODAS AS LOJAS NO PERÍODO, COM FRETE QUANDO REGISTRADO. A LINHA NÃO REPRESENTA UMA LOJA ESPECÍFICA.</div>';
+  graph='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Menor preço encontrado em cada período">'+ticks+labels+line+dots+'</svg><div class="chart-footnote">CADA PONTO REPRESENTA UMA OFERTA VALIDADA, COM FRETE QUANDO REGISTRADO.</div>';
  }
  return '<div class="price-chart"><div class="chart-caption">EVOLUÇÃO DO MENOR PREÇO GERAL · '+rangeLabel+'</div>'+controls+graph+'</div>';
 }
@@ -593,7 +591,7 @@ async function showDetail(id){
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+'</div><div class="meta">ESPECIFICAÇÕES: <span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="detail-actions"><button class="silver" id="detailCompare" type="button">COMPARAR MODELOS</button><button class="silver" id="detailSearchPrices" type="button">BUSCAR PREÇOS</button></div>'+
  '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+
- '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(d.savedAmount||0)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
+ '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(sharedSavedAmount)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">RESUMO TÉCNICO</div><p class="meta technical-summary">'+esc(d.specs||'INFORMAÇÕES TÉCNICAS AINDA NÃO DISPONÍVEIS.')+'</p>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
  '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
@@ -605,7 +603,7 @@ async function showDetail(id){
   if(event.target.closest('#applyChartDates')){const from=$('chartFrom')?.value||'',to=$('chartTo')?.value||'';const area=$('priceChartArea');if(area)area.innerHTML=priceChart(d.priceHistory||[],'custom',from,to);initDatePickers(area||document);}
  });
 
- $('saveProgress').onclick=async()=>{const savedAmount=Math.max(0,Number($('savedAmountInput').value||0));await patchData(id,{...d,savedAmount});await showDetail(id)};
+ $('saveProgress').onclick=async()=>{const savedAmount=Math.max(0,Number($('savedAmountInput').value||0));for(const member of savingGroup){const updated={...(member.data||{}),savedAmount};const result=await client.from('cosmos_wishlist_items').update({data:updated,updated_at:new Date().toISOString()}).eq('id',member.id);if(result.error)throw result.error}await load();await showDetail(id)};
  $('detailSearchPrices').onclick=()=>runPriceSearch(id);
  $('markPurchased').onclick=async()=>{
   const paid=Number($('paidPrice').value);if(!paid){alert('informe o valor realmente pago.');return}
@@ -792,7 +790,7 @@ async function runPriceSearch(id){
   const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString(),previousSearchLowest=fresh.lastSearchLowest||null,candidates=eligible.map(p=>({title:p.title,store:p.source,price:Number(p.priceValue),url:p.link,thumbnail:p.thumbnail||'',voltageStatus:p.voltageStatus,searchedAt:today()}));
   for(const p of eligible){
    const price=Number(p.priceValue||0);
-   history.push({store:p.source||'LOJA',price,shipping:0,url:p.link,at:today(),searchBatch:batch,voltageStatus:p.voltageStatus,title:p.title,read:false});
+   history.push({store:p.source||'LOJA',price,shipping:0,url:p.link,at:today(),searchBatch:batch,voltageStatus:p.voltageStatus,title:p.title,modelVerified:true,read:false});
    stores.push({store:p.source||'LOJA',price,shipping:0,url:p.link,searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageStatus:p.voltageStatus});
   }
   const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
