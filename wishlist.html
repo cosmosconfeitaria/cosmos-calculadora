@@ -7,7 +7,10 @@
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
 <title>COSMOS COOKIE LAB · WISHLIST</title>
 <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 <style>
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--red:#D22222;--line:#d4d1cc;--muted:#77736e}
 *{box-sizing:border-box}
@@ -123,6 +126,32 @@ footer.footer-cosmos .line-brand{font-family:'Helvetica Neue',Helvetica,Arial,sa
 footer.footer-cosmos .line-brand .logo-type{font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit}
 footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
 footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
+#itemForm input::placeholder,#itemForm textarea::placeholder{font-size:10px;letter-spacing:0}
+#itemForm input:not([type=file]),#itemForm textarea{font-size:12px}
+#itemForm input[type=date],.date-input{font-size:11px!important;background:#fff;color:var(--blue);border:1px solid var(--line);border-radius:10px;padding:12px}
+.link-import-copy{font:12px/1.35 'Gochi Hand',cursive!important;color:var(--red)!important;letter-spacing:0!important;margin:0}
+.chart-controls{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin:8px 0 12px}
+.chart-controls .silver{flex:1 1 0;min-width:0;padding:9px 7px;font-size:9px;text-align:center}
+.chart-custom{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0 0 12px}
+.chart-custom input{flex:1 1 130px;min-width:0}
+.favorite-star{border:1px solid var(--line);background:#fff;color:var(--red);font-size:19px;line-height:1;width:34px;height:32px;cursor:pointer}
+.favorite-star.active{background:#fff0f0;border-color:#e7bcbc}
+.result-select{width:15px;height:15px;accent-color:var(--blue);margin:0 5px 0 0}
+.result-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line)}
+.progress-overview{border:1px solid var(--line);background:var(--cream);padding:12px;margin:12px 0}
+.progress-overview-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:10px;color:var(--muted)}
+.progress-overview-head strong{font-size:18px;font-weight:500;color:var(--blue)}
+.progress-overview .progress-track{height:9px;background:#e3e0da;margin:9px 0 6px;overflow:hidden}
+.progress-overview .progress-fill{height:100%;background:var(--blue)}
+.flatpickr-calendar{font-family:Helvetica Neue,Helvetica,Arial,sans-serif!important;border:1px solid var(--line)!important;border-radius:10px!important;box-shadow:0 8px 24px #0002!important;background:var(--cream)!important}
+.flatpickr-months,.flatpickr-weekdays{background:var(--cream)!important}
+.flatpickr-current-month,.flatpickr-monthDropdown-months,.flatpickr-weekday{color:var(--blue)!important;fill:var(--blue)!important}
+.flatpickr-day{border-radius:5px!important;color:var(--ink)!important}
+.flatpickr-day.weekend-day{color:var(--red)!important}
+.flatpickr-day.selected,.flatpickr-day.startRange,.flatpickr-day.endRange{background:var(--blue)!important;border-color:var(--blue)!important;color:#fff!important}
+.flatpickr-day.today{border-color:var(--red)!important}
+.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{color:#aaa!important}
+@media(max-width:520px){.chart-controls{gap:4px}.chart-controls .silver{padding:8px 4px;font-size:8px}}
 @media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
 
 
@@ -210,32 +239,22 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 <label for="productLookup">ENCONTRE UM PRODUTO PARA ADICIONAR</label>
 <div class="search-line"><input id="productLookup" type="search" placeholder="ex.: batedeira planetária 7,6 litros"><button type="button" id="productLookupBtn">PESQUISAR</button></div>
 <div id="productLookupResults" class="discovery-results" aria-live="polite"></div>
-<p class="discovery-note">BUSCA EM OFERTAS DO GOOGLE SHOPPING. PRODUTOS SEM VOLTAGEM IDENTIFICADA EXIGEM SUA CONFIRMAÇÃO NO ANÚNCIO. ITENS 110V/127V NÃO PODEM SER ADICIONADOS.</p>
+<p class="discovery-note">BUSCA EM OFERTAS E ANÚNCIOS COMPATÍVEIS. O SISTEMA CONFERE A VOLTAGEM QUANDO A LOJA DISPONIBILIZA ESSA INFORMAÇÃO. ITENS 110V/127V NÃO PODEM SER ADICIONADOS.</p>
 </div>
 <div class="field full"><label>NOME DO PRODUTO / MODELO *</label><input name="title" required placeholder="ex.: batedeira planetária ..."></div>
 <div class="field"><label>CATEGORIA PRINCIPAL</label><select name="category"><option>EQUIPAMENTOS</option><option>REFORMA</option><option>ACESSÓRIOS</option><option>UTENSÍLIOS</option><option>TECNOLOGIA</option><option>EMBALAGENS</option><option>OUTROS</option></select></div>
 <div class="field"><label>SUBCATEGORIA</label><select name="subcategory" id="itemSubcategory"><option value="">SELECIONE A CATEGORIA PRINCIPAL</option></select></div>
 <div class="field"><label>IMPORTÂNCIA</label><select name="importance"><option value="BAIXA">BAIXA</option><option value="MEDIA" selected>MÉDIA</option><option value="ALTA">ALTA</option><option value="URGENTE">URGENTE</option></select></div>
 <div class="field"><label>PREÇO ATUAL / REFERÊNCIA (R$)</label><input name="currentPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
-<div class="field"><label>PREÇO-ALVO (R$)</label><input name="targetPrice" type="number" min="0" step=".01" placeholder="0,00"></div>
+<div class="field"><label>PREÇO-ALVO SUGERIDO (R$)</label><input name="targetPrice" type="number" min="0" step=".01" readonly placeholder="CALCULADO PELO HISTÓRICO DE PREÇOS"></div>
 <div class="field"><label>DATA PREVISTA DA COMPRA</label><input class="date-input" name="targetDate" type="date"></div>
 <div class="field"><label>APORTE PLANEJADO POR MÊS (R$)</label><input name="monthlyContribution" type="number" min="0" step=".01" placeholder="quanto pretende guardar?"></div>
 <div class="field"><label>ENTRADA (R$)</label><input name="downPayment" type="number" min="0" step=".01" placeholder="0,00"></div>
 <div class="field"><label>FORMA DE PAGAMENTO</label><select name="paymentMethod"><option value="PIX / À VISTA">PIX / À VISTA</option><option value="CARTÃO DE CRÉDITO">CARTÃO DE CRÉDITO</option><option value="A COMBINAR">A COMBINAR</option></select></div>
 <div class="field"><label>QUANTIDADE DE PARCELAS SEM JUROS</label><input name="installments" type="number" min="0" max="48" step="1" placeholder="INFORME SE QUISER SIMULAR"></div>
-<details class="advanced-fields"><summary>COMPLEMENTAR DADOS TÉCNICOS</summary><div class="form-grid"><div class="field"><label>MODELO / CÓDIGO EXATO</label><input name="model" placeholder="código do fabricante"></div>
-<div class="field"><label>CAPACIDADE / DIMENSÕES</label><input name="capacity" placeholder="ex.: tigela 7,6 L"></div>
-<div class="field"><label>GARANTIA</label><input name="warranty" placeholder="EX.: 12 MESES"></div>
-<div class="field"><label>POTÊNCIA</label><input name="power" placeholder="EX.: 500 W"></div>
-<div class="field"><label>QUALIDADE / CONFIABILIDADE</label><input name="quality" placeholder="MATERIAIS, DURABILIDADE, DEFEITOS RECORRENTES..."></div>
-<div class="field"><label>AVALIAÇÃO / RESUMO DE REVIEWS</label><input name="reviews" placeholder="nota, pontos positivos e negativos"></div>
-<div class="field"><label>ASSISTÊNCIA / PEÇAS DE REPOSIÇÃO</label><input name="support" placeholder="rede autorizada, peças..."></div>
-<div class="field full"><label>ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="fit" placeholder="capacidade real para nossos lotes, frequência de uso, espaço..."></textarea></div>
-<div class="field"><label>VOLTAGEM</label><input value="220V (PADRÃO COSMOS)" disabled></div>
-<div class="field full"><label>ESPECIFICAÇÕES IMPORTANTES</label><textarea name="specs" placeholder="capacidade, dimensões, potência, materiais, garantia..."></textarea></div>
-<div class="field full"><label>OBSERVAÇÕES / ADEQUAÇÃO À OPERAÇÃO COSMOS</label><textarea name="notes" placeholder="por que quero comprar, o que preciso avaliar..."></textarea></div></div></details>
+<div class="field full"><label>RESUMO TÉCNICO AUTOMÁTICO</label><textarea name="specs" readonly placeholder="O RESUMO SERÁ PREENCHIDO A PARTIR DO ANÚNCIO OU DA PÁGINA DA LOJA."></textarea><p class="meta">AS INFORMAÇÕES DISPONÍVEIS SERÃO ORGANIZADAS E SALVAS AUTOMATICAMENTE. DADOS NÃO ENCONTRADOS NÃO SERÃO INVENTADOS.</p></div><input type="hidden" name="model"><input type="hidden" name="capacity"><input type="hidden" name="warranty"><input type="hidden" name="power"><input type="hidden" name="quality"><input type="hidden" name="reviews"><input type="hidden" name="support"><input type="hidden" name="fit"><input type="hidden" name="notes">
 <div class="field"><label>IMAGEM DO PRODUTO (JPG, PNG OU WEBP · ATÉ 5 MB)</label><div class="file-picker"><input class="file-native" id="itemImage" name="image" type="file" accept="image/jpeg,image/png,image/webp"><label class="file-button" for="itemImage">ESCOLHER ARQUIVO</label><img id="filePreview" class="file-preview" alt="" hidden><span class="file-name" id="fileName">NENHUM ARQUIVO SELECIONADO</span></div></div>
-<div class="field"><label>LINK DE REFERÊNCIA</label><input class="reference-url" name="referenceUrl" type="url" placeholder="https://..."></div><div class="field full"><p class="meta" id="linkImportStatus">AO INSERIR UM LINK DE LOJA COMPATÍVEL, VAMOS TENTAR IMPORTAR AUTOMATICAMENTE OS DADOS DO PRODUTO.</p></div>
+<div class="field"><label>LINK DE REFERÊNCIA</label><input class="reference-url" name="referenceUrl" type="url" placeholder="https://..."></div><div class="field full"><p class="link-import-copy" id="linkImportStatus">AO INSERIR UM LINK DE LOJA COMPATÍVEL, O SISTEMA IMPORTA AUTOMATICAMENTE OS DADOS DISPONÍVEIS DO PRODUTO.</p></div>
 <div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input name="savedAmount" type="number" min="0" step=".01" placeholder="QUANTO JÁ CONSEGUIU JUNTAR?"></div><div class="field full"><div class="calc" id="financePreview">PREENCHA O PREÇO-ALVO E A DATA PREVISTA PARA VISUALIZAR SEU PLANEJAMENTO.</div></div>
 </div>
 <div class="form-actions"><button class="silver" type="submit">SALVAR ITEM</button><button class="silver" type="button" id="cancelForm">CANCELAR</button></div>
@@ -252,7 +271,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 
 <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
-    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
+    <div class="line-tagline">NOT YOUR AVERAGE COOKIE</div>
     <div class="line-est">EST. 2024</div>
   </footer>
 </div>
