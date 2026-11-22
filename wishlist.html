@@ -275,6 +275,37 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
  .category-check{font-size:7.5px}
 }
 
+
+/* CONTROLES COMPACTOS E CALENDÁRIO COSMOS */
+.category-check{font-size:11.5px;padding:7px 9px;gap:7px}
+.category-check input,.subcategory-option input{appearance:none;-webkit-appearance:none;width:12px!important;height:12px!important;min-width:12px;flex:0 0 12px;margin:0!important;border:1px solid #aaa8a3;border-radius:2px;background:#fff;box-shadow:none}
+.category-check input:checked,.subcategory-option input:checked{background:var(--blue);border-color:var(--blue);box-shadow:inset 0 0 0 2px #fff}
+.category-check input:focus-visible,.subcategory-option input:focus-visible{outline:2px solid #2263d255;outline-offset:2px}
+.purchase-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1fr);gap:12px}
+.purchase-grid .field{min-width:0}
+.purchase-grid input{width:100%;min-width:0;padding:9px 8px;font-size:12px}
+.item-delete{position:absolute;right:8px;top:7px;width:22px;height:22px;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--blue);font:18px 'Gochi Hand',cursive!important;cursor:pointer;padding:0!important}
+.item-delete:active{transform:none!important;box-shadow:none!important;color:var(--red)}
+.flatpickr-calendar{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif!important;font-size:11px!important;width:246px!important;box-shadow:0 6px 18px #102f6a22!important;border:1px solid #d4d1cc!important;border-radius:5px!important;padding:5px!important}
+.flatpickr-months .flatpickr-month,.flatpickr-current-month,.flatpickr-weekdays,.flatpickr-weekday{height:27px!important;color:var(--blue)!important;fill:var(--blue)!important;font-size:11px!important}
+.flatpickr-current-month{padding-top:5px!important}
+.flatpickr-day{max-width:29px!important;height:27px!important;line-height:27px!important;border-radius:3px!important;font-size:10px!important}
+.flatpickr-day.weekend-day{color:var(--red)!important}
+.flatpickr-day.selected,.flatpickr-day.startRange,.flatpickr-day.endRange{background:var(--blue)!important;border-color:var(--blue)!important;color:#fff!important}
+.flatpickr-day.today{border-color:var(--red)!important}
+.flatpickr-prev-month,.flatpickr-next-month{padding:5px!important}
+.delete-confirm-backdrop{position:fixed;inset:0;z-index:12000;background:#102f6a66;display:grid;place-items:center;padding:18px}
+.delete-confirm-backdrop.hidden{display:none}
+.delete-confirm-card{width:min(310px,calc(100vw - 36px));background:var(--cream);border:1px solid #fff;box-shadow:0 10px 28px #102f6a44;padding:17px 17px 15px;text-align:center}
+.delete-confirm-mark{font:28px 'Gochi Hand',cursive;color:var(--red);line-height:1}
+.delete-confirm-card h2{font:500 12px/1.45 'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--blue);margin:8px 0;text-transform:uppercase}
+.delete-confirm-card p{font:10px 'Gochi Hand',cursive;color:var(--red);margin:0 0 13px}
+.delete-confirm-actions{display:flex;justify-content:center;gap:8px}
+.delete-confirm-actions .silver{min-width:86px;padding:9px 12px}
+.chart-controls{display:flex;gap:6px;flex-wrap:wrap}
+.chart-controls .silver{padding:7px 9px;font-size:9px}
+@media(max-width:420px){.purchase-grid{grid-template-columns:minmax(0,.88fr) minmax(0,1fr);gap:8px}.purchase-grid input{font-size:11px;padding:8px 6px}}
+
 </style>
 </head>
 <body>
@@ -336,7 +367,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 </section>
 <div class="section-line"><h2 id="listTitle">ITENS DA WISHLIST</h2><span class="count" id="itemCount">0 itens</span></div>
 <div class="cards" id="items"></div>
-<section class="panel achievements-entry"><div class="section-line" style="margin:0"><div><h2>ACERVO COSMOS</h2><div class="meta">COMPRAS CONCLUÍDAS E ITENS GUARDADOS COM ESTRELINHA</div></div><div class="archive-links"><a class="silver nav-action" href="conquistas.html">CONQUISTAS</a><a class="silver nav-action" href="favoritos.html">FAVORITOS</a></div></div></section>
+<section class="panel achievements-entry"><div class="section-line" style="margin:0"><div><h2>ARQUIVO</h2><div class="meta">COMPRAS CONCLUÍDAS E ITENS FAVORITADOS</div></div><div class="archive-links"><a class="silver nav-action" href="conquistas.html">CONQUISTAS</a><a class="silver nav-action" href="favoritos.html">FAVORITOS</a></div></div></section>
 
 <footer class="footer-cosmos">
     <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
@@ -344,6 +375,7 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
     <div class="line-est">EST. 2024</div>
   </footer>
 </div>
+<div class="delete-confirm-backdrop hidden" id="deleteConfirm" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle"><div class="delete-confirm-card"><div class="delete-confirm-mark">×</div><h2 id="deleteConfirmTitle">TEM CERTEZA DE QUE DESEJA EXCLUIR ESSE ITEM DA WISHLIST?</h2><p>ESTA AÇÃO NÃO PODE SER DESFEITA.</p><div class="delete-confirm-actions"><button type="button" class="silver" id="deleteConfirmYes">SIM</button><button type="button" class="silver" id="deleteConfirmCancel">CANCELAR</button></div></div></div>
 <button class="floating-inbox" id="inboxBtn" type="button" aria-label="ABRIR CAIXA DE ENTRADA" title="CAIXA DE ENTRADA">✉<span class="dot hidden" id="inboxDot"></span></button>
 <div class="popup hidden" id="inboxPopup"><div class="popup-head"><strong>✉ CAIXA DE ENTRADA</strong><button class="close" id="inboxClose">×</button></div><div id="notices"></div></div><div class="cosmos-toast hidden" id="cosmosToast" role="status" aria-live="polite"><span id="cosmosToastText"></span><button class="close" id="cosmosToastClose" aria-label="fechar">×</button></div>
 <script>
@@ -518,7 +550,7 @@ async function render(){
  for(const item of list){
   const d=item.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);
   const card=document.createElement('article');card.className='item';
-  card.innerHTML='<button class="silver item-delete" type="button" data-delete="'+item.id+'" aria-label="excluir '+esc(item.title)+'" title="EXCLUIR ITEM">×</button><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title.toUpperCase())+'</h3><div class="meta">ADICIONADO EM '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'<div style="margin-top:7px"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance==='MEDIA'?'MÉDIA':(item.importance||'MÉDIA'))+'</span></div></div></div><div class="target-price-card"><span>PREÇO-ALVO</span><strong>'+(d.targetPrice?money(d.targetPrice):'NÃO DEFINIDO')+'</strong></div><div class="meta">'+(d.targetDate?'COMPRA PREVISTA: '+date(d.targetDate):'SEM DATA PREVISTA')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
+  card.innerHTML='<button class="item-delete" type="button" data-delete="'+item.id+'" aria-label="excluir '+esc(item.title)+'" title="EXCLUIR ITEM">×</button><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title.toUpperCase())+'</h3><div class="meta">ADICIONADO EM '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'<div style="margin-top:7px"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance==='MEDIA'?'MÉDIA':(item.importance||'MÉDIA'))+'</span></div></div></div><div class="target-price-card"><span>PREÇO-ALVO</span><strong>'+(d.targetPrice?money(d.targetPrice):'NÃO DEFINIDO')+'</strong></div><div class="meta">'+(d.targetDate?'COMPRA PREVISTA: '+date(d.targetDate):'SEM DATA PREVISTA')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
  }
  notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
@@ -561,10 +593,10 @@ async function showDetail(id){
  '<div class="meta">ADICIONADO: '+date(d.addedAt)+'</div><div class="meta">ESPECIFICAÇÕES: <span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'</div><div style="margin:8px 0"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance||'MÉDIA')+'</span></div>'+(d.referenceUrl?'<p class="meta reference-display"><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+
  '<div class="detail-actions"><button class="silver" id="detailCompare" type="button">COMPARAR MODELOS</button><button class="silver" id="detailSearchPrices" type="button">BUSCAR PREÇOS</button></div>'+
  '<div class="subhead">PREÇO ATUAL / REFERÊNCIA</div><p class="meta">'+(d.currentPrice?money(d.currentPrice):'AINDA NÃO INFORMADO')+'</p>'+(d.lastSearchLowest?'<div class="target-price-card"><span>MENOR PREÇO DA BUSCA ATUAL'+(d.previousSearchLowest?' · ANTERIOR '+money(d.previousSearchLowest):'')+'</span><strong>'+money(d.lastSearchLowest)+(d.previousSearchLowest?' · '+(d.lastSearchLowest<d.previousSearchLowest?'↓ ':'↑ ')+Math.abs((d.lastSearchLowest-d.previousSearchLowest)/d.previousSearchLowest*100).toFixed(1).replace('.',',')+'%':'')+'</strong></div>':'')+
- '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR QUE VOCÊ JÁ JUNTOU (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(d.savedAmount||0)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
+ '<div class="subhead">SEU PROGRESSO</div>'+progressOverview(d)+'<div class="saved-progress-editor"><div class="field"><label>VALOR JÁ GUARDADO (R$)</label><input id="savedAmountInput" type="number" min="0" step=".01" value="'+Number(d.savedAmount||0)+'" placeholder="0,00"></div><button class="silver" id="saveProgress" type="button">ATUALIZAR</button></div><div class="subhead">PLANEJAMENTO</div><div class="calc">'+calcHtml(d)+'</div>'+
  '<div class="subhead">RESUMO TÉCNICO</div><p class="meta technical-summary">'+esc(d.specs||'INFORMAÇÕES TÉCNICAS AINDA NÃO DISPONÍVEIS.')+'</p>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
- '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><p class="meta">BUSCA EM ANÚNCIOS E PÁGINAS ATUALIZADAS NO ÚLTIMO ANO. O HISTÓRICO DE PREÇOS REAL DA COSMOS COMEÇA A SER REGISTRADO A CADA BUSCA, NÃO É UMA RECONSTRUÇÃO DE PREÇOS ANTIGOS.</p><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
+ '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div><div id="priceChartArea">'+priceChart(d.priceHistory||[])+'</div>'+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="purchase-block"><div class="purchase-grid"><div class="field"><label>DATA DA COMPRA</label><input class="date-input" id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('detailCompare').onclick=()=>showTypeComparison(id);
@@ -740,7 +772,8 @@ $('productLookup').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventD
 $('addBtn').addEventListener('click',event=>{event.preventDefault();try{openForm(null)}catch(error){console.error('não foi possível abrir novo item',error);alert('NÃO FOI POSSÍVEL ABRIR O FORMULÁRIO: '+error.message)}});
 $('formClose').addEventListener('click',closeForm);$('cancelForm').addEventListener('click',closeForm);
 $('detailClose').onclick=()=>$('detailPanel').classList.add('hidden');
-async function deleteWishlistItem(id){const item=items.find(x=>x.id===id);if(!item)return;if(!confirm('TEM CERTEZA DE QUE DESEJA EXCLUIR "'+item.title.toUpperCase()+'" DA WISHLIST? ESTA AÇÃO NÃO PODE SER DESFEITA.'))return;const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',id);if(error){alert('NÃO FOI POSSÍVEL EXCLUIR: '+error.message);return}if(item.data?.imagePath)await client.storage.from(BUCKET).remove([item.data.imagePath]);$('detailPanel').classList.add('hidden');await load()}
+async function deleteWishlistItem(id){const item=items.find(x=>x.id===id);if(!item)return;const accepted=await confirmWishlistDelete();if(!accepted)return;const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',id);if(error){alert('NÃO FOI POSSÍVEL EXCLUIR: '+error.message);return}if(item.data?.imagePath)await client.storage.from(BUCKET).remove([item.data.imagePath]);$('detailPanel').classList.add('hidden');await load()}
+function confirmWishlistDelete(){return new Promise(resolve=>{const modal=$('deleteConfirm');if(!modal){resolve(false);return}const yes=$('deleteConfirmYes'),cancel=$('deleteConfirmCancel');const finish=value=>{modal.classList.add('hidden');yes.onclick=null;cancel.onclick=null;modal.onclick=null;resolve(value)};yes.onclick=()=>finish(true);cancel.onclick=()=>finish(false);modal.onclick=e=>{if(e.target===modal)finish(false)};modal.classList.remove('hidden')})}
 $('items').addEventListener('click',e=>{const open=e.target.closest('[data-open]'),edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');if(open)showDetail(open.dataset.open);if(edit)openForm(items.find(x=>x.id===edit.dataset.edit));if(del)deleteWishlistItem(del.dataset.delete)});
 async function runPriceSearch(id){
  const item=items.find(x=>x.id===id);if(!item)return;
@@ -804,7 +837,7 @@ async function showTypeComparison(id){
   const completeness=['model','capacity','power','warranty','reviews','specs'].filter(k=>String(d[k]||'').trim()).length;score+=(completeness/6)*5;parts+=5;
   return {item:x,score:parts?score/parts:0,parts};
  }).sort((a,b)=>b.score-a.score);const winner=rated[0];
- recommendation='<div class="comparison-verdict"><strong>PALPITE COSMOS: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>parece a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis'+(mixers?' · para a rotina atual, uma capacidade próxima de 7,6 L tende a equilibrar aumento de produção e investimento':'')+'. '+(winner.parts<70?'ainda faltam dados técnicos para transformar esse palpite em uma recomendação firme.':'confira a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
+ recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>parece a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis'+(mixers?' · para a rotina atual, uma capacidade próxima de 7,6 L tende a equilibrar aumento de produção e investimento':'')+'. '+(winner.parts<70?'ainda faltam dados técnicos para transformar esse palpite em uma recomendação firme.':'confira a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
