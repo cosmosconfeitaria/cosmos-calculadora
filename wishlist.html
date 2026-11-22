@@ -353,12 +353,12 @@ function showTypeComparison(id){
   {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:'max'},
   {label:'GARANTIA',get:x=>numericValue(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
   {label:'AVALIAÇÃO / REVIEWS',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'},
-  {label:'POTÊNCIA',get:x=>numericValue(x.data.power||x.data.specs),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'}
+  {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA'}
  ];
  const columns=group.map(x=>'<th>'+esc(x.data.model||x.title)+'</th>').join('');
  const rows=metrics.map(m=>{
-  const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=valid.length?Math[m.best](...valid):null;
-  return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
+  const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;
+  return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
  }).join('');
  const details=[['VOLTAGEM',x=>'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['AVALIAÇÕES',x=>x.data.reviews],['QUALIDADE / CONFIABILIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
