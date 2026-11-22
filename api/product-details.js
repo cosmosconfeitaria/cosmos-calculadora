@@ -1,0 +1,45 @@
+const SUPABASE_URL = 'https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const ALLOWED_USER_ID = 'b163037a-b543-42a8-a6a5-eeee31291898';
+const ALLOWED_EMAIL = 'cosmosconfeitaria@gmail.com';
+const COOKIE_NAME = 'cosmos_access_token';
+const ALLOWED_HOSTS = [
+ 'amazon.com.br','www.amazon.com.br','mercadolivre.com.br','www.mercadolivre.com.br',
+ 'magazineluiza.com.br','www.magazineluiza.com.br','kabum.com.br','www.kabum.com.br',
+ 'casasbahia.com.br','www.casasbahia.com.br','fastshop.com.br','www.fastshop.com.br',
+ 'zoom.com.br','www.zoom.com.br','buscape.com.br','www.buscape.com.br',
+ 'kitchenaid.com.br','www.kitchenaid.com.br','brastemp.com.br','www.brastemp.com.br',
+ 'electrolux.com.br','www.electrolux.com.br','philips.com.br','www.philips.com.br'
+];
+function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store, private'}})}
+function cookie(request){const p=(request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE_NAME+'='));return p?decodeURIComponent(p.slice(COOKIE_NAME.length+1)):''}
+function clean(s){return String(s||'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim()}
+function meta(html,key){for(const tag of html.matchAll(/<meta\b[^>]*>/gi)){const attrs={};for(const m of tag[0].matchAll(/([\w:-]+)\s*=\s*["']([^"']*)["']/g))attrs[m[1].toLowerCase()]=m[2];if((attrs.property||attrs.name)===key)return clean(attrs.content)}return ''}
+function findProductJson(value,out=[]){if(!value||typeof value!=='object')return out;if(Array.isArray(value)){for(const v of value)findProductJson(v,out);return out}const type=value['@type'];if(type==='Product'||(Array.isArray(type)&&type.includes('Product')))out.push(value);for(const v of Object.values(value))if(v&&typeof v==='object')findProductJson(v,out);return out}
+export async function POST(request){
+ const token=cookie(request);if(!token)return json({error:'SESSÃO EXPIRADA. ENTRE NOVAMENTE.'},401);
+ try{
+  const auth=await fetch(SUPABASE_URL+'/auth/v1/user',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+token},cache:'no-store'});
+  if(!auth.ok)return json({error:'SESSÃO INVÁLIDA.'},401);const user=await auth.json();
+  if(user.id!==ALLOWED_USER_ID||String(user.email||'').toLowerCase()!==ALLOWED_EMAIL)return json({error:'ACESSO NÃO AUTORIZADO.'},403);
+  const body=await request.json(),raw=String(body?.url||'').trim();let url;
+  try{url=new URL(raw)}catch(_){return json({error:'LINK INVÁLIDO.'},400)}
+  if(url.protocol!=='https:'||!ALLOWED_HOSTS.includes(url.hostname.toLowerCase()))return json({error:'POR SEGURANÇA, A LEITURA AUTOMÁTICA ESTÁ LIMITADA A LOJAS E COMPARADORES CONHECIDOS.'},400);
+  const upstream=await fetch(url.toString(),{headers:{'User-Agent':'Mozilla/5.0 (compatible; CosmosWishlist/1.0)','Accept':'text/html,application/xhtml+xml'},redirect:'follow',signal:AbortSignal.timeout(15000),cache:'no-store'});
+  if(!upstream.ok)return json({error:'A LOJA NÃO PERMITIU A LEITURA AUTOMÁTICA DESTA PÁGINA.'},502);
+  const finalUrl=new URL(upstream.url);if(finalUrl.protocol!=='https:'||!ALLOWED_HOSTS.includes(finalUrl.hostname.toLowerCase()))return json({error:'REDIRECIONAMENTO EXTERNO BLOQUEADO.'},400);
+  const html=(await upstream.text()).slice(0,1800000);
+  let product={};for(const m of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)){try{const data=JSON.parse(m[1]);const found=findProductJson(data);if(found.length){product=found[0];break}}catch(_){}}
+  const offers=Array.isArray(product.offers)?product.offers[0]:(product.offers||{});
+  const brand=typeof product.brand==='string'?product.brand:product.brand?.name||'';
+  const image=Array.isArray(product.image)?product.image[0]:typeof product.image==='object'?product.image.url:product.image;
+  const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
+  const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
+  const description=product.description||meta(html,'og:description')||meta(html,'description');
+  const sku=product.sku||product.mpn||product.model||'';
+  const textContent=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
+  const voltage=(textContent.match(/\b220\s?V\b|\b220\s?VOLTS?\b/i)||[])[0]||'';
+  const warranty=(textContent.match(/garantia.{0,35}(?:\d+\s*(?:mes(?:es)?|anos?))/i)||[])[0]||'';
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+ }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
+}
