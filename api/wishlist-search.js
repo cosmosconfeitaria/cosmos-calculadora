@@ -44,19 +44,19 @@ export async function POST(request) {
     }, 503);
     const discover = body?.mode === 'discover';
     const search = async (engine, q) => {
-      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey, ...(!discover ? { tbs: 'qdr:m3' } : {}) });
+      const params = new URLSearchParams({ engine, q, google_domain: 'google.com.br', gl: 'br', hl: 'pt-br', api_key: apiKey, ...(!discover ? { tbs: 'qdr:y' } : {}) });
       const response = await fetch('https://serpapi.com/search.json?' + params.toString(), {
         headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000), cache: 'no-store'
       });
       if (!response.ok) throw new Error('SEARCH_PROVIDER_' + response.status);
       return response.json();
     };
-    const searchQuery = discover ? query : query + ' 220V';
+    const searchQuery = query;
     const shopping = await search('google_shopping', searchQuery);
     let rows = Array.isArray(shopping.shopping_results) ? shopping.shopping_results : [];
     let source = 'GOOGLE SHOPPING';
     // A descoberta aceita resultados mais amplos e páginas de produto sem preço.
-    if (discover && rows.length < 4) {
+    if (rows.length < 4) {
       try {
         const general = await search('google', searchQuery);
         const organic = Array.isArray(general.organic_results) ? general.organic_results : [];
@@ -94,6 +94,7 @@ export async function POST(request) {
     return json({
       searchId: new Date().toISOString(), query, products,
       ignoredForVoltage: products.filter(p => p.voltageStatus === 'UNKNOWN' || p.voltageStatus === 'INCOMPATIBLE').length,
+      searchWindow: discover ? null : '12_MONTHS',
       source
     });
   } catch (error) {
