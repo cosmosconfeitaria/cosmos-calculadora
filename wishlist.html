@@ -555,14 +555,15 @@ async function searchWishlistProducts(){
   const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,mode:'discover'})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
   host.innerHTML='';const products=result.products||[];
-  if(!products.length){host.innerHTML='<p class="discovery-note">NENHUM RESULTADO ENCONTRADO. TENTE OUTRO TERMO OU MODELO.</p>';return}
+  if(!products.length){host.innerHTML='<p class="discovery-note">NÃO ENCONTRAMOS RESULTADOS PARA ESSA PALAVRA-CHAVE. TENTE UMA VARIAÇÃO SIMPLES, COMO "BATEDEIRA" OU "BATEDEIRA INDUSTRIAL".</p>';return}
+  const sourceNote=document.createElement('p');sourceNote.className='discovery-note';sourceNote.textContent=products.length+' RESULTADO(S) · '+(result.source||'GOOGLE');host.append(sourceNote);
   products.forEach(p=>{
    const status=p.voltageStatus||voltageStatus(p),bad=status==='INCOMPATIBLE',confirmed=status==='CONFIRMED_220V'||status==='BIVOLT';
    const card=document.createElement('article');card.className='product-result';
    const img=document.createElement('img');img.alt='';if(p.thumbnail)img.src=p.thumbnail;else img.style.visibility='hidden';
    const body=document.createElement('div'),title=document.createElement('strong');title.textContent=p.title||'PRODUTO SEM NOME';
-   const meta=document.createElement('div');meta.className='meta';meta.textContent=p.source||'GOOGLE SHOPPING';
-   const price=document.createElement('div');price.className='price';price.textContent=p.priceText||(p.priceValue?'R$ '+Number(p.priceValue).toLocaleString('pt-BR',{minimumFractionDigits:2}):'PREÇO NÃO INFORMADO');
+   const meta=document.createElement('div');meta.className='meta';meta.textContent=p.source||'GOOGLE';
+   const price=document.createElement('div');price.className='price';price.textContent=p.priceText||(p.priceValue?'R$ '+Number(p.priceValue).toLocaleString('pt-BR',{minimumFractionDigits:2}):'PREÇO NÃO INFORMADO · CONSULTAR ANÚNCIO');
    const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT · INCLUI 220V':'220V IDENTIFICADO'):bad?'110V/127V · INCOMPATÍVEL':'VOLTAGEM NÃO IDENTIFICADA';
    const actions=document.createElement('div');actions.className='result-actions';
    if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';actions.append(link)}
@@ -572,12 +573,20 @@ async function searchWishlistProducts(){
    if(status==='UNKNOWN')check.addEventListener('change',()=>{choose.disabled=!check.checked});
    choose.addEventListener('click',()=>{
     if(!confirmed&&!check.checked)return;
-    const voltage=status==='BIVOLT'?'BIVOLT':'220V';
-    const metaData={voltage,voltageVerifiedByUser:status==='UNKNOWN',productSource:p.source||'',productImageUrl:p.thumbnail||'',initialOffer:p.priceValue?{store:p.source||'GOOGLE SHOPPING',price:Number(p.priceValue),url:p.link||'',searchedAt:today(),title:p.title,voltageConfirmed:true}:null};
-    $('itemForm').elements.title.value=p.title||'';if(p.priceValue)$('itemForm').elements.currentPrice.value=Number(p.priceValue).toFixed(2);
-    $('itemForm').elements.referenceUrl.value=p.link||'';$('itemForm').dataset.productMeta=JSON.stringify(metaData);
-    const note=document.createElement('p');note.className='discovery-note';note.textContent='PRODUTO SELECIONADO. COMPLETE A CATEGORIA, PRIORIDADE E PLANEJAMENTO FINANCEIRO ABAIXO.';host.prepend(note);
-    $('itemForm').elements.title.focus();$('itemForm').elements.title.scrollIntoView({behavior:'smooth',block:'center'});
+    const form=$('itemForm'),fields=form.elements,voltage=status==='BIVOLT'?'BIVOLT':'220V';
+    const metaData={voltage,voltageVerifiedByUser:status==='UNKNOWN',productSource:p.source||'',productImageUrl:p.thumbnail||'',detectedVoltage:confirmed?status:'CONFIRMADO PELA USUÁRIA',initialOffer:p.priceValue&&p.link?{store:p.source||'GOOGLE SHOPPING',price:Number(p.priceValue),url:p.link,searchedAt:today(),title:p.title,voltageConfirmed:true}:null};
+    fields.title.value=p.title||'';
+    if(p.priceValue)fields.currentPrice.value=Number(p.priceValue).toFixed(2);
+    fields.referenceUrl.value=p.link||'';
+    if(p.description)fields.specs.value=p.description;
+    const capacity=(p.title+' '+(p.description||'')).match(/\b\d+(?:[,.]\d+)?\s?(?:L|litros?|kg|quilos?)\b/i);
+    const power=(p.title+' '+(p.description||'')).match(/\b\d{2,4}\s?W\b/i);
+    if(capacity&&!fields.capacity.value)fields.capacity.value=capacity[0];
+    if(power&&!fields.power.value)fields.power.value=power[0];
+    form.dataset.productMeta=JSON.stringify(metaData);
+    const note=document.createElement('p');note.className='discovery-note';note.textContent='PRODUTO SELECIONADO. PREÇO, IMAGEM E DADOS TÉCNICOS DISPONÍVEIS FORAM PREENCHIDOS AUTOMATICAMENTE. REVISE O QUE FALTAR ABAIXO.';host.prepend(note);
+    if(p.link){fields.referenceUrl.dispatchEvent(new Event('change',{bubbles:true}));}
+    updateFinancePreview();fields.title.focus();fields.title.scrollIntoView({behavior:'smooth',block:'center'});
    });
    actions.append(choose);body.append(title,meta,price,tag,actions);card.append(img,body);host.append(card);
   });
