@@ -560,48 +560,73 @@ $('itemForm').addEventListener('submit',async e=>{
 });
 
 function voltageStatus(product){const text=[product.title,product.voltage,product.description].filter(Boolean).join(' ');if(/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(text))return 'INCOMPATIBLE';if(/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(text))return 'BIVOLT';if(/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(text))return 'CONFIRMED_220V';return 'UNKNOWN'}
+async function saveDiscoveryResult(p,status='WISHLIST'){
+ const title=String(p.title||'').trim();if(!title)throw new Error('PRODUTO SEM NOME.');
+ const same=items.find(x=>x.status===status&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
+ if(same)return same.id;
+ const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':'220V';
+ const current=Number(p.priceValue||0)||null;
+ const history=items.filter(x=>x.status==='WISHLIST'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')).flatMap(x=>x.data.priceHistory||[]);
+ const cutoff=new Date(Date.now()-90*86400000);
+ const recent=history.filter(h=>new Date((h.at||'')+'T12:00:00')>=cutoff&&Number(h.price)>0);
+ const historicalLow=recent.length?Math.min(...recent.map(h=>Number(h.price)+Number(h.shipping||0))):null;
+ const technical=p.technicalSummary||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
+ const data={subcategory:'',voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NAS BUSCAS DOS ÚLTIMOS 3 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
+ if(current&&p.link){data.stores.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,searchedAt:today(),title,image:p.thumbnail||'',voltageConfirmed:true});data.priceHistory.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,at:today(),searchBatch:'initial-'+today(),read:false})}
+ const {data:row,error}=await client.from('cosmos_wishlist_items').insert({user_id:user.id,title,category,status,importance:'MEDIA',data}).select('id').single();
+ if(error)throw error;
+ if(status==='WISHLIST'){const favorite=items.find(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));if(favorite)await client.from('cosmos_wishlist_items').delete().eq('id',favorite.id)}
+ return row.id;
+}
+async function toggleDiscoveryFavorite(p,button){
+ const title=String(p.title||'').trim(),existing=items.find(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
+ try{
+  if(existing){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',existing.id);if(error)throw error;button.classList.remove('active');button.textContent='☆'}
+  else{await saveDiscoveryResult(p,'FAVORITE');button.classList.add('active');button.textContent='★'}
+  await load();
+ }catch(error){alert('NÃO FOI POSSÍVEL ATUALIZAR O FAVORITO: '+error.message)}
+}
 async function searchWishlistProducts(){
  const query=$('productLookup').value.trim();if(!query){$('productLookup').focus();return}
- const button=$('productLookupBtn'),host=$('productLookupResults');button.disabled=true;button.textContent='BUSCANDO...';host.innerHTML='<p class="discovery-note">PESQUISANDO OFERTAS...</p>';
+ const button=$('productLookupBtn'),host=$('productLookupResults');button.disabled=true;button.textContent='BUSCANDO...';host.innerHTML='<p class="discovery-note">PESQUISANDO PRODUTOS E CONFERINDO VOLTAGEM...</p>';
  try{
   const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,mode:'discover'})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
-  host.innerHTML='';const products=result.products||[];
-  if(!products.length){host.innerHTML='<p class="discovery-note">NÃO ENCONTRAMOS RESULTADOS PARA ESSA PALAVRA-CHAVE. TENTE UMA VARIAÇÃO SIMPLES, COMO "BATEDEIRA" OU "BATEDEIRA INDUSTRIAL".</p>';return}
-  const sourceNote=document.createElement('p');sourceNote.className='discovery-note';sourceNote.textContent=products.length+' RESULTADO(S) · '+(result.source||'GOOGLE');host.append(sourceNote);
-  products.forEach(p=>{
-   const status=p.voltageStatus||voltageStatus(p),bad=status==='INCOMPATIBLE',confirmed=status==='CONFIRMED_220V'||status==='BIVOLT';
+  let products=result.products||[];
+  products=await Promise.all(products.map(async original=>{
+   let p={...original},status=p.voltageStatus||voltageStatus(p);
+   if(status==='UNKNOWN'&&p.link){
+    try{
+     const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});
+     if(check.ok){const detail=await check.json();p={...p,...detail,source:p.source||detail.source,link:p.link,thumbnail:p.thumbnail||detail.image||'',description:[p.description,detail.description].filter(Boolean).join(' · '),technicalSummary:detail.technicalSummary||detail.specs||detail.description};status=voltageStatus({title:p.title,voltage:detail.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});if(status==='UNKNOWN'&&/220\s?V/i.test(p.technicalSummary||''))status='CONFIRMED_220V';}
+    }catch(_){}
+   }
+   p.voltageStatus=status;p.voltageConfirmed=status==='CONFIRMED_220V'||status==='BIVOLT';return p;
+  }));
+  host.innerHTML='';
+  if(!products.length){host.innerHTML='<p class="discovery-note">NÃO ENCONTRAMOS RESULTADOS PARA ESSA PALAVRA-CHAVE. TENTE UMA VARIAÇÃO SIMPLES.</p>';return}
+  const top=document.createElement('div');top.className='result-toolbar';
+  const note=document.createElement('span');note.className='meta';note.textContent=products.length+' RESULTADO(S) · '+(result.source||'GOOGLE');
+  const bulk=document.createElement('button');bulk.type='button';bulk.className='silver';bulk.textContent='ADICIONAR SELECIONADOS';bulk.disabled=true;top.append(note,bulk);host.append(top);
+  const selected=new Set(),syncBulk=()=>{bulk.disabled=!selected.size;bulk.textContent=selected.size?'ADICIONAR '+selected.size+' SELECIONADO(S)':'ADICIONAR SELECIONADOS'};
+  products.forEach((p,index)=>{
+   const status=p.voltageStatus||voltageStatus(p),bad=status==='INCOMPATIBLE',confirmed=p.voltageConfirmed||status==='CONFIRMED_220V'||status==='BIVOLT';
    const card=document.createElement('article');card.className='product-result';
    const img=document.createElement('img');img.alt='';if(p.thumbnail)img.src=p.thumbnail;else img.style.visibility='hidden';
    const body=document.createElement('div'),title=document.createElement('strong');title.textContent=p.title||'PRODUTO SEM NOME';
    const meta=document.createElement('div');meta.className='meta';meta.textContent=p.source||'GOOGLE';
    const price=document.createElement('div');price.className='price';price.textContent=p.priceText||(p.priceValue?'R$ '+Number(p.priceValue).toLocaleString('pt-BR',{minimumFractionDigits:2}):'PREÇO NÃO INFORMADO · CONSULTAR ANÚNCIO');
-   const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT · INCLUI 220V':'220V IDENTIFICADO'):bad?'110V/127V · INCOMPATÍVEL':'VOLTAGEM NÃO IDENTIFICADA';
+   const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT · INCLUI 220V':'220V IDENTIFICADO'):bad?'110V/127V · INCOMPATÍVEL':'VOLTAGEM NÃO CONFIRMADA';
    const actions=document.createElement('div');actions.className='result-actions';
+   const star=document.createElement('button');star.type='button';star.className='favorite-star'+(items.some(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===String(p.title||'').toLocaleLowerCase('pt-BR'))?' active':'');star.textContent=star.classList.contains('active')?'★':'☆';star.title='FAVORITAR';star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));actions.append(star);
    if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';actions.append(link)}
-   const checkLabel=document.createElement('label');checkLabel.className='voltage-confirm';const check=document.createElement('input');check.type='checkbox';checkLabel.append(check,document.createTextNode(' CONFERI NO ANÚNCIO: É 220V'));
-   if(status==='UNKNOWN')actions.append(checkLabel);
-   const choose=document.createElement('button');choose.type='button';choose.textContent=bad?'NÃO COMPATÍVEL':'ADICIONAR À WISHLIST';choose.disabled=bad||(!confirmed&&!check.checked);
-   if(status==='UNKNOWN')check.addEventListener('change',()=>{choose.disabled=!check.checked});
-   choose.addEventListener('click',()=>{
-    if(!confirmed&&!check.checked)return;
-    const form=$('itemForm'),fields=form.elements,voltage=status==='BIVOLT'?'BIVOLT':'220V';
-    const metaData={voltage,voltageVerifiedByUser:status==='UNKNOWN',productSource:p.source||'',productImageUrl:p.thumbnail||'',detectedVoltage:confirmed?status:'CONFIRMADO PELA USUÁRIA',initialOffer:p.priceValue&&p.link?{store:p.source||'GOOGLE SHOPPING',price:Number(p.priceValue),url:p.link,searchedAt:today(),title:p.title,voltageConfirmed:true}:null};
-    fields.title.value=p.title||'';
-    if(p.priceValue)fields.currentPrice.value=Number(p.priceValue).toFixed(2);
-    fields.referenceUrl.value=p.link||'';
-    if(p.description)fields.specs.value=p.description;
-    const capacity=(p.title+' '+(p.description||'')).match(/\b\d+(?:[,.]\d+)?\s?(?:L|litros?|kg|quilos?)\b/i);
-    const power=(p.title+' '+(p.description||'')).match(/\b\d{2,4}\s?W\b/i);
-    if(capacity&&!fields.capacity.value)fields.capacity.value=capacity[0];
-    if(power&&!fields.power.value)fields.power.value=power[0];
-    form.dataset.productMeta=JSON.stringify(metaData);
-    const note=document.createElement('p');note.className='discovery-note';note.textContent='PRODUTO SELECIONADO. PREÇO, IMAGEM E DADOS TÉCNICOS DISPONÍVEIS FORAM PREENCHIDOS AUTOMATICAMENTE. REVISE O QUE FALTAR ABAIXO.';host.prepend(note);
-    if(p.link){fields.referenceUrl.dispatchEvent(new Event('change',{bubbles:true}));}
-    updateFinancePreview();fields.title.focus();fields.title.scrollIntoView({behavior:'smooth',block:'center'});
-   });
-   actions.append(choose);body.append(title,meta,price,tag,actions);card.append(img,body);host.append(card);
+   const add=document.createElement('button');add.type='button';add.textContent=bad?'INCOMPATÍVEL':confirmed?'ADICIONAR À WISHLIST':'VOLTAGEM NÃO CONFIRMADA';add.disabled=bad||!confirmed;
+   add.addEventListener('click',async()=>{if(!confirmed)return;add.disabled=true;try{await saveDiscoveryResult(p,'WISHLIST');await load();add.textContent='ADICIONADO';}catch(error){alert('NÃO FOI POSSÍVEL ADICIONAR: '+error.message);add.disabled=false}});
+   const pick=document.createElement('input');pick.type='checkbox';pick.className='result-select';pick.disabled=bad||!confirmed;pick.setAttribute('aria-label','selecionar '+p.title);pick.addEventListener('change',()=>{if(pick.checked)selected.add(index);else selected.delete(index);syncBulk()});
+   const pickLabel=document.createElement('label');pickLabel.style.cssText='display:flex;align-items:center;margin:0;font-size:9px;color:var(--muted)';pickLabel.append(pick,document.createTextNode('SELECIONAR'));
+   actions.append(pickLabel,add);body.append(title,meta,price,tag,actions);card.append(img,body);host.append(card);
   });
+  bulk.addEventListener('click',async()=>{const chosen=[...selected].map(i=>products[i]);bulk.disabled=true;bulk.textContent='SALVANDO...';try{for(const p of chosen)await saveDiscoveryResult(p,'WISHLIST');await load();bulk.textContent='ADICIONADOS';selected.clear();}catch(error){alert('NÃO FOI POSSÍVEL ADICIONAR TODOS: '+error.message);syncBulk()}});
  }catch(error){host.innerHTML='';const message=document.createElement('p');message.className='discovery-note';message.textContent='NÃO FOI POSSÍVEL BUSCAR: '+error.message;host.append(message)}
  finally{button.disabled=false;button.textContent='PESQUISAR'}
 }
