@@ -500,12 +500,12 @@ function openForm(item){
 function closeForm(){$('formPanel').classList.add('hidden');editingId=null}
 let technicalEnrichmentStarted=false;
 async function autoEnrichExistingWishlist(){
- const pending=items.filter(x=>x.status==='WISHLIST'&&(!x.data?.model||!x.data?.capacity||!x.data?.power||!x.data?.warranty||!x.data?.rating||!x.data?.specs)&&(!x.data?.technicalLookupAt||Date.now()-new Date(x.data.technicalLookupAt).getTime()>30*86400000));
+ const pending=items.filter(x=>x.status==='WISHLIST'&&(!x.data?.model||!x.data?.capacity||!x.data?.power||!x.data?.warranty||!x.data?.rating||!x.data?.specs)&&(!x.data?.technicalLookupAt||Date.now()-new Date(x.data.technicalLookupAt).getTime()>30*86400000||Number(x.data?.technicalLookupVersion||0)<2));
  for(const item of pending){
   const d=item.data||{},model=d.model||((String(item.title).match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL))?\b/i)||[])[0]||'');
   try{
    const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:item.title,model,capacity:d.capacity||'',mode:'discover'})});
-   const result=await response.json(),candidate=(result.products||[])[0],update={...d,technicalLookupAt:new Date().toISOString()};
+   const result=await response.json(),candidate=(result.products||[])[0],update={...d,technicalLookupAt:new Date().toISOString(),technicalLookupVersion:2};
    if(candidate){
     for(const key of ['model','capacity','power','warranty','rating','ratingCount','dimensions'])if(!String(update[key]||'').trim()&&candidate[key])update[key]=candidate[key];
     if(!String(update.specs||'').trim()||/^VOLTAGEM:/i.test(update.specs))update.specs=candidate.description||candidate.specs||update.specs;
