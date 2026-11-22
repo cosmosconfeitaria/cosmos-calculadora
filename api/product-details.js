@@ -38,7 +38,7 @@ export async function POST(request){
   const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
   const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
   const description=product.description||meta(html,'og:description')||meta(html,'description');
-  const sku=product.sku||product.mpn||product.model||meta(html,'product:retailer_item_id')||meta(html,'og:sku')||(String(description||'').match(/modelo\s*[:\-]\s*([A-Z0-9-]+)/i)||[])[1]||(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}[A-Z0-9-]*\b/)||[])[0]||'';
+  const sku=product.sku||product.mpn||product.model||meta(html,'product:retailer_item_id')||meta(html,'og:sku')||(String(description||'').match(/modelo\s*[:\-]\s*([A-Z0-9-]+)/i)||[])[1]||(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}(?:\s+[A-Z0-9]+)?\b/)||[])[0]||'';
   const textContent=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
   const voltage=(textContent.match(/\b(?:BIVOLT|110\s?V|127\s?V|220\s?V|100\s?A\s?240\s?V)\b/i)||[])[0]||'';
   const warranty=(textContent.match(/garantia.{0,35}(?:\d+\s*(?:mes(?:es)?|anos?))/i)||[])[0]||'';
