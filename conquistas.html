@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2263D2">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<title>COSMOS COOKIE LAB · WISHLIST</title>
+<link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--red:#D22222;--line:#d4d1cc;--muted:#77736e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--blue);color:var(--blue);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px}
+body:before,body:after{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background-repeat:repeat;animation:stars 110s linear infinite}
+body:before{opacity:.75;background-image:radial-gradient(1px 1px at 13px 19px,#fff 98%,transparent),radial-gradient(1px 1px at 77px 53px,#dce8ff 98%,transparent),radial-gradient(1px 1px at 141px 117px,#fff 98%,transparent),radial-gradient(1px 1px at 193px 31px,#c8dcff 98%,transparent);background-size:257px 211px}
+body:after{opacity:.35;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent);background-size:293px 239px;animation-direction:reverse;animation-duration:150s}
+@keyframes stars{to{transform:translate3d(6%,5%,0)}}
+.wrap{width:min(900px,calc(100% - 32px));margin:22px auto;padding:22px 24px 28px;background:var(--cream);border:1px solid #fff;box-shadow:0 10px 35px #102f6a30;min-height:calc(100vh - 44px)}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:8px 0 16px;margin-bottom:30px;gap:12px}
+.brand{font-size:14px;font-weight:500;color:var(--blue)}
+.logo-type{position:relative;display:inline-block;color:transparent;-webkit-text-stroke:.65px var(--blue);font-weight:500}
+.logo-type:after{content:attr(data-text);position:absolute;inset:0;color:#2263D269;-webkit-text-stroke:0;transform:translate(2px,1.5px);animation:wobble 2.7s ease-in-out infinite;pointer-events:none}
+@keyframes wobble{0%,100%{transform:translate(1px,-.5px)}25%{transform:translate(-.5px,.7px)}50%{transform:translate(1.2px,.5px)}75%{transform:translate(.2px,-1px)}}
+.back,.silver,.icon-button{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);color:var(--blue);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;cursor:pointer}
+.back{width:42px;height:36px;display:grid;place-items:center;border-radius:8px;text-decoration:none;font-size:18px}
+.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px}
+h1{font-size:clamp(34px,7vw,56px);line-height:.98;letter-spacing:-1.5px;font-weight:500;margin:0;color:var(--blue)}
+.intro{text-transform:uppercase;font-size:12px;line-height:1.55;color:#55514d;max-width:650px;margin:12px 0 24px}
+.toolbar{display:grid;grid-template-columns:1fr auto auto auto;gap:9px;align-items:center;margin-bottom:14px}
+input,select,textarea{text-transform:uppercase;width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;background:#fff;color:var(--ink);font:12px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.2px;outline:none}
+input::placeholder,textarea::placeholder{ text-transform:uppercase; opacity:.65 } textarea{min-height:80px;resize:vertical;line-height:1.45}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2263d21a}
+label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
+.field{min-width:0}
+.silver{border-radius:8px;padding:12px 14px;font:500 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:-.35px;text-transform:uppercase;white-space:nowrap}
+.silver:active,.back:active,.icon-button:active{transform:translateY(2px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}
+.icon-button{width:42px;height:40px;border-radius:8px;position:relative;font-size:17px}
+.dot{position:absolute;right:7px;top:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1px solid white}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.section-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 12px}
+.section-line h2{font-size:12px;letter-spacing:.08em;font-weight:500;margin:0}
+.count{font-size:10px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.item{border:1px solid var(--line);background:#fff;padding:14px;min-width:0;box-shadow:0 2px 0 #dedbd6}
+.item-top{display:flex;gap:12px;align-items:flex-start}
+.thumb{width:76px;height:76px;flex:0 0 76px;object-fit:cover;background:var(--cream);border:1px solid var(--line)}
+.thumb.empty{display:grid;place-items:center;font-size:25px;color:#b9b5ae}
+.item h3{font-size:15px;font-weight:500;color:var(--blue);line-height:1.2;margin:0 0 6px;overflow-wrap:anywhere}
+.meta{text-transform:uppercase;font-size:10px;color:var(--muted);line-height:1.5}
+.price{font-size:16px;color:var(--ink);margin:12px 0 3px}
+.item-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.item-actions button{font-size:10px;padding:8px 10px}
+.small-link{color:var(--blue);font-size:10px;text-decoration:underline;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);font-size:9px;color:var(--muted);margin:5px 4px 0 0}
+.empty-state{text-transform:uppercase;border:1px dashed #c8c4bd;padding:28px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
+.panel{border:1px solid var(--line);background:#fff;padding:16px;margin:12px 0;box-shadow:0 2px 0 #dedbd6}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.full{grid-column:1/-1}
+.hidden{display:none!important}
+.form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.form-actions .silver{min-width:120px}
+.subhead{text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:var(--blue);margin:18px 0 10px;font-weight:500}
+.calc{text-transform:uppercase;background:var(--cream);padding:12px;border:1px solid var(--line);font-size:11px;line-height:1.6}
+.calc strong{font-size:17px;font-weight:500;color:var(--blue)}
+.store-row{display:grid;grid-template-columns:1.1fr 1fr .8fr 1fr auto;gap:7px;margin:8px 0;align-items:end}
+.store-row input{font-size:11px;padding:10px 8px}
+.store-row button{height:36px}
+.notice{text-transform:uppercase;border:1px solid #e7c5c5;background:#fff7f6;padding:12px;margin:8px 0;font-size:11px;line-height:1.5;color:var(--ink)}
+.notice.unread{border-left:4px solid var(--red)}
+.notice strong{color:var(--blue);font-weight:500}
+.chart-empty{padding:18px;border:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}.price-chart{border:1px solid var(--line);padding:12px;background:#fff}.chart-caption{text-transform:uppercase;font-size:9px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}.price-chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-legend-wrap{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.chart-legend{font-size:10px;color:var(--ink);display:inline-flex;align-items:center;gap:5px}.chart-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.chart-footnote{text-transform:uppercase;font-size:9px;color:var(--muted);line-height:1.4;margin-top:9px}.popup{position:fixed;z-index:10000;right:18px;bottom:94px;top:auto;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
+.popup-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.popup-head strong{text-transform:uppercase;font-size:12px;font-weight:500}
+.close{border:0;background:none;color:var(--blue);font-size:20px;cursor:pointer}
+.back{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 34px;border:1px solid #d4d1cc;border-radius:8px;background:linear-gradient(180deg,#fff 0%,#f0efed 48%,#d8d7d4 100%);box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e,0 3px 5px #0000000b;color:var(--blue);text-decoration:none}.menu-lines{display:flex;flex-direction:column;gap:4px;width:15px}.menu-lines i{display:block;width:15px;height:2px;border-radius:2px;background:var(--blue)}.back:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.floating-inbox{position:fixed;right:18px;bottom:18px;z-index:10001;width:62px;height:62px;border-radius:50%;border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,inset 0 -2px 2px #aaa9a6,0 4px 0 #a5a39e,0 7px 12px #0002;color:var(--blue);font-size:23px;cursor:pointer}.floating-inbox:active{transform:translateY(3px);box-shadow:inset 0 2px 1px #fff,0 1px 0 #a5a39e}.floating-inbox .dot{right:7px;top:7px;width:10px;height:10px}
+.nav-action{display:inline-flex;align-items:center;text-decoration:none}
+.comparison-table{border-collapse:collapse;min-width:620px;width:100%;font-size:11px}.comparison-table th,.comparison-table td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.comparison-table thead th{background:var(--cream);color:var(--blue);font-weight:500}.comparison-table tbody th{color:var(--muted);font-weight:500;white-space:nowrap}.comparison-table .best-value{background:#e8f4eb;color:#176b37;font-weight:600}.comparison-table .worst-value{background:#fff0ed;color:#b72b20;font-weight:600}
+.archive-list{display:grid;gap:9px}
+.archive-row{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);background:#fff;font-size:11px}
+.archive-row strong{font-weight:500;color:var(--blue)}
+footer{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:34px 12px 18px}
+.footer-cosmos .line-brand{font-size:26px;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+.footer-cosmos .line-tagline{font-size:10px;color:var(--blue)}
+.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;color:var(--red)}
+@media(max-width:620px){.wrap{margin:12px auto;min-height:calc(100vh - 24px);padding:16px 14px 22px}.toolbar{grid-template-columns:1fr auto auto}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.store-row{grid-template-columns:1fr 1fr}.store-row .store-remove{grid-column:2;justify-self:end}.item-top .thumb{width:68px;height:68px;flex-basis:68px}}
+@media(prefers-reduced-motion:reduce){body:before,body:after,.logo-type:after{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar para COSMOS TOOLS" title="voltar para COSMOS TOOLS"><span class="menu-lines"><i></i><i></i><i></i></span></a></header>
+<p class="eyebrow">COSMOS TOOLS / WISHLIST</p>
+<h1>CONQUISTAS<span style="color:var(--red)">.</span></h1>
+<p class="intro">UM REGISTRO DAS COISAS QUE A COSMOS JÁ CONQUISTOU. CADA COMPRA FICA GUARDADA COM SUA DATA, VALOR REAL E HISTÓRICO.</p>
+<div class="toolbar" style="grid-template-columns:1fr">
+<a class="silver nav-action" href="wishlist.html">VOLTAR À WISHLIST</a>
+</div>
+<div class="section-line"><h2>ITENS ADQUIRIDOS</h2><span class="count" id="achievementCount">0 CONQUISTAS</span></div>
+<div class="cards" id="achievementItems"><div class="empty-state">CARREGANDO SUAS CONQUISTAS...</div></div>
+<footer class="footer-cosmos">
+    <div class="line-brand"><span class="logo-type" data-text="COSMOS">COSMOS</span></div>
+    <div class="line-tagline">NOT YOUR REGULAR COOKIE</div>
+    <div class="line-est">EST. 2024</div>
+  </footer>
+</div>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://gjotzkvhvdqhnaoxcgxv.supabase.co';
+const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
+const ALLOWED_EMAIL='cosmosconfeitaria@gmail.com';
+const client=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+async function init(){
+ if(!client){$('achievementItems').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONECTAR AO SUPABASE.</div>';return}
+ const {data,error}=await client.auth.getSession(),session=data?.session;
+ if(error||!session||String(session.user.email||'').toLowerCase()!==ALLOWED_EMAIL){location.replace('index.html?auth=required');return}
+ const response=await fetch('/api/session',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session.access_token})});
+ if(!response.ok){$('achievementItems').innerHTML='<div class="notice">SUA SESSÃO PRECISA SER VALIDADA. VOLTE À PÁGINA INICIAL E ENTRE NOVAMENTE.</div>';return}
+ const result=await client.from('cosmos_wishlist_items').select('*').eq('status','PURCHASED').order('updated_at',{ascending:false});
+ if(result.error){$('achievementItems').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CARREGAR AS CONQUISTAS: '+esc(result.error.message)+'</div>';return}
+ const rows=result.data||[];
+ $('achievementCount').textContent=rows.length+' CONQUISTA(S)';
+ $('achievementItems').innerHTML=rows.map(row=>{
+  const d=row.data||{};
+  return '<article class="item"><div class="item-top"><div class="thumb empty">★</div><div style="min-width:0"><h3>'+esc(row.title)+'</h3><div class="meta">'+esc(row.category)+' · '+esc(d.productType||'')+' · '+esc(d.model||'')+'</div><span class="pill">220V</span></div></div><div class="price">'+money(d.paidPrice)+'</div><div class="meta">ADICIONADO À WISHLIST: '+date(d.addedAt)+'<br>COMPRADO EM: '+date(d.purchaseDate)+'</div>'+(d.targetPrice?'<div class="meta">PREÇO-ALVO: '+money(d.targetPrice)+'</div>':'')+(d.referenceUrl?'<p><a class="small-link" href="'+esc(d.referenceUrl)+'" target="_blank" rel="noopener">ABRIR LINK DE REFERÊNCIA</a></p>':'')+'</article>';
+ }).join('')||'<div class="empty-state">AINDA NÃO HÁ CONQUISTAS REGISTRADAS.<br>QUANDO VOCÊ MARCAR UM ITEM COMO COMPRADO NA WISHLIST, ELE APARECERÁ AQUI.</div>';
+}
+init();
+})();
+</script>
+</body>
+</html>
