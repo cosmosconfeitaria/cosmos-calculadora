@@ -49,6 +49,7 @@ export async function POST(request){
   const rating=product.aggregateRating?.ratingValue||'';
   const reviewCount=product.aggregateRating?.reviewCount||product.aggregateRating?.ratingCount||'';
   const specs=properties.map(p=>clean((p.name||'')+': '+(p.value||''))).filter(Boolean).join(' · ');
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('ESPECIFICAÇÕES: '+specs),description&&('DESCRIÇÃO: '+clean(description))].filter(Boolean).join('\n');
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
