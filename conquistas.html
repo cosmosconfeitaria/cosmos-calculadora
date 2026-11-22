@@ -86,6 +86,23 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 .footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:14px;color:var(--red)}
 @media(max-width:620px){.wrap{margin:12px auto;min-height:calc(100vh - 24px);padding:16px 14px 22px}.toolbar{grid-template-columns:1fr auto auto}.cards{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.store-row{grid-template-columns:1fr 1fr}.store-row .store-remove{grid-column:2;justify-self:end}.item-top .thumb{width:68px;height:68px;flex-basis:68px}}
 @media(prefers-reduced-motion:reduce){body:before,body:after,.logo-type:after{animation:none}}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding:8px 0 16px;margin-bottom:34px;gap:12px}
+.brand{font-size:14px;font-weight:500;letter-spacing:-.35px;color:var(--blue)}
+.back{width:42px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #aaa8a3;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#f0efed 18%,#d8d7d4 48%,#c5c4c1 52%,#e6e5e2 82%,#c9c8c5 100%);box-shadow:inset 0 2px 1px #fff,0 3px 0 #a5a39e;text-decoration:none}
+.menu-lines{display:grid;gap:4px;width:17px}
+.menu-lines i{display:block;height:2px;border-radius:2px;background:var(--blue)}
+header{border-bottom:1px solid #d4d1cc}
+.back:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.logo-type:after{animation:none}}
+
+/* RODAPÉ OFICIAL COSMOS: MESMO CÓDIGO DO FLAVOR GENERATOR */
+footer.footer-cosmos{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;padding:28px 12px 20px;margin:0;gap:3px;background:transparent}
+footer.footer-cosmos .line-brand{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:26px;font-weight:500;letter-spacing:-.7px;line-height:1;color:var(--blue)}
+footer.footer-cosmos .line-brand .logo-type{font-size:inherit;font-weight:inherit;letter-spacing:inherit;line-height:inherit}
+footer.footer-cosmos .line-tagline{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:-.25px;line-height:1.15;color:var(--blue)}
+footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;font-weight:400;letter-spacing:0;line-height:1.1;color:#D22222}
+@media(max-width:520px){footer.footer-cosmos .line-brand{font-size:26px}}
+
 </style>
 </head>
 <body>
