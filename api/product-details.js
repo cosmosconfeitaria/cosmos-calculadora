@@ -40,7 +40,7 @@ export async function POST(request){
   const description=product.description||meta(html,'og:description')||meta(html,'description');
   const sku=product.sku||product.mpn||product.model||'';
   const textContent=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
-  const voltage=(textContent.match(/\b220\s?V\b|\b220\s?VOLTS?\b/i)||[])[0]||'';
+  const voltage=(textContent.match(/\b(?:BIVOLT|110\s?V|127\s?V|220\s?V|100\s?A\s?240\s?V)\b/i)||[])[0]||'';
   const warranty=(textContent.match(/garantia.{0,35}(?:\d+\s*(?:mes(?:es)?|anos?))/i)||[])[0]||'';
   const properties=Array.isArray(product.additionalProperty)?product.additionalProperty:[];
   const prop=(...terms)=>{const found=properties.find(p=>terms.some(t=>String(p.name||'').toLowerCase().includes(t)));return found?clean(found.value):''};
@@ -48,8 +48,12 @@ export async function POST(request){
   const power=prop('potencia','potência')||(textContent.match(/\b\d{2,4}\s?W\b/i)||[])[0]||'';
   const rating=product.aggregateRating?.ratingValue||'';
   const reviewCount=product.aggregateRating?.reviewCount||product.aggregateRating?.ratingCount||'';
-  const specs=properties.map(p=>clean((p.name||'')+': '+(p.value||''))).filter(Boolean).join(' · ');
-  const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('ESPECIFICAÇÕES: '+specs),description&&('DESCRIÇÃO: '+clean(description))].filter(Boolean).join('\n');
+  const propertySpecs=properties.map(p=>clean((p.name||'')+': '+(p.value||''))).filter(Boolean);
+  const featureTerms=['pedal','velocidades?','controle de velocidade','planetári[oa]','movimento planetário','batedores?','tigela','tampa','anti-respingos','inclinaç[aã]o','trava','material','base antiderrapante','ruído','motor','proteç[aã]o','timer','acessórios','gancho','globo','raquete','espátula','display','bot[aã]o','painel','funç[aã]o','desligamento automático','capacidade máxima','peso da massa'];
+  const featureLines=[];
+  for(const term of featureTerms){const match=textContent.match(new RegExp('.{0,65}'+term+'.{0,100}','i'));if(match){const line=clean(match[0]);if(line.length>12&&!featureLines.some(x=>x.toLowerCase()===line.toLowerCase()))featureLines.push(line)}}
+  const specs=[...propertySpecs,...featureLines].filter((line,i,all)=>all.findIndex(x=>x.toLowerCase()===line.toLowerCase())===i).slice(0,18).join('\n');
+  const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+specs),description&&('DESCRIÇÃO DO FABRICANTE: '+clean(description))].filter(Boolean).join('\n');
   return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:Number(String(price||'').replace(',','.'))||null,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
