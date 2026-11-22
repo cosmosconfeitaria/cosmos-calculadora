@@ -166,10 +166,10 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 .file-picker{display:flex;flex-wrap:wrap;align-items:center;gap:9px;min-height:38px}
 .file-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 .file-button{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid #d4d1cc;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#f0efed 48%,#d8d7d4 100%);box-shadow:inset 0 1px 1px #fff,0 2px 0 #a5a39e;color:var(--blue)!important;font:500 10px 'Helvetica Neue',Helvetica,Arial,sans-serif!important;cursor:pointer}
-.file-name{font:400 14px 'Gochi Hand',cursive!important;color:var(--red)!important;line-height:1.15;overflow-wrap:anywhere}
-.count{font:400 14px 'Gochi Hand',cursive!important;color:var(--red)!important;text-transform:uppercase}
-.category-filter-heading .count{font:400 13px 'Gochi Hand',cursive!important;color:var(--red)!important}
-.pill{font:400 14px 'Gochi Hand',cursive!important;letter-spacing:.015em}
+.file-name{font:400 10px 'Helvetica Neue',Helvetica,Arial,sans-serif!important;color:var(--muted)!important;line-height:1.15;overflow-wrap:anywhere}
+.count{font:400 10px 'Gochi Hand',cursive!important;color:var(--red)!important;text-transform:uppercase}
+.category-filter-heading .count{font:400 10px 'Gochi Hand',cursive!important;color:var(--red)!important}
+.pill{font:400 10px 'Gochi Hand',cursive!important;letter-spacing:.015em;color:var(--red)!important}
 .key-select-trigger{font-size:11px!important}
 @media(max-width:480px){.finance-main{align-items:flex-start;flex-direction:column;gap:5px}.finance-main strong{font-size:21px}.finance-gap{align-items:flex-start;flex-direction:column;gap:4px}}
 
@@ -271,7 +271,7 @@ function finance(d){
  const due=d.targetDate?new Date(d.targetDate+'T12:00:00'):null,now=new Date();
  const months=due?Math.max(1,(due.getFullYear()-now.getFullYear())*12+due.getMonth()-now.getMonth()):0;
  const remaining=Math.max(0,price-down),planned=Number(d.monthlyContribution||0),saved=Number(d.savedAmount||0),method=d.paymentMethod||'PIX / À VISTA';
- const saveTarget=method==='CARTÃO DE CRÉDITO'&&down>0?down:price,monthlyNeed=months?saveTarget/months:0,installment=parts>0?remaining/parts:0;
+ const saveTarget=method==='CARTÃO DE CRÉDITO'?down:(method==='A COMBINAR'&&down>0?down:price),monthlyNeed=months?saveTarget/months:0,installment=parts>0?remaining/parts:0;
  return {months,monthlyNeed,installment,remaining,planned,saved,down,price,method,parts,saveTarget};
 }
 function calcHtml(d){
@@ -298,8 +298,8 @@ function calcHtml(d){
  const startDate=new Date((d.addedAt||today())+'T12:00:00'),dueDate=new Date(d.targetDate+'T12:00:00');
  const totalMonths=Math.max(1,Math.ceil((dueDate-startDate)/(1000*60*60*24*30.4375)));
  const elapsed=Math.max(0,Math.min(totalMonths,totalMonths-f.months)),expected=f.saveTarget*(elapsed/totalMonths),percent=f.saveTarget?Math.min(100,f.saved/f.saveTarget*100):0;
- const pace=f.saved>=expected?'NO RITMO OU À FRENTE':'ABAIXO DO RITMO PREVISTO',neededNow=f.months?Math.max(0,(f.saveTarget-f.saved)/f.months):0;
- html+='<div class="finance-progress"><div class="finance-line"><span>PROGRESSO GUARDADO</span><b>'+money(f.saved)+' DE '+money(f.saveTarget)+'</b></div><div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div><div class="finance-line"><span>AVALIAÇÃO DO RITMO</span><b>'+pace+'</b></div><div class="finance-line"><span>PARA CHEGAR AO PRAZO A PARTIR DE AGORA</span><b>'+money(neededNow)+'/MÊS</b></div></div>';
+ const pace=f.saveTarget?(f.saved>=expected?'NO RITMO OU À FRENTE':'ABAIXO DO RITMO PREVISTO'):'NENHUMA ENTRADA DEFINIDA',neededNow=f.months&&f.saveTarget?Math.max(0,(f.saveTarget-f.saved)/f.months):0;
+ html+='<div class="finance-progress"><div class="finance-line"><span>PROGRESSO GUARDADO</span><b>'+money(f.saved)+' DE '+(f.saveTarget?money(f.saveTarget):'SEM ENTRADA')+'</b></div>'+(f.saveTarget?'<div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div>':'')+'<div class="finance-line"><span>AVALIAÇÃO DO RITMO</span><b>'+pace+'</b></div>'+(f.saveTarget?'<div class="finance-line"><span>PARA CHEGAR AO PRAZO A PARTIR DE AGORA</span><b>'+money(neededNow)+'/MÊS</b></div>':'')+'</div>';
  return html;
 }
 function updateFinancePreview(){
@@ -498,6 +498,7 @@ async function showInbox(){
  $('notices').innerHTML=notices.map(n=>'<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title)+'</strong><br>preço em '+esc(n.store)+' caiu '+n.drop+'%: '+money(n.price)+'<br><span class="meta">'+date(n.at)+'</span></div>').join('')||'<p class="meta">nenhuma notificação por enquanto. quedas de 5% ou mais em preços registrados aparecem aqui.</p>';
  for(const item of items){if((item.data.priceHistory||[]).some(h=>h.alert&&!h.read)){const data={...item.data,priceHistory:item.data.priceHistory.map(h=>h.alert?{...h,read:true}:h)};await patchData(item.id,data)}}
 }
+$('itemForm').addEventListener('change',()=>updateFinancePreview());
 $('itemForm').addEventListener('input',event=>{
  const el=event.target;
  if(el.matches('input[type="text"],textarea')||el.matches('input:not([type])')){const start=el.selectionStart,end=el.selectionEnd,next=el.value.toLocaleUpperCase('pt-BR');if(el.value!==next){el.value=next;try{el.setSelectionRange(start,end)}catch(_){}}}
@@ -511,10 +512,10 @@ $('itemForm').elements.referenceUrl.addEventListener('change',async event=>{
   const response=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||'NÃO FOI POSSÍVEL LER O LINK.');
   const form=$('itemForm'),set=(name,value,overwrite=false)=>{const el=form.elements[name];if(el&&value&&(overwrite||!el.value))el.value=value};
-  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.description);
+  set('title',result.title);set('model',result.model);set('warranty',result.warranty);set('specs',result.specs||result.description);set('capacity',result.capacity);set('power',result.power);set('reviews',result.reviews);
   if(result.price)set('currentPrice',result.price,true);
   const data=Object.fromEntries(new FormData(form).entries());data.productImageUrl=result.image||'';data.productBrand=result.brand||'';data.detectedVoltage=result.voltage||'';
-  form.dataset.productMeta=JSON.stringify(data);
+  form.dataset.productMeta=JSON.stringify({productImageUrl:data.productImageUrl,productBrand:data.productBrand,detectedVoltage:data.detectedVoltage});
   if(status)status.textContent='DADOS IMPORTADOS QUANDO DISPONÍVEIS · '+(result.source||'LOJA')+(result.voltage?' · '+result.voltage:' · CONFIRME A VOLTAGEM 220V NA PÁGINA');
   updateFinancePreview();
  }catch(error){if(status)status.textContent=error.message}
