@@ -500,14 +500,14 @@ function openForm(item){
 function closeForm(){$('formPanel').classList.add('hidden');editingId=null}
 let technicalEnrichmentStarted=false;
 async function autoEnrichExistingWishlist(){
- const pending=items.filter(x=>x.status==='WISHLIST'&&(!x.data?.model||!x.data?.capacity||!x.data?.power||!x.data?.warranty||!x.data?.reviews||!x.data?.specs)&&(!x.data?.technicalLookupAt||Date.now()-new Date(x.data.technicalLookupAt).getTime()>30*86400000));
+ const pending=items.filter(x=>x.status==='WISHLIST'&&(!x.data?.model||!x.data?.capacity||!x.data?.power||!x.data?.warranty||!x.data?.rating||!x.data?.specs)&&(!x.data?.technicalLookupAt||Date.now()-new Date(x.data.technicalLookupAt).getTime()>30*86400000));
  for(const item of pending){
   const d=item.data||{},model=d.model||((String(item.title).match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL))?\b/i)||[])[0]||'');
   try{
    const response=await fetch('/api/wishlist-search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:item.title,model,capacity:d.capacity||'',mode:'discover'})});
    const result=await response.json(),candidate=(result.products||[])[0],update={...d,technicalLookupAt:new Date().toISOString()};
    if(candidate){
-    for(const key of ['model','capacity','power','warranty','reviews'])if(!String(update[key]||'').trim()&&candidate[key])update[key]=candidate[key];
+    for(const key of ['model','capacity','power','warranty','rating','ratingCount','dimensions'])if(!String(update[key]||'').trim()&&candidate[key])update[key]=candidate[key];
     if(!String(update.specs||'').trim()||/^VOLTAGEM:/i.test(update.specs))update.specs=candidate.description||candidate.specs||update.specs;
     if(!update.productBrand&&candidate.brand)update.productBrand=candidate.brand;
     if(!update.productImageUrl&&candidate.thumbnail)update.productImageUrl=candidate.thumbnail;
@@ -624,7 +624,7 @@ function priceChart(history,range='365',customFrom='',customTo=''){
  }
  return '<div class="price-chart"><div class="chart-caption">EVOLUÇÃO DO MENOR PREÇO GERAL · '+rangeLabel+'</div>'+controls+graph+'</div>';
 }
-function technicalSummaryText(d){const rows=[['MARCA',d.productBrand],['MODELO',d.model],['CAPACIDADE',d.capacity],['POTÊNCIA',d.power],['GARANTIA',d.warranty],['AVALIAÇÃO',d.reviews],['VOLTAGEM',d.voltage]];const lines=rows.filter(([,v])=>String(v||'').trim()).map(([k,v])=>k+': '+v);if(d.specs&& !/^VOLTAGEM:/i.test(String(d.specs).trim()))lines.push('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+d.specs);return lines.join('\n')}
+function technicalSummaryText(d){const rows=[['MARCA',d.productBrand],['MODELO',d.model],['CAPACIDADE',d.capacity],['POTÊNCIA',d.power],['DIMENSÕES',d.dimensions],['GARANTIA',d.warranty],['NOTA MÉDIA',d.rating?Number(d.rating).toFixed(1).replace('.',',')+'/5':''],['VOLTAGEM',d.voltage]];return rows.filter(([,v])=>String(v||'').trim()).map(([k,v])=>k+': '+v).join('\n')+(d.specs&&!/^VOLTAGEM:/i.test(String(d.specs).trim())?'\n'+d.specs:'')}
 function progressOverview(d){const goal=Number(d.targetPrice||0),saved=Number(d.savedAmount||0),percent=goal>0?Math.min(100,Math.round(saved/goal*100)):0;return '<div class="progress-overview"><div class="progress-overview-head"><span>VALOR GUARDADO · '+money(saved)+' DE '+(goal?money(goal):'PREÇO AINDA NÃO DEFINIDO')+'</span><strong>'+percent+'%</strong></div><div class="progress-track"><div class="progress-fill" style="width:'+percent+'%"></div></div><div class="meta">'+(goal?money(Math.max(0,goal-saved))+' RESTANTES PARA A COMPRA':'A REFERÊNCIA DE PREÇO SERÁ CALCULADA APÓS AS PRIMEIRAS BUSCAS')+(d.priceTargetBasis?' · '+esc(d.priceTargetBasis):'')+'</div></div>'}
 function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
@@ -751,7 +751,7 @@ async function saveDiscoveryResult(p,status='WISHLIST'){
  const recent=history.filter(h=>new Date((h.at||'')+'T12:00:00')>=cutoff&&Number(h.price)>0);
  const historicalLow=recent.length?Math.min(...recent.map(h=>Number(h.price)+Number(h.shipping||0))):null;
  const technical=p.technicalSummary||p.specs||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
- const data={subcategory,voltage,detectedVoltage:p.voltageStatus,productSource:p.source||'',productBrand:p.brand||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',reviews:p.reviews||'',addedAt:today(),stores:[],priceHistory:[]};
+ const data={subcategory,voltage,detectedVoltage:p.voltageStatus||'',productSource:p.source||'',productBrand:p.brand||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:p.link||'',currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',rating:p.rating||null,ratingCount:p.ratingCount||'',dimensions:p.dimensions||'',addedAt:today(),stores:[],priceHistory:[]};
  if(current&&p.link){data.stores.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,searchedAt:today(),title,image:p.thumbnail||'',voltageConfirmed:true});data.priceHistory.push({store:p.source||'GOOGLE SHOPPING',price:current,shipping:0,url:p.link,at:today(),searchBatch:'initial-'+today(),read:false})}
  const {data:row,error}=await client.from('cosmos_wishlist_items').insert({user_id:user.id,title,category,status,importance:'MEDIA',data}).select('id').single();
  if(error)throw error;
@@ -867,10 +867,10 @@ async function showTypeComparison(id){
   {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4.5):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:'max'},
   {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'},
   {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
-  {label:'AVALIAÇÃO',get:x=>numericValue(x.data.reviews),fmt:(v,x)=>x.data.reviews||'NÃO INFORMADA',best:'max'}
+  {label:'NOTA MÉDIA',get:x=>Number(x.data.rating)||null,fmt:(v,x)=>v==null?'NÃO INFORMADA':v.toFixed(1).replace('.',',')+'/5',best:'max'}
  ];
  const rows=metrics.map(m=>{const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>'}).join('');
- const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['ESPECIFICAÇÕES',x=>x.data.specs],['QUALIDADE',x=>x.data.quality],['ASSISTÊNCIA / PEÇAS',x=>x.data.support],['ADEQUAÇÃO À COSMOS',x=>x.data.fit],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
+ const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['DIMENSÕES',x=>x.data.dimensions],['ADEQUAÇÃO À COZINHA',x=>x.data.fit||'VERIFICAR LOCAL DE INSTALAÇÃO, SUPORTE E CIRCULAÇÃO NA COZINHA PEQUENA'],['PREÇO-ALVO',x=>x.data.targetPrice?money(x.data.targetPrice):'NÃO DEFINIDO']];
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
  const mixers=/BATEDEIRA|MIXER|PLANETÁRIA/.test(type+' '+current.title.toUpperCase());
  let recommendation='';
@@ -879,10 +879,10 @@ async function showTypeComparison(id){
   if(liters!=null){const fit=mixers?Math.max(0,1-Math.abs(liters-7.6)/12):Math.min(1,liters/15);score+=fit*25;parts+=25}
   if(watts!=null){score+=Math.min(1,watts/700)*20;parts+=20}
   if(months!=null){score+=Math.min(1,months/24)*10;parts+=10}
-  const completeness=['model','capacity','power','warranty','reviews','specs'].filter(k=>String(d[k]||'').trim()).length;score+=(completeness/6)*5;parts+=5;
+  const completeness=['model','capacity','power','warranty','rating','dimensions'].filter(k=>String(d[k]||'').trim()).length;score+=(completeness/6)*5;parts+=5;
   return {item:x,score:parts?score/parts:0,parts};
  }).sort((a,b)=>b.score-a.score);const winner=rated[0];
- recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>parece a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis'+(mixers?' · para a rotina atual, uma capacidade próxima de 7,6 L tende a equilibrar aumento de produção e investimento':'')+'. '+(winner.parts<70?'ainda faltam dados técnicos para transformar esse palpite em uma recomendação firme.':'confira a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
+ recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+(mixers?'a cozinha é pequena e a batedeira hoje fica sobre a máquina de lavar: antes da compra, é preciso medir onde ela ficará, verificar se será necessário outro suporte e se algum móvel precisará mudar de lugar. O freezer atual tem 175 L, então um lote estimado muito alto pode ultrapassar o espaço de armazenamento disponível. A estimativa de cookies não é uma meta de produção nem uma garantia de capacidade de armazenamento. ':'')+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
