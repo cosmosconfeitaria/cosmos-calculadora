@@ -12,7 +12,6 @@
 :root{--blue:#2263D2;--cream:#F6F4F1;--ink:#2D2D2D;--red:#D22222;--line:#d4d1cc;--muted:#77736e}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--blue);color:var(--blue);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.35px}
-body.auth-pending .wrap{visibility:hidden}
 body:before,body:after{content:"";position:fixed;inset:-35%;z-index:-1;pointer-events:none;background-repeat:repeat;animation:stars 110s linear infinite}
 body:before{opacity:.75;background-image:radial-gradient(1px 1px at 13px 19px,#fff 98%,transparent),radial-gradient(1px 1px at 77px 53px,#dce8ff 98%,transparent),radial-gradient(1px 1px at 141px 117px,#fff 98%,transparent),radial-gradient(1px 1px at 193px 31px,#c8dcff 98%,transparent);background-size:257px 211px}
 body:after{opacity:.35;background-image:radial-gradient(1px 1px at 31px 83px,#fff 98%,transparent),radial-gradient(1px 1px at 119px 17px,#e8efff 98%,transparent);background-size:293px 239px;animation-direction:reverse;animation-duration:150s}
@@ -70,7 +69,7 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .notice{border:1px solid #e7c5c5;background:#fff7f6;padding:12px;margin:8px 0;font-size:11px;line-height:1.5;color:var(--ink)}
 .notice.unread{border-left:4px solid var(--red)}
 .notice strong{color:var(--blue);font-weight:500}
-.popup{position:fixed;z-index:50;right:max(18px,calc((100vw - 900px)/2));top:80px;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
+.chart-empty{padding:18px;border:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}.price-chart{border:1px solid var(--line);padding:12px;background:#fff}.chart-caption{font-size:9px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}.price-chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-legend-wrap{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.chart-legend{font-size:10px;color:var(--ink);display:inline-flex;align-items:center;gap:5px}.chart-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.chart-footnote{font-size:9px;color:var(--muted);line-height:1.4;margin-top:9px}.popup{position:fixed;z-index:50;right:max(18px,calc((100vw - 900px)/2));top:80px;width:min(390px,calc(100vw - 36px));max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 35px #0003;padding:16px}
 .popup-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .popup-head strong{font-size:12px;font-weight:500}
 .close{border:0;background:none;color:var(--blue);font-size:20px;cursor:pointer}
@@ -85,7 +84,7 @@ footer{display:flex;flex-direction:column;align-items:center;text-align:center;g
 @media(prefers-reduced-motion:reduce){body:before,body:after,.logo-type:after{animation:none}}
 </style>
 </head>
-<body class="auth-pending">
+<body>
 <div class="wrap">
 <header><div class="brand"><span class="logo-type" data-text="COSMOS COOKIE LAB">COSMOS COOKIE LAB</span></div><a class="back" href="index.html" aria-label="voltar">←</a></header>
 <p class="eyebrow">COSMOS TOOLS / BUYING LAB</p>
@@ -237,6 +236,19 @@ async function render(){
  notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
  $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
 }
+function priceChart(history){
+ const rows=history||[];
+ if(!rows.length)return '<div class="chart-empty">o gráfico aparecerá assim que houver preços registrados. registre ofertas de lojas diferentes para acompanhar a evolução ao longo dos meses.</div>';
+ const now=new Date(),months=Array.from({length:12},(_,i)=>{const d=new Date(now.getFullYear(),now.getMonth()-11+i,1);return {key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}}),stores=[...new Set(rows.map(x=>x.store))];
+ const values=rows.map(x=>Number(x.price||0)+Number(x.shipping||0)).filter(x=>x>0),min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min),W=720,H=270,L=62,R=18,T=18,B=42,innerW=W-L-R,innerH=H-T-B;
+ const y=v=>T+(max===min?innerH/2:(max-v)/spread)*innerH,x=i=>L+i*(innerW/11);
+ const palette=['#2263D2','#D22222','#3B7D5B','#9A68A6','#D18A22','#2D2D2D'];
+ const lines=stores.map((store,si)=>{const points=months.map((m,i)=>{const vals=rows.filter(h=>h.store===store&&String(h.at||'').slice(0,7)===m.key).map(h=>Number(h.price||0)+Number(h.shipping||0)).filter(v=>v>0);return vals.length?{i,v:Math.min(...vals)}:null}).filter(Boolean);if(!points.length)return '';return '<polyline fill="none" stroke="'+palette[si%palette.length]+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="'+points.map(p=>x(p.i)+','+y(p.v)).join(' ')+'"/>'+points.map(p=>'<circle cx="'+x(p.i)+'" cy="'+y(p.v)+'" r="4" fill="'+palette[si%palette.length]+'" stroke="#fff" stroke-width="1.5"><title>'+esc(store)+' · '+months[p.i].label+': '+money(p.v)+'</title></circle>').join('')}).join('');
+ const ticks=Array.from({length:4},(_,i)=>{const v=max-(spread*i/3),yy=T+innerH*i/3;return '<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#e8e5e0"/><text x="'+(L-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#77736e">'+money(v).replace(',00','')+'</text>'}).join('');
+ const labels=months.map((m,i)=>'<text x="'+x(i)+'" y="'+(H-13)+'" text-anchor="middle" font-size="10" fill="#77736e">'+m.label+'</text>').join('');
+ const legend=stores.map((store,i)=>'<span class="chart-legend"><i style="background:'+palette[i%palette.length]+'"></i>'+esc(store)+'</span>').join('');
+ return '<div class="price-chart"><div class="chart-caption">MENOR PREÇO REGISTRADO POR MÊS · ÚLTIMOS 12 MESES · COM FRETE QUANDO INFORMADO</div><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Gráfico de evolução dos preços por loja">'+ticks+labels+lines+'</svg><div class="chart-legend-wrap">'+legend+'</div><div class="chart-footnote">os pontos mostram o menor valor registrado em cada mês para cada fonte. meses sem registro ficam sem ponto; não são estimativas.</div></div>';
+}
 function storeRows(stores){
  return (stores||[]).map((s,i)=>'<div class="store-row" data-store="'+i+'"><div><label>LOJA / COMPARADOR</label><input data-k="store" value="'+esc(s.store||'')+'" placeholder="Zoom, Amazon..."></div><div><label>PREÇO (R$)</label><input data-k="price" type="number" min="0" step=".01" value="'+esc(s.price||'')+'"></div><div><label>FRETE (R$)</label><input data-k="shipping" type="number" min="0" step=".01" value="'+esc(s.shipping||'')+'"></div><div><label>LINK</label><input data-k="url" type="url" value="'+esc(s.url||'')+'" placeholder="https://..."></div><button class="silver store-remove" type="button" data-remove-store="'+i+'">×</button></div>').join('');
 }
@@ -253,6 +265,7 @@ async function showDetail(id){
  '<div class="subhead">LOJAS E COMPARADORES</div><div id="storeRows">'+storeRows(d.stores)+'</div><div class="form-actions"><button class="silver" id="addStore" type="button">+ ADICIONAR LOJA</button><button class="silver" id="saveStores" type="button">SALVAR LINKS</button></div>'+
  '<div class="subhead">REGISTRAR PREÇO VERIFICADO</div><div class="form-grid"><div class="field"><label>LOJA / FONTE</label><input id="priceStore" placeholder="Zoom, JáCotei, Magalu..."></div><div class="field"><label>PREÇO (R$)</label><input id="priceValue" type="number" min="0" step=".01"></div><div class="field"><label>FRETE (R$)</label><input id="priceShip" type="number" min="0" step=".01" value="0"></div><div class="field"><label>LINK DO PRODUTO</label><input id="priceUrl" type="url" placeholder="https://..."></div></div><div class="form-actions"><button class="silver" id="recordPrice" type="button">REGISTRAR PREÇO</button></div>'+
  '<div class="subhead">HISTÓRICO DE PREÇOS</div>'+history+
+ '<div class="subhead">EVOLUÇÃO DOS PREÇOS</div>'+priceChart(d.priceHistory||[])+
  '<div class="subhead">CONCLUIR COMPRA</div><div class="form-grid"><div class="field"><label>DATA DA COMPRA</label><input id="purchaseDate" type="date" value="'+today()+'"></div><div class="field"><label>VALOR REAL PAGO (R$)</label><input id="paidPrice" type="number" min="0" step=".01"></div></div><div class="form-actions"><button class="silver" id="markPurchased" type="button">MARCAR COMO COMPRADO</button><button class="silver" id="deleteItem" type="button">EXCLUIR ITEM</button></div>';
  $('detailPanel').classList.remove('hidden');$('formPanel').classList.add('hidden');$('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
  $('addStore').onclick=()=>{const host=$('storeRows');const div=document.createElement('div');div.innerHTML=storeRows([{}]);host.append(div.firstElementChild)};
@@ -306,7 +319,7 @@ async function init(){
  const response=await fetch('/api/session',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session.access_token})});
  if(!response.ok){location.replace('index.html?auth=required');return}
  user=session.user;
- try{await load();document.body.classList.remove('auth-pending')}catch(err){alert('não foi possível carregar a wishlist: '+err.message)}
+ try{await load()}catch(err){$('items').innerHTML='<div class="notice">não foi possível carregar os itens: '+esc(err.message)+'. atualize a página ou tente novamente.</div>';console.error('wishlist load error',err)}
 }
 init();
 })();
