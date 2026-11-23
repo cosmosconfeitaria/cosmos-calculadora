@@ -950,20 +950,21 @@ async function showTypeComparison(id){
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
  let recommendation='';
  if(group.length){
-  const prices=group.map(x=>productPrice(x)).filter(v=>v!=null),minPrice=prices.length?Math.min(...prices):null,maxCapacity=Math.max(0,...group.map(x=>numericValue(x.data.capacity)||0));
   const rated=group.map(x=>{
-   const d=x.data||{},price=productPrice(x),capacity=numericValue(d.capacity),fitText=String(d.fit||'').toLowerCase();
-   let score=0,weight=0;
-   if(price!=null&&minPrice>0){score+=(minPrice/price)*35;weight+=35}
-   if(capacity!=null&&maxCapacity>0){score+=(capacity/maxCapacity)*25;weight+=25}
-   if(d.dimensions){score+=10;weight+=10}
-   if(fitText){score+=(/não cabe|nao cabe|incompatível|incompativel|sem espaço|sem espaco|ultrapassa/.test(fitText)?0:/cabe|adequad|compatível|compativel/.test(fitText)?15:7.5);weight+=15}
-   const tech=['model','capacity','power','warranty','rating','dimensions'].filter(k=>String(d[k]||'').trim()).length;
-   score+=(tech/6)*15;weight+=15;
-   return {item:x,score:weight?score/weight:0};
+   const d=x.data||{},price=productPrice(x),liters=numericValue(d.capacity),watts=numericValue(d.power),months=warrantyMonths(d.warranty);
+   let score=0,parts=0;
+   if(price!=null){const prices=group.map(g=>productPrice(g)).filter(v=>v!=null),min=Math.min(...prices);score+=(min/price)*40;parts+=40}
+   if(liters!=null){const fit=mixers?Math.max(0,1-Math.abs(liters-7.6)/12):Math.min(1,liters/15);score+=fit*25;parts+=25}
+   if(watts!=null){score+=Math.min(1,watts/700)*20;parts+=20}
+   if(months!=null){score+=Math.min(1,months/24)*10;parts+=10}
+   const completeness=['model','capacity','power','warranty','rating','dimensions'].filter(k=>String(d[k]||'').trim()).length;
+   score+=(completeness/6)*5;parts+=5;
+   const fitText=String(d.fit||'').toLowerCase();
+   if(d.fit||d.dimensions){score+=(/não cabe|nao cabe|incompatível|incompativel|sem espaço|sem espaco|ultrapassa/.test(fitText)?0:/cabe|adequad|compatível|compativel/.test(fitText)?10:5);parts+=10}
+   return {item:x,score:parts?score/parts:0,parts};
   }).sort((a,b)=>b.score-a.score);
-  const winner=rated[0].item,winnerTitle=compactProductTitle(winner.title,winner.data?.model,winner.data?.capacity,winner.data?.productBrand);
-  recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> a recomendação pondera preço, capacidade, dados técnicos e adequação física. '+(mixers?'na comparação técnica, maior capacidade e mais cookies por lote são vantagens e aparecem em verde. a decisão final também precisa considerar o espaço da cozinha, o apoio seguro e o freezer de 175 L: o rendimento estimado não significa que todo o lote precise ser produzido ou armazenado de uma vez. ':'')+' '+esc(kitchenFitText(winner,mixers))+'</div>';
+  const winner=rated[0],winnerTitle=compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand);
+  recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+esc(kitchenFitText(winner.item,mixers))+' '+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e as condições de instalação antes de decidir.')+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
