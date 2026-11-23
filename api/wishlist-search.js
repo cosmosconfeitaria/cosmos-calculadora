@@ -42,7 +42,7 @@ function parseDisplayedPrice(row) {
   const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
   const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(context(m)))||
     valid.find(m=>/por\s*$/i.test(text.slice(Math.max(0,m.index-14),m.index)))||
-    (!installmentMatch?valid[0]:null);
+    valid.find(m=>!installmentAmount||Math.abs(parse(m[1])-installmentAmount)>=0.01);
   const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(context(m))&&!/\d{1,2}\s*x/i.test(context(m)));
   const numericFallback=(!matches.length&&!installmentMatch)?Number(row.extracted_price??row.price_value??row.price??0):null;
   const cashPrice=cashMatch?parse(cashMatch[1]):(Number.isFinite(numericFallback)&&numericFallback>0?numericFallback:null);
