@@ -51,8 +51,9 @@ export async function POST(request){
   const creditMatch=validMoney.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(moneyContext(m))&&!/\d{1,2}\s*x/i.test(moneyContext(m)));
   const schemaPrice=moneyValue(offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount'));
   const parsedCash=cashMatch?parseMoney(cashMatch[1]):schemaPrice;
-  const cashPrice=installmentMatch&&parsedCash&&installmentAmount&&Math.abs(parsedCash-installmentAmount)<0.01?null:parsedCash;
-  const creditPrice=creditMatch?parseMoney(creditMatch[1]):(installmentTotal||null);
+  const schemaIsCardPrice=creditMatch&&schemaPrice&&Math.abs(schemaPrice-parseMoney(creditMatch[1]))<0.01;
+  const cashPrice=installmentMatch&&parsedCash&&installmentAmount&&Math.abs(parsedCash-installmentAmount)<0.01?null:(schemaIsCardPrice&&!cashMatch?null:parsedCash);
+  const creditPrice=installmentTotal|| (creditMatch?parseMoney(creditMatch[1]):null);
   const price=cashPrice||creditPrice||schemaPrice;
   const priceText=[
     cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
