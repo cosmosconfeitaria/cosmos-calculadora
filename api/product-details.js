@@ -56,7 +56,7 @@ export async function POST(request){
   const cashPrice=cashMatch?parseMoney(cashMatch[1]):null;
   const creditPrice=installmentTotal|| (creditMatch?parseMoney(creditMatch[1]):null);
   const productPrice=!cashPrice&&!schemaIsCardPrice&&!schemaIsInstallmentAmount&&!schemaIsInstallmentTotal?schemaPrice:null;
-  const price=cashPrice||productPrice||creditPrice||null;
+  const price=cashPrice||productPrice||null;
   const priceText=[
     cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
     creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
