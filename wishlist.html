@@ -334,6 +334,13 @@ footer.footer-cosmos .line-est{font-family:'Gochi Hand',cursive;font-size:9px;fo
 @media(max-width:620px){.category-checks{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.category-check{min-height:34px;font-size:11px;padding:6px 8px}.subcategory-filters{grid-template-columns:1fr}.flatpickr-calendar{width:224px!important}}
 @media(min-width:760px){.category-checks{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
+<style>
+/* MEDIDAS FINAIS DA WISHLIST */
+.category-check input{width:8px!important;height:8px!important;flex:0 0 8px!important}
+.purchase-grid{grid-template-columns:135px 135px!important}
+.purchase-grid .field{width:135px!important;min-width:0!important}
+.purchase-grid .field input,.purchase-grid .field .flatpickr-input{width:135px!important;max-width:135px!important}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -517,10 +524,38 @@ async function autoEnrichExistingWishlist(){
   }catch(error){console.warn('technical enrichment skipped',item.title,error)}
  }
 }
+function rebuildNotices(){
+ notices=items.flatMap(item=>{
+  const priceAlerts=(item.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:item.id,title:item.title,...h,kind:h.kind||'price-drop',read:!!h.read}));
+  const reminders=(item.data.reminderEvents||[]).map(n=>({...n,id:item.id+'|'+n.id,itemId:item.id,title:n.title||item.title,kind:'purchase-reminder',read:!!n.read}));
+  return [...priceAlerts,...reminders];
+ }).sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
+ $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
+}
+async function syncPurchaseReminders(){
+ const todayKey=today(),todayDate=new Date(todayKey+'T12:00:00');
+ for(const item of items){
+  if(item.status!=='WISHLIST'||!item.data?.targetDate)continue;
+  const target=String(item.data.targetDate).slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(target))continue;
+  const targetDate=new Date(target+'T12:00:00');
+  const days=Math.round((targetDate-todayDate)/86400000);
+  const wanted=[];
+  if(days===7)wanted.push({id:'one-week-'+target,reminderType:'one-week',title:'SUA COMPRA ESTÁ CHEGANDO',message:'Falta uma semana para o dia planejado de comprar '+item.title+'. Hora de conferir o valor guardado e as ofertas.',targetDate:target});
+  if(days<=0)wanted.push({id:'purchase-day-'+target,reminderType:'purchase-day',title:days===0?'HOJE É O DIA DA SUA COMPRA':'A DATA PLANEJADA JÁ CHEGOU',message:days===0?'Hoje é o dia que você planejou para comprar '+item.title+'. Confira a Wishlist antes de fechar a compra.':'A data planejada para comprar '+item.title+' passou. Confira se ainda quer manter esse objetivo.',targetDate:target});
+  if(!wanted.length)continue;
+  const existing=item.data.reminderEvents||[],fresh=wanted.filter(n=>!existing.some(old=>old.id===n.id));
+  if(!fresh.length)continue;
+  const next={...item.data,reminderEvents:[...existing,...fresh.map(n=>({...n,kind:'purchase-reminder',at:todayKey,read:false}))]};
+  const {error}=await client.from('cosmos_wishlist_items').update({data:next,updated_at:new Date().toISOString()}).eq('id',item.id);
+  if(error)throw error;
+  item.data=next;
+ }
+}
 async function load(){
  const {data,error}=await client.from('cosmos_wishlist_items').select('*').order('created_at',{ascending:false});
  if(error)throw error;
- items=(data||[]).map(r=>({...r,data:r.data||{}}));await render();
+ items=(data||[]).map(r=>({...r,data:r.data||{}}));await syncPurchaseReminders();await render();
  if(!technicalEnrichmentStarted){technicalEnrichmentStarted=true;await autoEnrichExistingWishlist();await load();}
 }
 async function imageUrl(path,remote){
@@ -600,8 +635,7 @@ async function render(){
   card.innerHTML='<button class="item-delete" type="button" data-delete="'+item.id+'" aria-label="excluir '+esc(item.title)+'" title="EXCLUIR ITEM">×</button><div class="item-top">'+(img?'<img class="thumb" src="'+img+'" alt="">':'<div class="thumb empty">✧</div>')+'<div style="min-width:0"><h3>'+esc(item.title.toUpperCase())+'</h3><div class="meta">ADICIONADO EM '+date(d.addedAt||item.created_at?.slice(0,10))+'</div><span class="pill">'+esc(d.voltage||'220V')+'</span>'+(d.model?'<span class="pill model-pill">'+esc(d.model)+'</span>':'')+'<div style="margin-top:7px"><span class="priority-tag priority-'+String(item.importance||'MEDIA').toLowerCase()+'">PRIORIDADE: '+esc(item.importance==='MEDIA'?'MÉDIA':(item.importance||'MÉDIA'))+'</span></div></div></div><div class="target-price-card"><span>PREÇO-ALVO</span><strong>'+((d.targetPrice&&((d.stores||[]).some(x=>x.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(x.url))||(d.priceHistory||[]).some(h=>h.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(h.url)&&(h.priceDate||h.validFrom))))?money(d.targetPrice):'NÃO DEFINIDO')+'</strong></div><div class="meta">'+(d.targetDate?'COMPRA PREVISTA: '+date(d.targetDate):'SEM DATA PREVISTA')+'</div><div class="item-actions"><button class="silver" data-open="'+item.id+'">VER DETALHES</button><button class="silver" data-edit="'+item.id+'">EDITAR</button></div>';
   $('items').append(card);
  }
- notices=items.flatMap(x=>(x.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:x.id,title:x.title,...h,read:!!h.read}))).sort((a,b)=>b.at.localeCompare(a.at));
- $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
+ rebuildNotices();
 }
 function priceChart(history,range='365',customFrom='',customTo=''){
  const rows=(history||[]).filter(h=>isStoreUrl(h.url)&&h.priceType==='FULL_PRODUCT_PRICE'&&Number(h.price||0)>0&&(h.priceDate||h.validFrom)),now=new Date();
@@ -667,8 +701,23 @@ async function patchData(id,data){
 }
 async function showInbox(){
  $('inboxPopup').classList.remove('hidden');
- $('notices').innerHTML=notices.map(n=>'<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title)+'</strong><br>preço em '+esc(n.store)+' caiu '+n.drop+'%: '+money(n.price)+'<br><span class="meta">'+date(n.at)+'</span></div>').join('')||'<p class="meta">nenhuma notificação por enquanto. quedas de 5% ou mais em preços registrados aparecem aqui.</p>';
- for(const item of items){if((item.data.priceHistory||[]).some(h=>h.alert&&!h.read)){const data={...item.data,priceHistory:item.data.priceHistory.map(h=>h.alert?{...h,read:true}:h)};await patchData(item.id,data)}}
+ $('notices').innerHTML=notices.map(n=>{
+  const body=n.kind==='purchase-reminder'?esc(n.message||'Confira o planejamento desta compra.'):('o preço caiu '+Number(n.drop||0).toFixed(1).replace('.',',')+'% e agora está em '+money(n.price)+'.');
+  const link=n.url&&isStoreUrl(n.url)?'<a class="small-link" href="'+esc(n.url)+'" target="_blank" rel="noopener noreferrer">LINK DO PRODUTO</a>':'';
+  const open=n.kind==='purchase-reminder'?'<button class="silver" type="button" data-inbox-open="'+esc(n.itemId||n.id)+'">VER ITEM</button>':'';
+  return '<div class="notice '+(!n.read?'unread':'')+'"><strong>'+esc(n.title||'ATUALIZAÇÃO DA WISHLIST')+'</strong><br>'+body+'<br><span class="meta">'+date(n.at)+'</span><div class="item-actions">'+link+open+'</div></div>';
+ }).join('')||'<p class="meta">nenhuma notificação por enquanto. quedas acima de 5% e lembretes de compra aparecem aqui.</p>';
+ for(const item of items){
+  const oldHistory=item.data.priceHistory||[],oldReminders=item.data.reminderEvents||[];
+  const history=oldHistory.map(h=>h.alert?{...h,read:true}:h);
+  const reminders=oldReminders.map(n=>({...n,read:true}));
+  if(history.some((h,i)=>h.read!==oldHistory[i]?.read)||reminders.some((n,i)=>n.read!==oldReminders[i]?.read)){
+   const next={...item.data,priceHistory:history,reminderEvents:reminders};
+   const {error}=await client.from('cosmos_wishlist_items').update({data:next,updated_at:new Date().toISOString()}).eq('id',item.id);
+   if(!error)item.data=next;
+  }
+ }
+ rebuildNotices();
 }
 function initDatePickers(root=document){if(!window.flatpickr)return;root.querySelectorAll('input.date-input,input[type="date"]').forEach(el=>{if(el._flatpickr)return;flatpickr(el,{locale:flatpickr.l10ns.pt,dateFormat:'Y-m-d',altInput:true,altFormat:'d/m/Y',allowInput:true,disableMobile:true,position:'auto',static:false,monthSelectorType:'static',onDayCreate:(dObj,dStr,fp,dayElem)=>{const day=dayElem.dateObj.getDay();if(day===0||day===6)dayElem.classList.add('weekend-day')}})})}
 initDatePickers();
@@ -844,7 +893,9 @@ async function runPriceSearch(id){
   }
   for(const product of enriched){for(const point of (product.priceHistory||[])){if(point.url&&point.priceDate&&Number(point.price)>0)history.push({...point,priceType:'FULL_PRODUCT_PRICE',at:today(),searchBatch:'source-history-'+batch,read:false,modelVerified:true})}}
   const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
-  const todays=history.filter(h=>h.searchBatch===batch),lowest=todays.reduce((m,h)=>!m||Number(h.price)+Number(h.shipping||0)<m.price?{price:Number(h.price),total:Number(h.price)+Number(h.shipping||0),store:h.store}:m,null),cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);const recentHistory=history.filter(h=>h.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(h.url)&&(h.priceDate||h.validFrom)&&new Date((h.priceDate||h.validFrom)+'T12:00:00')>=cutoff&&Number(h.price)>0),lowest12m=recentHistory.length?Math.min(...recentHistory.map(h=>Number(h.price)+Number(h.shipping||0))):null;
+  const todays=history.filter(h=>h.searchBatch===batch),lowest=todays.reduce((m,h)=>{const total=Number(h.price)+Number(h.shipping||0);return !m||total<m.total?{price:Number(h.price),total,store:h.store,url:h.url}:m},null),cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);const recentHistory=history.filter(h=>h.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(h.url)&&(h.priceDate||h.validFrom)&&new Date((h.priceDate||h.validFrom)+'T12:00:00')>=cutoff&&Number(h.price)>0),lowest12m=recentHistory.length?Math.min(...recentHistory.map(h=>Number(h.price)+Number(h.shipping||0))):null;
+  const dropPercent=Number(previousSearchLowest)>0&&lowest?((Number(previousSearchLowest)-lowest.total)/Number(previousSearchLowest))*100:0;
+  if(dropPercent>5&&lowest?.url)history.push({store:lowest.store||'LOJA',price:lowest.total,priceType:'FULL_PRODUCT_PRICE',url:lowest.url,at:today(),searchBatch:'alert-'+batch,alert:true,kind:'price-drop',drop:Number(dropPercent.toFixed(2)),title:item.title,read:false,message:'Boa notícia! Encontramos uma queda de preço acima de 5%.'});
   await patchData(id,{...fresh,stores:unique,priceHistory:history,currentPrice:lowest?.total||lowest?.price||fresh.currentPrice||null,lastSearchAt:new Date().toISOString(),lastSearchCount:todays.length,lastSearchIgnored:(result.ignoredForVoltage||0)+(enriched.length-eligible.length),lastSearchCandidates:candidates,previousSearchLowest,lastSearchLowest:lowest?.total||lowest?.price||fresh.lastSearchLowest||null,targetPrice:lowest12m||lowest?.total||((fresh.stores||[]).some(x=>isStoreUrl(x.url))?fresh.targetPrice:null),priceTargetBasis:lowest12m?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':lowest?.total?'PREÇO DE REFERÊNCIA ATUAL · HISTÓRICO REAL EM FORMAÇÃO':((fresh.stores||[]).some(x=>isStoreUrl(x.url))?'PREÇO DE REFERÊNCIA ATUAL':'AGUARDANDO OFERTA COM LINK DIRETO DE LOJA')});
   if(todays.length){await showDetail(id)}else alert('NÃO ENCONTRAMOS OFERTAS COM PREÇO, LINK E VOLTAGEM 220V/BIVOLT CONFIRMADOS. RESULTADOS SEM COMPATIBILIDADE COMPROVADA FORAM DESCARTADOS E O HISTÓRICO PERMANECE INALTERADO.');
  }catch(error){alert('NÃO FOI POSSÍVEL FAZER A BUSCA: '+error.message)}
@@ -858,33 +909,60 @@ function productPrice(item){
 function numericValue(s){const m=String(s||'').replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):null}
 function warrantyMonths(s){const text=String(s||'').toLowerCase(),n=numericValue(text);if(n==null)return null;if(/ano/.test(text))return n*12;if(/mes/.test(text))return n;return n>5?n:n*12}
 function compactProductTitle(title,model,capacity,brand){const m=String(model||'').trim(),c=String(capacity||'').match(/[0-9]+(?:[,.][0-9]+)?\s?L/i)?.[0]?.replace(/\s+/g,'').toUpperCase()||'',b=String(brand||'').trim();if(m&&c)return [m,c,b].filter(Boolean).join(' ').toUpperCase();const raw=String(title||'').trim(),match=raw.match(/\b([A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2})\b.*?\b(\d+(?:[,.]\d+)?\s?L)\b/i);if(match){const brandGuess=b||raw.split(/\s+/).slice(-1)[0];return [match[1],match[2].replace(/\s+/g,'').toUpperCase(),brandGuess].filter(Boolean).join(' ').toUpperCase()}return raw.toUpperCase()}
+function kitchenFitText(item,mixers){
+ const d=item.data||{},parts=[];
+ if(d.fit)parts.push(String(d.fit));
+ else if(d.dimensions)parts.push('dimensões informadas: '+d.dimensions+'. confira largura, profundidade, altura livre e circulação antes da compra.');
+ else parts.push('as dimensões não foram encontradas. ainda não é possível confirmar se o produto cabe no espaço disponível; meça a área de instalação antes de comprar.');
+ if(mixers){
+  const liters=numericValue(d.capacity),batch=liters?Math.round(30*liters/4):null;
+  if(batch)parts.push('rendimento proporcional estimado: cerca de '+batch+' cookies de 70 g por lote. a cozinha é pequena e a batedeira atual fica sobre a máquina de lavar, então é preciso validar apoio, altura e circulação. o freezer atual tem 175 L; o lote maior é uma vantagem de produção, mas precisa ser dividido ou armazenado sem comprometer o espaço disponível.');
+ }
+ return parts.join(' ');
+}
 async function showTypeComparison(id){
  const current=items.find(x=>x.id===id);if(!current)return;
  const type=String(current.data?.subcategory||current.data?.productType||inferSubcategory(current.category,current.title)||'').trim().toLocaleUpperCase('pt-BR');
  const group=items.filter(x=>x.status==='WISHLIST'&&x.category===current.category&&String(x.data?.subcategory||x.data?.productType||inferSubcategory(x.category,x.title)||'').trim().toLocaleUpperCase('pt-BR')===type);
+ const mixers=/BATEDEIRA|MIXER|PLANETÁRIA/.test(type+' '+current.title.toUpperCase());
  const columns=await Promise.all(group.map(async x=>{const d=x.data||{},img=await imageUrl(d.imagePath,d.productImageUrl);return '<th><div class="comparison-product-head">'+(img?'<img src="'+esc(img)+'" alt="">':'<div class="comparison-product-head-placeholder">✧</div>')+'<strong>'+esc(compactProductTitle(x.title,d.model,d.capacity,d.productBrand))+'</strong></div></th>'}));
  const metrics=[
-  {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'SEM PREÇO':money(v),best:'min'},
-  {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>x.data.capacity||'NÃO INFORMADA',best:null},
-  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return liters?Math.round(30*liters/4):null},fmt:v=>v==null?'NÃO INFORMADO':v+' COOKIES',best:null},
-  {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>x.data.power||'NÃO INFORMADA',best:'max'},
-  {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>x.data.warranty||'NÃO INFORMADA',best:'max'},
-  {label:'NOTA MÉDIA',get:x=>Number(x.data.rating)||null,fmt:(v,x)=>v==null?'NÃO INFORMADA':v.toFixed(1).replace('.',',')+'/5',best:'max'}
+  {label:'PREÇO ATUAL',get:x=>productPrice(x),fmt:v=>v==null?'—':money(v),best:'min'},
+  {label:'CAPACIDADE',get:x=>numericValue(x.data.capacity),fmt:(v,x)=>v==null?'—':x.data.capacity,best:'max'},
+  {label:'LOTE ESTIMADO · 70G',get:x=>{const liters=numericValue(x.data.capacity);return mixers&&liters?Math.round(30*liters/4):null},fmt:v=>v==null?'—':v+' COOKIES',best:'max'},
+  {label:'POTÊNCIA',get:x=>numericValue(x.data.power),fmt:(v,x)=>v==null?'—':x.data.power,best:'max'},
+  {label:'GARANTIA',get:x=>warrantyMonths(x.data.warranty),fmt:(v,x)=>v==null?'—':x.data.warranty,best:'max'},
+  {label:'NOTA MÉDIA',get:x=>Number(x.data.rating)||null,fmt:v=>v==null?'—':v.toFixed(1).replace('.',',')+'/5',best:'max'}
  ];
- const rows=metrics.map(m=>{const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=m.best&&valid.length?Math[m.best](...valid):null;return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=!!m.best&&v!=null&&valid.length>1&&(m.best==='min'?v===Math.max(...valid):v===Math.min(...valid));const source=(x.data.stores||[]).filter(z=>Number(z.price)>0&&isStoreUrl(z.url)).sort((a,b)=>(Number(a.price)+Number(a.shipping||0))-(Number(b.price)+Number(b.shipping||0)))[0];const value=esc(m.fmt(v,x));return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+value+'</td>'}).join('')+'</tr>'}).join('');
- const details=[['VOLTAGEM',x=>x.data.voltage||'220V'],['DIMENSÕES',x=>x.data.dimensions],['ADEQUAÇÃO À COZINHA',x=>x.data.fit||'VERIFICAR LOCAL DE INSTALAÇÃO, SUPORTE E CIRCULAÇÃO NA COZINHA PEQUENA'],['PREÇO-ALVO',x=>x.data.targetPrice&&((x.data.stores||[]).some(s=>isStoreUrl(s.url))||(x.data.priceHistory||[]).some(h=>isStoreUrl(h.url)&&(h.priceDate||h.validFrom)))?money(x.data.targetPrice):'NÃO DEFINIDO']];
+ const visibleMetrics=metrics.filter(m=>group.some(x=>m.get(x)!=null));
+ const rows=visibleMetrics.map(m=>{
+  const vals=group.map(m.get),valid=vals.filter(v=>v!=null),best=valid.length?Math[m.best](...valid):null,worst=valid.length>1?Math[m.best==='min'?'max':'min'](...valid):null;
+  return '<tr><th>'+m.label+'</th>'+group.map((x,i)=>{const v=vals[i],isBest=v!=null&&v===best,isWorst=v!=null&&v===worst;return '<td class="'+(isBest?'best-value':isWorst?'worst-value':'')+'">'+esc(m.fmt(v,x))+'</td>'}).join('')+'</tr>';
+ }).join('');
+ const detailDefs=[
+  ['VOLTAGEM',x=>x.data.voltage],
+  ['DIMENSÕES',x=>x.data.dimensions],
+  ['ADEQUAÇÃO À COZINHA',x=>kitchenFitText(x,mixers)],
+  ['PREÇO-ALVO',x=>x.data.targetPrice&&money(x.data.targetPrice)]
+ ];
+ const details=detailDefs.filter(([label,get])=>label==='ADEQUAÇÃO À COZINHA'||group.some(x=>get(x)));
  const extra=details.map(([label,get])=>'<tr><th>'+label+'</th>'+group.map(x=>'<td>'+esc(get(x)||'—')+'</td>').join('')+'</tr>').join('');
- const mixers=/BATEDEIRA|MIXER|PLANETÁRIA/.test(type+' '+current.title.toUpperCase());
  let recommendation='';
- if(group.length){const rated=group.map(x=>{const d=x.data||{},price=productPrice(x),liters=numericValue(d.capacity),watts=numericValue(d.power),months=warrantyMonths(d.warranty);let score=0,parts=0;
-  if(price!=null){const prices=group.map(g=>productPrice(g)).filter(v=>v!=null),min=Math.min(...prices);score+=(min/price)*40;parts+=40}
-  if(liters!=null){const fit=mixers?Math.max(0,1-Math.abs(liters-7.6)/12):Math.min(1,liters/15);score+=fit*25;parts+=25}
-  if(watts!=null){score+=Math.min(1,watts/700)*20;parts+=20}
-  if(months!=null){score+=Math.min(1,months/24)*10;parts+=10}
-  const completeness=['model','capacity','power','warranty','rating','dimensions'].filter(k=>String(d[k]||'').trim()).length;score+=(completeness/6)*5;parts+=5;
-  return {item:x,score:parts?score/parts:0,parts};
- }).sort((a,b)=>b.score-a.score);const winner=rated[0];
- recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand))+'</strong>é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+(mixers?'a cozinha é pequena e a batedeira hoje fica sobre a máquina de lavar: antes da compra, é preciso medir onde ela ficará, verificar se será necessário outro suporte e se algum móvel precisará mudar de lugar. O freezer atual tem 175 L, então um lote estimado muito alto pode ultrapassar o espaço de armazenamento disponível. A estimativa de cookies não é uma meta de produção nem uma garantia de capacidade de armazenamento. ':'')+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e a capacidade máxima de massa indicada pelo fabricante antes de decidir.')+'</div>';
+ if(group.length){
+  const prices=group.map(x=>productPrice(x)).filter(v=>v!=null),minPrice=prices.length?Math.min(...prices):null,maxCapacity=Math.max(0,...group.map(x=>numericValue(x.data.capacity)||0));
+  const rated=group.map(x=>{
+   const d=x.data||{},price=productPrice(x),capacity=numericValue(d.capacity),fitText=String(d.fit||'').toLowerCase();
+   let score=0,weight=0;
+   if(price!=null&&minPrice>0){score+=(minPrice/price)*35;weight+=35}
+   if(capacity!=null&&maxCapacity>0){score+=(capacity/maxCapacity)*25;weight+=25}
+   if(d.dimensions){score+=10;weight+=10}
+   if(fitText){score+=(/não cabe|nao cabe|incompatível|incompativel|sem espaço|sem espaco|ultrapassa/.test(fitText)?0:/cabe|adequad|compatível|compativel/.test(fitText)?15:7.5);weight+=15}
+   const tech=['model','capacity','power','warranty','rating','dimensions'].filter(k=>String(d[k]||'').trim()).length;
+   score+=(tech/6)*15;weight+=15;
+   return {item:x,score:weight?score/weight:0};
+  }).sort((a,b)=>b.score-a.score);
+  const winner=rated[0].item,winnerTitle=compactProductTitle(winner.title,winner.data?.model,winner.data?.capacity,winner.data?.productBrand);
+  recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> a recomendação pondera preço, capacidade, dados técnicos e adequação física. '+(mixers?'na comparação técnica, maior capacidade e mais cookies por lote são vantagens e aparecem em verde. a decisão final também precisa considerar o espaço da cozinha, o apoio seguro e o freezer de 175 L: o rendimento estimado não significa que todo o lote precise ser produzido ou armazenado de uma vez. ':'')+' '+esc(kitchenFitText(winner,mixers))+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
@@ -895,7 +973,7 @@ $('categoryChecks').addEventListener('change',()=>{renderSubcategoryFilters();re
 $('itemForm').elements.category.addEventListener('change',()=>updateItemSubcategory(inferSubcategory($('itemForm').elements.category.value,$('itemForm').elements.title.value)||''));
 $('itemForm').elements.title.addEventListener('input',()=>{const detected=inferSubcategory($('itemForm').elements.category.value,$('itemForm').elements.title.value);if(detected)updateItemSubcategory(detected)});
 
-$('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');$('cosmosToastClose').onclick=()=>$('cosmosToast').classList.add('hidden');
+$('inboxBtn').onclick=showInbox;$('inboxClose').onclick=()=>$('inboxPopup').classList.add('hidden');$('notices').addEventListener('click',event=>{const button=event.target.closest('[data-inbox-open]');if(!button)return;$('inboxPopup').classList.add('hidden');showDetail(button.dataset.inboxOpen)});$('cosmosToastClose').onclick=()=>$('cosmosToast').classList.add('hidden');
 async function init(){
  renderSubcategoryFilters();
  if(!client){$('items').innerHTML='<div class="notice">NÃO FOI POSSÍVEL CONECTAR AO SUPABASE. RECARREGUE A PÁGINA.</div>';return}
