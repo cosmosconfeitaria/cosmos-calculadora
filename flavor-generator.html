@@ -272,11 +272,11 @@ function add(type,category,name,mass,chocolate,filling,complement,topping,occasi
  if(/red velvet/i.test(mass)&&chocolate!==null) chocolate='chocolate branco';
  let parts=[];
  if(type==='COOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING',topping||'sem topping adicional']];
- if(type==='DOT') parts=[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(name,mass,filling,complement,occasion)]];
+ if(type==='DOT') parts=[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE',String(filling||'').replace(/brigadeiro(?! de colher)/i,'brigadeiro de colher')+' · textura cremosa e macia mesmo refrigerada, sem endurecer'],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING','creme nuvem'],['MIÇANGAS',dotPearlColors(name,mass,filling,complement,occasion)]];
  if(type==='BROOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',chocolate],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',filling],...(complement&&!/brownie/i.test(complement)?[['COMPLEMENTO',complement]]:[]),['TOPPING',topping||'sem topping adicional']];
  if(type==='ICE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['BASE DO SORVETE',filling],['COMPLEMENTO DO SORVETE',complement||'sem complemento adicional']];
  const id=[type,category,occasion||'GERAL',name].join('|');
- ideas.push({id,type,category,name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
+ ideas.push({id,type,category,name:type==='DOT'?name.replace(/^DOT\\s+/i,''):name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
 }
 const B='chocolate blend';
 const W='chocolate branco';
@@ -562,7 +562,7 @@ function buildCreativeIdeas(){
   const mass=p[2],redVelvet=/red velvet/i.test(mass),choc=redVelvet?'chocolate branco':p[3],occasion=p[7]||null,keys=p[8]||[];
   let parts=[];
   if(type==='COOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',choc],['RECHEIO',p[4]],['RECHEIO COMPLEMENTAR',p[5]],['TOPPING',p[6]]];
-  if(type==='DOT')parts=[['MASSA DO COOKIE',mass],...(choc?[['CHOCOLATE NA MASSA',choc]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',p[4]],['RECHEIO COMPLEMENTAR',/geleia|compota|curd|creme de fruta/i.test(p[5])?p[5]:'não se aplica'],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(p[1],mass,p[4],p[5],occasion)]];
+  if(type==='DOT')parts=[['MASSA DO COOKIE',mass],...(choc?[['CHOCOLATE NA MASSA',choc]]:[]),['RECHEIO BASE',String(p[4]||'').replace(/brigadeiro(?! de colher)/i,'brigadeiro de colher')+' · textura cremosa e macia mesmo refrigerada, sem endurecer'],['RECHEIO COMPLEMENTAR',/geleia|compota|curd|creme de fruta/i.test(p[5])?p[5]:'não se aplica'],['TOPPING','creme nuvem'],['MIÇANGAS',dotPearlColors(p[1],mass,p[4],p[5],occasion)]];
   if(type==='BROOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',choc],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',p[4]],...(!/brownie/i.test(p[5])?[['COMPLEMENTO',p[5]]]:[]),['TOPPING',p[6]]];
   if(type==='ICE'){
    const n=p[1].toLowerCase();
@@ -570,7 +570,7 @@ function buildCreativeIdeas(){
    const extra=/morango|framboesa|cereja/.test(n)?'pedacinhos de morango':/doce de leite|caramelo|churros/.test(n)?'pedacinhos de brownie de chocolate 50%':/cafe/.test(n)?'flocos de chocolate blend':/pistache/.test(n)?'pistache picado':/abacaxi/.test(n)?'abacaxi em compota':'flocos de chocolate blend';
    parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',choc],['BASE DO SORVETE',base],['COMPLEMENTO DO SORVETE',extra]];
   }
-  out.push({id:'creative|'+type+'|'+p[0]+'|'+(occasion||'GERAL')+'|'+p[1],type,category:p[0],name:(type==='DOT'?'DOT ':type==='BROOKIE'?'BROOKIE ':type==='ICE'?'ICE COOKIE ':'')+p[1],parts,occasion:occasion||'TODAS',keys:[...new Set(keys)]});
+  out.push({id:'creative|'+type+'|'+p[0]+'|'+(occasion||'GERAL')+'|'+p[1],type,category:p[0],name:(type==='BROOKIE'?'BROOKIE ':type==='ICE'?'ICE COOKIE ':'')+p[1],parts,occasion:occasion||'TODAS',keys:[...new Set(keys)]});
  });
  return out;
 }
