@@ -80,7 +80,7 @@ label{display:block;font-size:10px;color:var(--muted);margin-bottom:6px;letter-s
 .pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);font-size:9px;color:var(--muted);margin:5px 4px 0 0}
 .empty-state{text-transform:uppercase;border:1px dashed #c8c4bd;padding:28px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;grid-column:1/-1}
 .panel{border:1px solid var(--line);background:#fff;padding:16px;margin:12px 0;box-shadow:0 2px 0 #dedbd6}
-.product-discovery{grid-column:1/-1;border:1px solid var(--line);padding:12px;background:#fff;margin-bottom:4px}.product-discovery>label{display:block;font-size:10px;letter-spacing:.07em;margin-bottom:7px}.search-line{display:flex;gap:7px}.search-line input{flex:1;min-width:0}.search-line button,.product-result button{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff,#d8d7d4);color:var(--blue);padding:9px 12px;font-size:10px;cursor:pointer}.discovery-note{font-size:9px;color:var(--muted);line-height:1.5;margin:8px 0 0}.discovery-results{display:grid;gap:8px;margin-top:10px}.product-result{display:grid;grid-template-columns:68px 1fr;gap:10px;border-top:1px solid var(--line);padding-top:10px;font-size:10px;min-width:0}.product-result img{width:68px;height:68px;object-fit:contain;background:var(--cream)}.product-result strong{display:block;font-size:11px;font-weight:500;line-height:1.4}.product-result .meta{font-size:9px;color:var(--muted);margin:4px 0}.product-result .price{font-size:13px;color:var(--blue);margin:4px 0}.product-result .result-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}.product-result button:disabled{opacity:.4;cursor:not-allowed}.voltage-tag{display:inline-block;border:1px solid var(--line);padding:3px 5px;font-size:8px;letter-spacing:.04em}.voltage-tag.bad{border-color:#d22222;color:#d22222}.voltage-confirm{font-size:9px;display:flex;gap:5px;align-items:center;margin-top:6px}@media(max-width:520px){.search-line{flex-direction:column}.product-result{grid-template-columns:54px 1fr}.product-result img{width:54px;height:54px}}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.product-discovery{grid-column:1/-1;border:1px solid var(--line);padding:12px;background:#fff;margin-bottom:4px}.product-discovery>label{display:block;font-size:10px;letter-spacing:.07em;margin-bottom:7px}.search-line{display:flex;gap:7px}.search-line input{flex:1;min-width:0}.search-line button,.product-result button{border:1px solid #aaa8a3;background:linear-gradient(180deg,#fff,#d8d7d4);color:var(--blue);padding:9px 12px;font-size:10px;cursor:pointer}.discovery-note{font-size:9px;color:var(--muted);line-height:1.5;margin:8px 0 0}.discovery-results{display:grid;gap:8px;margin-top:10px}.product-result{display:grid;grid-template-columns:68px 1fr;gap:10px;border-top:1px solid var(--line);padding-top:10px;font-size:10px;min-width:0}.product-result img{width:68px;height:68px;object-fit:contain;background:var(--cream)}.product-result strong{display:block;font-size:11px;font-weight:500;line-height:1.4}.product-result .meta{font-size:9px;color:var(--muted);margin:4px 0}.product-result .price{display:flex;flex-direction:column;gap:2px;margin:6px 0 5px;color:var(--blue)}.product-result .price-main{font-size:13px;font-weight:500;line-height:1.25}.product-result .price-main-label{font-size:8px;letter-spacing:.05em;color:var(--muted);margin-right:5px}.product-result .price-detail{font-size:9px;line-height:1.35;color:var(--ink)}.product-result .result-actions{display:grid;grid-template-columns:1fr;gap:7px;margin-top:7px}.product-result .result-action-top,.product-result .result-action-bottom{display:flex;align-items:center;gap:9px;min-width:0}.product-result .result-action-bottom{justify-content:space-between}.product-result .result-action-bottom button{min-width:0;padding:7px 10px;font-size:9px}.product-result .favorite-star{width:24px;height:24px;flex:0 0 24px;font-size:17px!important}.product-result .result-select-label{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid #c8c5bf;background:linear-gradient(180deg,#fff,#e7e5e1);box-shadow:inset 0 1px 0 #fff,0 1px 0 #c8c5bf}.product-result .result-select{width:14px;height:14px;flex:0 0 14px}.product-result button:disabled{opacity:.4;cursor:not-allowed}.voltage-tag{display:inline-block;border:1px solid #d22222;color:#d22222;padding:2px 5px;font-size:8px;letter-spacing:.04em}.voltage-tag.bad{border-color:#d22222;color:#d22222}.voltage-confirm{font-size:9px;display:flex;gap:5px;align-items:center;margin-top:6px}@media(max-width:520px){.search-line{flex-direction:column}.product-result{grid-template-columns:54px 1fr}.product-result img{width:54px;height:54px}}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .full{grid-column:1/-1}
 .hidden{display:none!important}
 .form-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -791,30 +791,33 @@ $('itemForm').addEventListener('submit',async e=>{
 
 function voltageStatus(product){const text=[product.title,product.voltage,product.description].filter(Boolean).join(' ');if(/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(text))return 'INCOMPATIBLE';if(/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(text))return 'BIVOLT';if(/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(text))return 'CONFIRMED_220V';return 'UNKNOWN'}
 async function saveDiscoveryResult(p,status='WISHLIST'){
- const rawTitle=String(p.title||'').trim();if(!rawTitle)throw new Error('PRODUTO SEM NOME.');const title=compactProductTitle(rawTitle,p.model,p.capacity,p.brand);
- const same=items.find(x=>x.status===status&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
+ const rawTitle=String(p.title||'').trim();if(!rawTitle)throw new Error('PRODUTO SEM NOME.');const title=discoveryProductName(p),modelKey=String(p.model||discoveryModelLine(p)).toLocaleLowerCase('pt-BR'),productUrl=String(p.link||'');
+ const same=items.find(x=>x.status===status&&(String(x.data?.referenceUrl||'')===productUrl&&productUrl||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===modelKey));
  if(same)return same.id;
  const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',searchTerm=String($('productLookup').value||''),productTerm=String(p.title||''),subcategory=inferSubcategory(category,searchTerm+' '+productTerm)||$('itemForm').elements.subcategory.value||'',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':p.voltageStatus==='CONFIRMED_220V'?'220V':'NÃO CONFIRMADA';
  const sourceOffers=(p.offers||[]).filter(o=>isStoreUrl(o.link)&&Number(o.priceValue)>0),bestOffer=sourceOffers.slice().sort((a,b)=>(Number(a.priceValue)+Number(a.shipping||0))-(Number(b.priceValue)+Number(b.shipping||0)))[0],current=bestOffer?(Number(bestOffer.priceValue)+Number(bestOffer.shipping||0)):(p.link?(Number(p.priceValue||0)||null):null),referenceLink=bestOffer?.link||p.link||'';
- const history=items.filter(x=>x.status==='WISHLIST'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')).flatMap(x=>x.data.priceHistory||[]).filter(h=>h.priceType==='FULL_PRODUCT_PRICE');
+ const history=items.filter(x=>x.status==='WISHLIST'&&(String(x.data?.referenceUrl||'')===referenceLink&&referenceLink||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===modelKey)).flatMap(x=>x.data.priceHistory||[]).filter(h=>h.priceType==='FULL_PRODUCT_PRICE');
  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);
  const recent=history.filter(h=>h.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(h.url)&&(h.priceDate||h.validFrom)&&new Date((h.priceDate||h.validFrom)+'T12:00:00')>=cutoff&&Number(h.price)>0);
  const historicalLow=recent.length?Math.min(...recent.map(h=>Number(h.price)+Number(h.shipping||0))):null;
  const technical=p.technicalSummary||p.specs||[p.description&&('DESCRIÇÃO: '+p.description),p.voltageStatus&&('VOLTAGEM: '+voltage)].filter(Boolean).join('\n');
- const data={subcategory,voltage,detectedVoltage:p.voltageStatus||'',productSource:p.source||'',productBrand:p.brand||'',productImageUrl:p.thumbnail||p.image||'',referenceUrl:referenceLink,currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',rating:p.rating||null,ratingCount:p.ratingCount||'',dimensions:p.dimensions||'',addedAt:today(),stores:sourceOffers.map(o=>({store:o.store,price:Number(o.priceValue),priceType:'FULL_PRODUCT_PRICE',cashPrice:o.cashPrice??null,creditPrice:o.creditPrice??null,productPrice:o.productPrice??null,installmentAmount:o.installmentAmount??null,installmentCount:o.installmentCount??null,installmentPlan:o.installmentPlan||'',shipping:Number(o.shipping||0),url:o.link,searchedAt:today(),title:o.title||p.title,image:o.thumbnail||p.thumbnail||'',voltageStatus:o.voltageStatus||p.voltageStatus})),priceHistory:[...(p.priceHistory||[]).filter(h=>isStoreUrl(h.url)&&h.priceDate&&Number(h.price)>0).map(h=>({...h,at:today(),searchBatch:'google-history-'+today(),read:false})),...sourceOffers.map(o=>({store:o.store,price:Number(o.priceValue),priceType:'FULL_PRODUCT_PRICE',cashPrice:o.cashPrice??null,creditPrice:o.creditPrice??null,productPrice:o.productPrice??null,installmentAmount:o.installmentAmount??null,installmentCount:o.installmentCount??null,installmentPlan:o.installmentPlan||'',shipping:Number(o.shipping||0),url:o.link,at:today(),priceDate:null,searchBatch:'initial-'+today(),voltageStatus:o.voltageStatus,title:o.title||p.title,read:false}))]};
+ const data={subcategory,voltage,detectedVoltage:p.voltageStatus||'',productSource:p.source||'',productBrand:p.brand||'',displayModel:discoveryModelLine(p),productImageUrl:p.thumbnail||p.image||'',referenceUrl:referenceLink,currentPrice:current,targetPrice:historicalLow||current,priceTargetBasis:historicalLow?'MENOR PREÇO OBSERVADO NOS ÚLTIMOS 12 MESES':'PREÇO DE REFERÊNCIA INICIAL · HISTÓRICO DE 12 MESES EM FORMAÇÃO',specs:technical,model:p.model||'',capacity:p.capacity||'',power:p.power||'',warranty:p.warranty||'',rating:p.rating||null,ratingCount:p.ratingCount||'',dimensions:p.dimensions||'',addedAt:today(),stores:sourceOffers.map(o=>({store:o.store,price:Number(o.priceValue),priceType:'FULL_PRODUCT_PRICE',cashPrice:o.cashPrice??null,creditPrice:o.creditPrice??null,productPrice:o.productPrice??null,installmentAmount:o.installmentAmount??null,installmentCount:o.installmentCount??null,installmentPlan:o.installmentPlan||'',shipping:Number(o.shipping||0),url:o.link,searchedAt:today(),title:o.title||p.title,image:o.thumbnail||p.thumbnail||'',voltageStatus:o.voltageStatus||p.voltageStatus})),priceHistory:[...(p.priceHistory||[]).filter(h=>isStoreUrl(h.url)&&h.priceDate&&Number(h.price)>0).map(h=>({...h,at:today(),searchBatch:'google-history-'+today(),read:false})),...sourceOffers.map(o=>({store:o.store,price:Number(o.priceValue),priceType:'FULL_PRODUCT_PRICE',cashPrice:o.cashPrice??null,creditPrice:o.creditPrice??null,productPrice:o.productPrice??null,installmentAmount:o.installmentAmount??null,installmentCount:o.installmentCount??null,installmentPlan:o.installmentPlan||'',shipping:Number(o.shipping||0),url:o.link,at:today(),priceDate:null,searchBatch:'initial-'+today(),voltageStatus:o.voltageStatus,title:o.title||p.title,read:false}))]};
  if(current&&referenceLink&&!data.stores.length){data.stores.push({store:p.source||'LOJA',price:current,priceType:'FULL_PRODUCT_PRICE',cashPrice:p.cashPrice??null,creditPrice:p.creditPrice??null,productPrice:p.productPrice??null,installmentAmount:p.installmentAmount??null,installmentCount:p.installmentCount??null,installmentPlan:p.installmentPlan||'',shipping:0,url:referenceLink,searchedAt:today(),title,image:p.thumbnail||'',voltageConfirmed:true});data.priceHistory.push({store:p.source||'LOJA',price:current,priceType:'FULL_PRODUCT_PRICE',cashPrice:p.cashPrice??null,creditPrice:p.creditPrice??null,productPrice:p.productPrice??null,installmentAmount:p.installmentAmount??null,installmentCount:p.installmentCount??null,installmentPlan:p.installmentPlan||'',shipping:0,url:referenceLink,at:today(),priceDate:p.priceDate||null,searchBatch:'initial-'+today(),read:false})}
  const {data:row,error}=await client.from('cosmos_wishlist_items').insert({user_id:user.id,title,category,status,importance:'MEDIA',data}).select('id').single();
  if(error)throw error;
- if(status==='WISHLIST'){const favorite=items.find(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));if(favorite)await client.from('cosmos_wishlist_items').delete().eq('id',favorite.id)}
+ if(status==='WISHLIST'){const favorite=items.find(x=>x.status==='FAVORITE'&&(String(x.data?.referenceUrl||'')===referenceLink&&referenceLink||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===modelKey));if(favorite)await client.from('cosmos_wishlist_items').delete().eq('id',favorite.id)}
  return row.id;
 }
 async function toggleDiscoveryFavorite(p,button){
- const title=String(p.title||'').trim(),existing=items.find(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'));
+ const title=discoveryProductName(p),url=String(p.link||''),modelKey=String(p.model||discoveryModelLine(p)).toLocaleLowerCase('pt-BR');
+ const existing=items.find(x=>x.status==='FAVORITE'&&(url&&String(x.data?.referenceUrl||'')===url||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===modelKey));
+ button.disabled=true;
  try{
-  if(existing){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',existing.id);if(error)throw error;button.classList.remove('active');button.textContent='★'}
-  else{await saveDiscoveryResult(p,'FAVORITE');button.classList.add('active');button.textContent='★'}
+  if(existing){const {error}=await client.from('cosmos_wishlist_items').delete().eq('id',existing.id);if(error)throw error;button.classList.remove('active');button.setAttribute('aria-pressed','false');button.title='FAVORITAR'}
+  else{await saveDiscoveryResult(p,'FAVORITE');button.classList.add('active');button.setAttribute('aria-pressed','true');button.title='REMOVER DOS FAVORITOS'}
   await load();
  }catch(error){alert('NÃO FOI POSSÍVEL ATUALIZAR O FAVORITO: '+error.message)}
+ finally{button.disabled=false}
 }
 async function searchWishlistProducts(){
  const query=$('productLookup').value.trim();if(!query){$('productLookup').focus();return}
@@ -844,18 +847,26 @@ async function searchWishlistProducts(){
    const status=p.voltageStatus||voltageStatus(p),bad=status==='INCOMPATIBLE',confirmed=p.voltageConfirmed||status==='CONFIRMED_220V'||status==='BIVOLT';
    const card=document.createElement('article');card.className='product-result';
    const img=document.createElement('img');img.alt='';if(p.thumbnail)img.src=p.thumbnail;else img.style.visibility='hidden';
-   const body=document.createElement('div'),title=document.createElement('strong');title.textContent=(p.title||'PRODUTO SEM NOME').toUpperCase();
+   const body=document.createElement('div'),title=document.createElement('strong');title.textContent=discoveryProductName(p);
+   const modelLine=discoveryModelLine(p);if(modelLine){const model=document.createElement('div');model.className='meta product-model-line';model.textContent=modelLine;body.append(title,model)}
    const meta=document.createElement('div');meta.className='meta';meta.textContent=p.source||'GOOGLE';
-   const price=document.createElement('div');price.className='price';price.textContent=p.link?(p.priceText||(p.priceValue?'TOTAL DO PRODUTO '+money(p.priceValue):'PREÇO NÃO INFORMADO · CONSULTAR ANÚNCIO')):'PREÇO NÃO EXIBIDO · LINK DA LOJA NÃO DISPONÍVEL';
-   const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT · INCLUI 220V':'220V IDENTIFICADO'):bad?'110V/127V · INCOMPATÍVEL':'VOLTAGEM NÃO CONFIRMADA';
+   const price=document.createElement('div');price.className='price';const priceLines=discoveryPriceLines(p);
+   const main=document.createElement('div');main.className='price-main';const mainLabel=document.createElement('span');mainLabel.className='price-main-label';mainLabel.textContent=priceLines.main.split(' ')[0];const mainAmount=document.createElement('span');mainAmount.textContent=priceLines.main.split(' ').slice(1).join(' ');main.append(mainLabel,mainAmount);price.append(main);
+   if(priceLines.detail){const detail=document.createElement('div');detail.className='price-detail';detail.textContent=priceLines.detail;price.append(detail)}
+   if(!p.link){const unavailable=document.createElement('div');unavailable.className='price-detail';unavailable.textContent='LINK DA LOJA NÃO DISPONÍVEL';price.append(unavailable)}
+   const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT':'220'):bad?'110/127':'NÃO CONFIRMADA';
    const actions=document.createElement('div');actions.className='result-actions';
-   const star=document.createElement('button');star.type='button';star.className='favorite-star'+(items.some(x=>x.status==='FAVORITE'&&x.title.toLocaleLowerCase('pt-BR')===String(p.title||'').toLocaleLowerCase('pt-BR'))?' active':'');star.textContent='★';star.title='FAVORITAR';star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));actions.append(star);
-   if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';actions.append(link)}
+   const topActions=document.createElement('div');topActions.className='result-action-top';
+   const favoriteTitle=discoveryProductName(p),favoriteUrl=String(p.link||''),favoriteModel=String(p.model||discoveryModelLine(p)).toLocaleLowerCase('pt-BR');
+   const isFavorite=items.some(x=>x.status==='FAVORITE'&&(favoriteUrl&&String(x.data?.referenceUrl||'')===favoriteUrl||x.title.toLocaleLowerCase('pt-BR')===favoriteTitle.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===favoriteModel));
+   const star=document.createElement('button');star.type='button';star.className='favorite-star'+(isFavorite?' active':'');star.textContent='★';star.title=isFavorite?'REMOVER DOS FAVORITOS':'FAVORITAR';star.setAttribute('aria-pressed',String(isFavorite));star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));topActions.append(star);
+   if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';topActions.append(link)}
+   const bottomActions=document.createElement('div');bottomActions.className='result-action-bottom';
    const add=document.createElement('button');add.type='button';add.textContent=bad?'INCOMPATÍVEL':confirmed?'ADICIONAR À WISHLIST':'VOLTAGEM NÃO CONFIRMADA';add.disabled=bad||!confirmed;
    add.addEventListener('click',async()=>{if(!confirmed)return;add.disabled=true;try{await saveDiscoveryResult(p,'WISHLIST');await load();closeForm();}catch(error){alert('NÃO FOI POSSÍVEL ADICIONAR: '+error.message);add.disabled=false}});
    const pick=document.createElement('input');pick.type='checkbox';pick.className='result-select';pick.disabled=bad||!confirmed;pick.setAttribute('aria-label','selecionar '+p.title);pick.addEventListener('change',()=>{if(pick.checked)selected.add(index);else selected.delete(index);syncBulk()});
    const pickLabel=document.createElement('label');pickLabel.className='result-select-label';pickLabel.append(pick);pickLabel.title='SELECIONAR PRODUTO';
-   actions.append(pickLabel,add);body.append(title,meta,price,tag,actions);card.append(img,body);host.append(card);
+   bottomActions.append(add,pickLabel);actions.append(topActions,bottomActions);body.append(meta,price,tag,actions);card.append(img,body);host.append(card);
   });
   bulk.addEventListener('click',async()=>{const chosen=[...selected].map(i=>products[i]);bulk.disabled=true;bulk.textContent='SALVANDO...';try{for(const p of chosen)await saveDiscoveryResult(p,'WISHLIST');await load();closeForm();selected.clear();}catch(error){alert('NÃO FOI POSSÍVEL ADICIONAR TODOS: '+error.message);syncBulk()}});
  }catch(error){host.innerHTML='';const message=document.createElement('p');message.className='discovery-note';message.textContent='NÃO FOI POSSÍVEL BUSCAR: '+error.message;host.append(message)}
@@ -909,6 +920,36 @@ function productPrice(item){
 function numericValue(s){const m=String(s||'').replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):null}
 function warrantyMonths(s){const text=String(s||'').toLowerCase(),n=numericValue(text);if(n==null)return null;if(/ano/.test(text))return n*12;if(/mes/.test(text))return n;return n>5?n:n*12}
 function compactProductTitle(title,model,capacity,brand){const m=String(model||'').trim(),c=String(capacity||'').match(/[0-9]+(?:[,.][0-9]+)?\s?L/i)?.[0]?.replace(/\s+/g,'').toUpperCase()||'',b=String(brand||'').trim();if(m&&c)return [m,c,b].filter(Boolean).join(' ').toUpperCase();const raw=String(title||'').trim(),match=raw.match(/\b([A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2})\b.*?\b(\d+(?:[,.]\d+)?\s?L)\b/i);if(match){const brandGuess=b||raw.split(/\s+/).slice(-1)[0];return [match[1],match[2].replace(/\s+/g,'').toUpperCase(),brandGuess].filter(Boolean).join(' ').toUpperCase()}return raw.toUpperCase()}
+function discoveryProductName(p){
+ const source=(String($('productLookup')?.value||'')+' '+String(p.title||'')).toLocaleUpperCase('pt-BR');
+ const types=[
+  [/BATEDEIRA|PLANETÁRIA/,'BATEDEIRA'],[/FREEZER/,'FREEZER'],[/FORNO/,'FORNO'],[/GELADEIRA|REFRIGERADOR/,'GELADEIRA'],[/MIXER/,'MIXER'],[/LIQUIDIFICADOR/,'LIQUIDIFICADOR'],[/BALANÇA/,'BALANÇA'],[/SELADORA/,'SELADORA'],[/IMPRESSORA/,'IMPRESSORA'],[/NOTEBOOK|LAPTOP/,'NOTEBOOK'],[/ARMÁRIO|ARMARIO/,'ARMÁRIO'],[/PRATELEIRA/,'PRATELEIRA'],[/MESA/,'MESA'],[/BANCADA/,'BANCADA'],[/MICRO.ONDA/,'MICRO-ONDAS'],[/EMBALAGEM/,'EMBALAGEM']
+ ];
+ const found=types.find(([pattern])=>pattern.test(source));
+ if(found)return found[1];
+ return String(p.title||'PRODUTO').replace(/\s+/g,' ').trim().toLocaleUpperCase('pt-BR');
+}
+function discoveryModelLine(p){
+ const raw=String(p.title||''),model=String(p.model||raw.match(/\b[A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2}\b/i)?.[0]||'').trim();
+ const capacity=String(p.capacity||raw.match(/\b\d+(?:[,.]\d+)?\s?L\b/i)?.[0]||'').replace(/\s+/g,'').toUpperCase();
+ const brand=String(p.brand||'').trim();
+ const line=[model,capacity,brand].filter((v,i,a)=>v&&!a.slice(0,i).some(x=>x.toLowerCase()===v.toLowerCase())).join(' · ');
+ return line||raw;
+}
+function discoveryPriceLines(p){
+ const cash=Number(p.cashPrice||0),generic=Number(p.productPrice||0),credit=Number(p.creditPrice||0),amount=Number(p.installmentAmount||0),count=Number(p.installmentCount||0);
+ const mainValue=cash||generic||credit||Number(p.priceValue||0);
+ const mainLabel=cash?'À VISTA':generic?'VALOR TOTAL':credit?'TOTAL PARCELADO':'VALOR TOTAL';
+ const main=mainValue?mainLabel+' '+money(mainValue):'PREÇO NÃO INFORMADO';
+ let detail='';
+ if(amount>0&&count>1&&credit>0){
+  const condition=/sem\s*juros/i.test(String(p.installmentPlan||p.priceText||''))?'SEM JUROS':/com\s*juros/i.test(String(p.installmentPlan||p.priceText||''))?'COM JUROS':'';
+  detail=count+'x DE '+money(amount)+(condition?' '+condition:'')+' (TOTAL '+money(credit)+')';
+ }else if(credit>0&&cash>0&&Math.abs(credit-cash)>.01)detail='TOTAL NO CARTÃO '+money(credit);
+ else if(generic>0&&cash>0&&Math.abs(generic-cash)>.01)detail='PREÇO ANUNCIADO '+money(generic);
+ else if(credit>0&&mainValue!==credit)detail='TOTAL PARCELADO '+money(credit);
+ return {main,detail};
+}
 function kitchenFitText(item,mixers){
  const d=item.data||{},parts=[];
  if(d.fit)parts.push(String(d.fit));
@@ -963,7 +1004,7 @@ async function showTypeComparison(id){
    if(d.fit||d.dimensions){score+=(/não cabe|nao cabe|incompatível|incompativel|sem espaço|sem espaco|ultrapassa/.test(fitText)?0:/cabe|adequad|compatível|compativel/.test(fitText)?10:5);parts+=10}
    return {item:x,score:parts?score/parts:0,parts};
   }).sort((a,b)=>b.score-a.score);
-  const winner=rated[0],winnerTitle=compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand);
+  const winner=rated[0],winnerTitle=[winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand].filter(Boolean).join(' · ').toUpperCase();
   recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+esc(kitchenFitText(winner.item,mixers))+' '+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e as condições de instalação antes de decidir.')+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
