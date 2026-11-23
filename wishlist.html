@@ -791,7 +791,7 @@ $('itemForm').addEventListener('submit',async e=>{
 
 function voltageStatus(product){const text=[product.title,product.voltage,product.description].filter(Boolean).join(' ');if(/\b(110|127)\s?V\b|\b(110|127)\s?VOLTS?\b/i.test(text))return 'INCOMPATIBLE';if(/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(text))return 'BIVOLT';if(/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(text))return 'CONFIRMED_220V';return 'UNKNOWN'}
 async function saveDiscoveryResult(p,status='WISHLIST'){
- const rawTitle=String(p.title||'').trim();if(!rawTitle)throw new Error('PRODUTO SEM NOME.');const title=discoveryProductName(p),modelKey=String(p.model||'').toLocaleLowerCase('pt-BR'),productUrl=String(p.link||'');
+ const rawTitle=String(p.title||'').trim();if(!rawTitle)throw new Error('PRODUTO SEM NOME.');const title=discoveryProductName(p),modelKey=discoveryModelCode(p).toLocaleLowerCase('pt-BR'),productUrl=String(p.link||'');
  const same=items.find(x=>x.status===status&&(String(x.data?.referenceUrl||'')===productUrl&&productUrl||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===modelKey));
  if(same)return same.id;
  const category=$('itemForm').elements.category.value||'EQUIPAMENTOS',searchTerm=String($('productLookup').value||''),productTerm=String(p.title||''),subcategory=inferSubcategory(category,searchTerm+' '+productTerm)||$('itemForm').elements.subcategory.value||'',voltage=p.voltageStatus==='BIVOLT'?'BIVOLT':p.voltageStatus==='CONFIRMED_220V'?'220V':'NÃO CONFIRMADA';
@@ -857,7 +857,7 @@ async function searchWishlistProducts(){
    const tag=document.createElement('span');tag.className='voltage-tag'+(bad?' bad':'');tag.textContent=confirmed?(status==='BIVOLT'?'BIVOLT':'220'):bad?'110/127':'NÃO CONFIRMADA';
    const actions=document.createElement('div');actions.className='result-actions';
    const topActions=document.createElement('div');topActions.className='result-action-top';
-   const favoriteTitle=discoveryProductName(p),favoriteUrl=String(p.link||''),favoriteModel=String(p.model||'').toLocaleLowerCase('pt-BR');
+   const favoriteTitle=discoveryProductName(p),favoriteUrl=String(p.link||''),favoriteModel=discoveryModelCode(p).toLocaleLowerCase('pt-BR');
    const isFavorite=items.some(x=>x.status==='FAVORITE'&&(favoriteUrl&&String(x.data?.referenceUrl||'')===favoriteUrl||x.title.toLocaleLowerCase('pt-BR')===favoriteTitle.toLocaleLowerCase('pt-BR')&&String(x.data?.model||'').toLocaleLowerCase('pt-BR')===favoriteModel));
    const star=document.createElement('button');star.type='button';star.className='favorite-star'+(isFavorite?' active':'');star.textContent='★';star.title=isFavorite?'REMOVER DOS FAVORITOS':'FAVORITAR';star.setAttribute('aria-pressed',String(isFavorite));star.addEventListener('click',()=>toggleDiscoveryFavorite(p,star));topActions.append(star);
    if(p.link){const link=document.createElement('a');link.href=p.link;link.target='_blank';link.rel='noopener noreferrer';link.className='small-link';link.textContent='VER ANÚNCIO';topActions.append(link)}
@@ -932,10 +932,11 @@ function discoveryProductName(p){
 function discoveryModelLine(p){
  const raw=String(p.title||''),model=String(p.model||raw.match(/\b[A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2}\b/i)?.[0]||'').trim();
  const capacity=String(p.capacity||raw.match(/\b\d+(?:[,.]\d+)?\s?L\b/i)?.[0]||'').replace(/\s+/g,'').toUpperCase();
- const brand=String(p.brand||'').trim();
+ const detectedKitchenAid=/KIT.?NEIDE|KITCHEN.?AID/i.test(raw),brand=detectedKitchenAid?'KitchenAid':String(p.brand||'').trim();
  const line=[model,capacity,brand].filter((v,i,a)=>v&&!a.slice(0,i).some(x=>x.toLowerCase()===v.toLowerCase())).join(' · ');
  return line||raw;
 }
+function discoveryModelCode(p){const raw=String(p.title||'');return String(p.model||raw.match(/\b[A-Z]{2,8}[-]?\d{1,3}(?:\s+[A-Z0-9]+){0,2}\b/i)?.[0]||'').trim()}
 function discoveryPriceLines(p){
  const cash=Number(p.cashPrice||0),generic=Number(p.productPrice||0),credit=Number(p.creditPrice||0),amount=Number(p.installmentAmount||0),count=Number(p.installmentCount||0);
  const mainValue=cash||generic||credit||Number(p.priceValue||0);
