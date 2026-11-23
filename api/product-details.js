@@ -53,10 +53,14 @@ export async function POST(request){
   const schemaIsCardPrice=creditMatch&&schemaPrice&&Math.abs(schemaPrice-parseMoney(creditMatch[1]))<0.01;
   const cashPrice=installmentMatch&&parsedCash&&installmentAmount&&Math.abs(parsedCash-installmentAmount)<0.01?null:(schemaIsCardPrice&&!cashMatch?null:parsedCash);
   const creditPrice=installmentTotal|| (creditMatch?parseMoney(creditMatch[1]):null);
-  const price=cashPrice||creditPrice||schemaPrice;
+  const schemaIsInstallmentAmount=installmentAmount&&schemaPrice&&Math.abs(schemaPrice-installmentAmount)<0.01;
+  const schemaIsInstallmentTotal=installmentTotal&&schemaPrice&&Math.abs(schemaPrice-installmentTotal)<0.01;
+  const productPrice=!cashPrice&&!schemaIsCardPrice&&!schemaIsInstallmentAmount&&!schemaIsInstallmentTotal?schemaPrice:null;
+  const price=cashPrice||creditPrice||productPrice||null;
   const priceText=[
     cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
     creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
+    productPrice?'PREÇO ANUNCIADO '+productPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
     installmentAmount&&installmentCount?'PARCELA '+installmentCount+'X DE '+installmentAmount.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+(/sem\s*juros/i.test(installmentPlan)?' SEM JUROS':/com\s*juros/i.test(installmentPlan)?' COM JUROS':''):''
   ].filter(Boolean).join(' · ');
   const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
@@ -77,7 +81,7 @@ export async function POST(request){
   for(const term of featureTerms){const match=textContent.match(new RegExp('.{0,65}'+term+'.{0,100}','i'));if(match){const line=clean(match[0]);if(line.length>12&&!featureLines.some(x=>x.toLowerCase()===line.toLowerCase()))featureLines.push(line)}}
   const specs=[...propertySpecs,...featureLines].filter((line,i,all)=>all.findIndex(x=>x.toLowerCase()===line.toLowerCase())===i).slice(0,18).join('\n');
   const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+specs),description&&('DESCRIÇÃO DO FABRICANTE: '+clean(description))].filter(Boolean).join('\n');
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice,creditPrice,installmentAmount,installmentCount,installmentPlan,priceText,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice,creditPrice,productPrice,installmentAmount,installmentCount,installmentPlan,priceText,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
 ,m.index+2),after=pageText.slice(m.index,next>=0?next:Math.min(pageText.length,m.index+60));return before+' '+after};
