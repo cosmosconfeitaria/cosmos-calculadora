@@ -53,7 +53,7 @@ export async function POST(request){
   const schemaIsCardPrice=creditMatch&&schemaPrice&&Math.abs(schemaPrice-parseMoney(creditMatch[1]))<0.01;
   const schemaIsInstallmentAmount=installmentAmount&&schemaPrice&&Math.abs(schemaPrice-installmentAmount)<0.01;
   const schemaIsInstallmentTotal=installmentTotal&&schemaPrice&&Math.abs(schemaPrice-installmentTotal)<0.01;
-  const cashPrice=cashMatch?parseMoney(cashMatch[1]):(schemaIsCardPrice||schemaIsInstallmentAmount?null:schemaPrice);
+  const cashPrice=cashMatch?parseMoney(cashMatch[1]):null;
   const creditPrice=installmentTotal|| (creditMatch?parseMoney(creditMatch[1]):null);
   const productPrice=!cashPrice&&!schemaIsCardPrice&&!schemaIsInstallmentAmount&&!schemaIsInstallmentTotal?schemaPrice:null;
   const price=cashPrice||creditPrice||productPrice||null;
