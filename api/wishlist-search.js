@@ -53,7 +53,7 @@ function parseDisplayedPrice(row) {
   const genericMatch=!cashPrice?valid.find(m=>m!==creditMatch&&(!installmentAmount||Math.abs(parse(m[1])-installmentAmount)>=0.01)):null;
   const numericProductPrice=installmentCount>1&&rawPrice&&installmentAmount&&Math.abs(rawPrice-installmentAmount)>=0.01&&Math.abs(rawPrice-(installmentTotal||0))>=0.01?rawPrice:null;
   const productPrice=genericMatch?parse(genericMatch[1]):(numericProductPrice||(!cashPrice&&!creditPrice&&Number.isFinite(numericFallback)&&numericFallback>0?numericFallback:null));
-  const priceValue=cashPrice||productPrice||creditPrice||null;
+  const priceValue=cashPrice||productPrice||null;
   const priceText=[
     cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
     creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
