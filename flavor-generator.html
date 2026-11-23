@@ -276,7 +276,7 @@ function add(type,category,name,mass,chocolate,filling,complement,topping,occasi
  if(type==='BROOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',chocolate],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',filling],...(complement&&!/brownie/i.test(complement)?[['COMPLEMENTO',complement]]:[]),['TOPPING',topping||'sem topping adicional']];
  if(type==='ICE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['BASE DO SORVETE',filling],['COMPLEMENTO DO SORVETE',complement||'sem complemento adicional']];
  const id=[type,category,occasion||'GERAL',name].join('|');
- ideas.push({id,type,category,name:type==='DOT'?name.replace(/^DOT\\s+/i,''):name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
+ ideas.push({id,type,category,name:type==='DOT'?name.replace(/^DOT\s+/i,''):name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
 }
 const B='chocolate blend';
 const W='chocolate branco';
@@ -677,7 +677,7 @@ function normalizeSavedIdea(idea){
   const complement=find('RECHEIO COMPLEMENTAR')?.[1]||'não se aplica';
   const softFilling=String(filling||'').replace(/brigadeiro(?! de colher)/i,'brigadeiro de colher');
   const baseLabel=softFilling.includes('mesmo refrigerado')?softFilling:softFilling+' · textura cremosa e macia mesmo refrigerada, sem endurecer';
-  return {...idea,name:String(idea.name||'').replace(/^DOT\\s+/i,''),parts:[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE',baseLabel],['RECHEIO COMPLEMENTAR',complement],['TOPPING','creme nuvem'],['MIÇANGAS',dotPearlColors(idea.name,mass,filling,complement,idea.occasion)]]};
+  return {...idea,name:String(idea.name||'').replace(/^DOT\s+/i,''),parts:[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE',baseLabel],['RECHEIO COMPLEMENTAR',complement],['TOPPING','creme nuvem'],['MIÇANGAS',dotPearlColors(idea.name,mass,filling,complement,idea.occasion)]]};
  }
  if(idea.type==='BROOKIE'){
   const mass=find('MASSA DO COOKIE')?.[1]||'massa de baunilha';
