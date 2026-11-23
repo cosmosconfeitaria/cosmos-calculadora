@@ -667,12 +667,35 @@ const SUPABASE_KEY='sb_publishable_MIgd-yrCkY1_JZln8pZQNw_AE3sog86';
 const supabaseClient=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 let currentUser=null,cloudSyncBusy=false;
 function storageKey(){return currentUser?KEY+'.user_'+currentUser.id:KEY}
-function getSaved(){try{return JSON.parse(localStorage.getItem(storageKey())||'[]')}catch(e){return[]}}
-function setSaved(list){localStorage.setItem(storageKey(),JSON.stringify(list));renderSaved()}
+function normalizeSavedIdea(idea){
+ if(!idea||!Array.isArray(idea.parts))return idea;
+ const parts=idea.parts,find=label=>parts.find(p=>String(p[0]||'').toUpperCase().includes(label));
+ if(idea.type==='DOT'){
+  const mass=find('MASSA DO COOKIE')?.[1]||'massa de baunilha';
+  const chocolate=find('CHOCOLATE')?.[1]||'';
+  const filling=find('RECHEIO')?.[1]||'brigadeiro cremoso';
+  const complement=find('RECHEIO COMPLEMENTAR')?.[1]||'não se aplica';
+  return {...idea,parts:[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',filling],['RECHEIO COMPLEMENTAR',complement],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(idea.name,mass,filling,complement,idea.occasion)]]};
+ }
+ if(idea.type==='BROOKIE'){
+  const mass=find('MASSA DO COOKIE')?.[1]||'massa de baunilha';
+  const chocolate=find('CHOCOLATE')?.[1]||'chocolate blend';
+  const filling=find('RECHEIO')?.[1]||'recheio cremoso';
+  const complement=find('COMPLEMENTO')?.[1]||'';
+  const topping=find('TOPPING')?.[1]||'sem topping adicional';
+  return {...idea,parts:[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',chocolate],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',filling],...(complement&&!/brownie/i.test(complement)?[['COMPLEMENTO',complement]]:[]),['TOPPING',topping]]};
+ }
+ if(idea.type==='ICE'){
+  return {...idea,parts:parts.map(p=>String(p[0]||'').toUpperCase()==='SORVETE'?['BASE DO SORVETE',p[1]]:p)};
+ }
+ return idea;
+}
+function getSaved(){try{return JSON.parse(localStorage.getItem(storageKey())||'[]').map(normalizeSavedIdea)}catch(e){return[]}}
+function setSaved(list){localStorage.setItem(storageKey(),JSON.stringify(list.map(normalizeSavedIdea)));renderSaved()}
 function setCloudStatus(message){const el=$('cloudSavedStatus');if(el)el.textContent=message||''}
 function mergeIdeas(a,b){
  const map=new Map();
- [...a,...b].forEach(idea=>{if(idea&&idea.id)map.set(idea.id,idea)});
+ [...a,...b].forEach(raw=>{const idea=normalizeSavedIdea(raw);if(idea&&idea.id)map.set(idea.id,idea)});
  return [...map.values()];
 }
 async function saveIdeaToCloud(idea){
