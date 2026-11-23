@@ -41,7 +41,7 @@ function parseDisplayedPrice(row) {
   const valid=matches.filter(m=>!isInstallment(m));
   const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
   const paymentContext=m=>{const before=text.slice(Math.max(0,m.index-36),m.index),next=text.indexOf('R'+'$',m.index+2),after=text.slice(m.index,next>=0?next:Math.min(text.length,m.index+60));return before+' '+after};
-  const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(paymentContext(m))&&!/\d{1,2}\s*x/i.test(paymentContext(m)));
+  const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(paymentContext(m)));
   const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m)));
   const numericFallback=(!matches.length&&!installmentMatch)?Number(row.extracted_price??row.price_value??row.price??0):null;
   const cashPrice=cashMatch?parse(cashMatch[1]):null;
