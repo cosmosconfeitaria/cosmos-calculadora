@@ -36,13 +36,29 @@ export async function POST(request){
   const offers=Array.isArray(product.offers)?product.offers[0]:(product.offers||{});
   const brand=typeof product.brand==='string'?product.brand:product.brand?.name||'';
   const image=Array.isArray(product.image)?product.image[0]:typeof product.image==='object'?product.image.url:product.image;
-  const price=offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount');
   const pageText=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
-  const creditCandidate=pageText.match(/(?:no\s+cr[eé]dito|cart[aã]o)[^R$]{0,30}R\$\s*([\d.,]+)/i);
-  const creditMatch=creditCandidate&&!/\b\d{1,2}\s*x\b/i.test(creditCandidate[0])?creditCandidate:null;
+  const moneyMatches=[...pageText.matchAll(/R\$\s*([\d.]+,\d{2}|[\d,]+\.\d{2})/gi)];
+  const parseMoney=value=>moneyValue(value);
   const installmentMatch=pageText.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
-  const installmentPlan=installmentMatch?installmentMatch[0]:'';
-  const installmentTotal=installmentMatch?moneyValue(installmentMatch[2])*Number(installmentMatch[1]):null;
+  const installmentAmount=installmentMatch?parseMoney(installmentMatch[2]):null;
+  const installmentCount=installmentMatch?Number(installmentMatch[1]):null;
+  const installmentTotal=installmentAmount&&installmentCount?installmentAmount*installmentCount:null;
+  const installmentPlan=installmentMatch?(pageText.slice(installmentMatch.index,installmentMatch.index+90).match(/^\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:'';
+  const isInstallment=m=>/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*$/i.test(pageText.slice(Math.max(0,m.index-24),m.index));
+  const validMoney=moneyMatches.filter(m=>!isInstallment(m));
+  const moneyContext=m=>pageText.slice(Math.max(0,m.index-48),Math.min(pageText.length,m.index+64));
+  const cashMatch=validMoney.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(moneyContext(m)));
+  const creditMatch=validMoney.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(moneyContext(m))&&!/\d{1,2}\s*x/i.test(moneyContext(m)));
+  const schemaPrice=moneyValue(offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount'));
+  const parsedCash=cashMatch?parseMoney(cashMatch[1]):schemaPrice;
+  const cashPrice=installmentMatch&&parsedCash&&installmentAmount&&Math.abs(parsedCash-installmentAmount)<0.01?null:parsedCash;
+  const creditPrice=creditMatch?parseMoney(creditMatch[1]):(installmentTotal||null);
+  const price=cashPrice||creditPrice||schemaPrice;
+  const priceText=[
+    cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
+    creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
+    installmentAmount&&installmentCount?'PARCELA '+installmentCount+'X DE '+installmentAmount.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+(/sem\s*juros/i.test(installmentPlan)?' SEM JUROS':/com\s*juros/i.test(installmentPlan)?' COM JUROS':''):''
+  ].filter(Boolean).join(' · ');
   const title=product.name||meta(html,'og:title')||meta(html,'twitter:title')||clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
   const description=product.description||meta(html,'og:description')||meta(html,'description');
   const titleModel=(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}\s+(?:PLUS|PRO|MAX|DIGITAL|ELETRÔNICA|ELETRONICA)\b/i)||[])[0]||'';const sku=titleModel||product.sku||product.mpn||product.model||meta(html,'product:retailer_item_id')||meta(html,'og:sku')||(String(description||'').match(/modelo\s*[:\-]\s*([A-Z0-9-]+)/i)||[])[1]||(String(title||'').match(/\b[A-Z]{1,5}[-]?\d{2,5}(?:\s+[A-Z0-9]+)?\b/)||[])[0]||'';
@@ -61,6 +77,6 @@ export async function POST(request){
   for(const term of featureTerms){const match=textContent.match(new RegExp('.{0,65}'+term+'.{0,100}','i'));if(match){const line=clean(match[0]);if(line.length>12&&!featureLines.some(x=>x.toLowerCase()===line.toLowerCase()))featureLines.push(line)}}
   const specs=[...propertySpecs,...featureLines].filter((line,i,all)=>all.findIndex(x=>x.toLowerCase()===line.toLowerCase())===i).slice(0,18).join('\n');
   const technicalSummary=[brand&&('MARCA: '+clean(brand)),sku&&('MODELO: '+clean(sku)),capacity&&('CAPACIDADE: '+clean(capacity)),power&&('POTÊNCIA: '+clean(power)),warranty&&('GARANTIA: '+clean(warranty)),voltage&&('VOLTAGEM: '+clean(voltage)),rating&&('AVALIAÇÃO: '+rating+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')),specs&&('CARACTERÍSTICAS E ESPECIFICAÇÕES:\n'+specs),description&&('DESCRIÇÃO DO FABRICANTE: '+clean(description))].filter(Boolean).join('\n');
-  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice:moneyValue(price),creditPrice:creditMatch?moneyValue(creditMatch[1]):(installmentTotal||null),installmentPlan,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
+  return json({title:clean(title),brand:clean(brand),model:clean(sku),description:clean(description),specs:specs||clean(description),technicalSummary,capacity,power,reviews:rating?(String(rating)+(reviewCount?' · '+reviewCount+' AVALIAÇÕES':'')):'',image:typeof image==='string'&&/^https:\/\//i.test(image)?image:'',price:moneyValue(price),cashPrice,creditPrice,installmentAmount,installmentCount,installmentPlan,priceText,voltage:clean(voltage),warranty:clean(warranty),source:finalUrl.hostname});
  }catch(error){console.error('product metadata read failed',error);return json({error:'NÃO FOI POSSÍVEL LER OS DADOS DESTA PÁGINA.'},502)}
 }
