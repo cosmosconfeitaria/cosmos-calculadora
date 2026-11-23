@@ -527,7 +527,7 @@ async function autoEnrichExistingWishlist(){
 function rebuildNotices(){
  notices=items.flatMap(item=>{
   const priceAlerts=(item.data.priceHistory||[]).filter(h=>h.alert).map(h=>({id:item.id,title:item.title,...h,kind:h.kind||'price-drop',read:!!h.read}));
-  const reminders=(item.data.reminderEvents||[]).map(n=>({...n,id:item.id+'|'+n.id,itemId:item.id,title:n.title||item.title,kind:'purchase-reminder',read:!!n.read}));
+  const reminders=item.status==='WISHLIST'?(item.data.reminderEvents||[]).map(n=>({...n,id:item.id+'|'+n.id,itemId:item.id,title:n.title||item.title,kind:'purchase-reminder',read:!!n.read})):[];
   return [...priceAlerts,...reminders];
  }).sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
  $('inboxDot').classList.toggle('hidden',!notices.some(n=>!n.read));
@@ -544,8 +544,8 @@ async function syncPurchaseReminders(){
   if(days===7)wanted.push({id:'one-week-'+target,reminderType:'one-week',title:'SUA COMPRA ESTÁ CHEGANDO',message:'Falta uma semana para o dia planejado de comprar '+item.title+'. Hora de conferir o valor guardado e as ofertas.',targetDate:target});
   if(days<=0)wanted.push({id:'purchase-day-'+target,reminderType:'purchase-day',title:days===0?'HOJE É O DIA DA SUA COMPRA':'A DATA PLANEJADA JÁ CHEGOU',message:days===0?'Hoje é o dia que você planejou para comprar '+item.title+'. Confira a Wishlist antes de fechar a compra.':'A data planejada para comprar '+item.title+' passou. Confira se ainda quer manter esse objetivo.',targetDate:target});
   if(!wanted.length)continue;
-  const existing=item.data.reminderEvents||[],fresh=wanted.filter(n=>!existing.some(old=>old.id===n.id));
-  if(!fresh.length)continue;
+  const allExisting=item.data.reminderEvents||[],existing=allExisting.filter(old=>old.targetDate===target),fresh=wanted.filter(n=>!existing.some(old=>old.id===n.id));
+  if(!fresh.length&&existing.length===allExisting.length)continue;
   const next={...item.data,reminderEvents:[...existing,...fresh.map(n=>({...n,kind:'purchase-reminder',at:todayKey,read:false}))]};
   const {error}=await client.from('cosmos_wishlist_items').update({data:next,updated_at:new Date().toISOString()}).eq('id',item.id);
   if(error)throw error;
