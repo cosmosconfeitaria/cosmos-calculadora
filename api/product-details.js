@@ -4,7 +4,7 @@ const ALLOWED_USER_ID = 'b163037a-b543-42a8-a6a5-eeee31291898';
 const ALLOWED_EMAIL = 'cosmosconfeitaria@gmail.com';
 const COOKIE_NAME = 'cosmos_access_token';
 const ALLOWED_HOSTS = [
- 'amazon.com.br','www.amazon.com.br','mercadolivre.com.br','www.mercadolivre.com.br',
+ 'amazon.com.br','www.amazon.com.br','mercadolivre.com.br','www.mercadolivre.com.br','stockup.com.br','www.stockup.com.br',
  'magazineluiza.com.br','www.magazineluiza.com.br','kabum.com.br','www.kabum.com.br',
  'casasbahia.com.br','www.casasbahia.com.br','fastshop.com.br','www.fastshop.com.br',
  'zoom.com.br','www.zoom.com.br','buscape.com.br','www.buscape.com.br',
