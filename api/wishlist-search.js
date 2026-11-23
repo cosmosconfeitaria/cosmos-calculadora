@@ -198,7 +198,7 @@ export async function POST(request) {
               const parsed = new Date(point.date);
               const price = Number(point.price);
               if (!Number.isFinite(parsed.getTime()) || !Number.isFinite(price) || price <= 0) continue;
-              history.push({ store: offer.store, price, priceDate: parsed.toISOString().slice(0,10), url: offer.link, shipping: 0, voltageStatus: offer.voltageStatus, title: offer.title });
+              history.push({ store: offer.store, price, priceType:'FULL_PRODUCT_PRICE', priceDate: parsed.toISOString().slice(0,10), url: offer.link, shipping: 0, voltageStatus: offer.voltageStatus, title: offer.title });
             }
           }
         }
