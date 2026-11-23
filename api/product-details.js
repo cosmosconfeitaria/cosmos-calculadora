@@ -46,9 +46,9 @@ export async function POST(request){
   const installmentPlan=installmentMatch?(pageText.slice(installmentMatch.index,installmentMatch.index+90).match(/^\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:'';
   const isInstallment=m=>/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*$/i.test(pageText.slice(Math.max(0,m.index-24),m.index));
   const validMoney=moneyMatches.filter(m=>!isInstallment(m));
-  const paymentContext=m=>{const before=pageText.slice(Math.max(0,m.index-36),m.index),next=pageText.indexOf('R'+'$',m.index+2),after=pageText.slice(m.index,next>=0?next:Math.min(pageText.length,m.index+60));return before+' '+after};
+  const paymentContext=m=>{const before=pageText.slice(Math.max(0,m.index-24),m.index),after=pageText.slice(m.index,Math.min(pageText.length,m.index+34));return before+' '+after};
   const creditMatch=validMoney.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(paymentContext(m)));
-  const cashMatch=validMoney.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m)));
+  const cashMatch=validMoney.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m))&&!(installmentAmount&&Math.abs(parseMoney(m[1])-installmentAmount)<0.01));
   const schemaPrice=moneyValue(offers.price||offers.lowPrice||meta(html,'product:price:amount')||meta(html,'og:price:amount'));
   const schemaIsCardPrice=creditMatch&&schemaPrice&&Math.abs(schemaPrice-parseMoney(creditMatch[1]))<0.01;
   const schemaIsInstallmentAmount=installmentAmount&&schemaPrice&&Math.abs(schemaPrice-installmentAmount)<0.01;
