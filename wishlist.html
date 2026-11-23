@@ -840,7 +840,7 @@ async function runPriceSearch(id){
   for(const p of eligible){
    const price=Number(p.priceValue||0);
    history.push({store:p.source||'LOJA',price,priceType:'FULL_PRODUCT_PRICE',shipping:Number(p.shipping||0),url:p.link,at:today(),priceDate:null,searchBatch:batch,voltageStatus:p.voltageStatus,title:p.title,modelVerified:true,cashPrice:p.cashPrice??null,creditPrice:p.creditPrice??null,productPrice:p.productPrice??null,installmentAmount:p.installmentAmount??null,installmentCount:p.installmentCount??null,installmentPlan:p.installmentPlan||'',read:false});
-   stores.push({store:p.source||'LOJA',price,priceType:'FULL_PRODUCT_PRICE',cashPrice:p.cashPrice??null,creditPrice:p.creditPrice??null,installmentAmount:p.installmentAmount??null,installmentCount:p.installmentCount??null,installmentPlan:p.installmentPlan||'',shipping:Number(p.shipping||0),url:p.link,searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageStatus:p.voltageStatus});
+   stores.push({store:p.source||'LOJA',price,priceType:'FULL_PRODUCT_PRICE',cashPrice:p.cashPrice??null,creditPrice:p.creditPrice??null,productPrice:p.productPrice??null,installmentAmount:p.installmentAmount??null,installmentCount:p.installmentCount??null,installmentPlan:p.installmentPlan||'',shipping:Number(p.shipping||0),url:p.link,searchedAt:today(),title:p.title,image:p.thumbnail||'',voltageStatus:p.voltageStatus});
   }
   for(const product of enriched){for(const point of (product.priceHistory||[])){if(point.url&&point.priceDate&&Number(point.price)>0)history.push({...point,priceType:'FULL_PRODUCT_PRICE',at:today(),searchBatch:'source-history-'+batch,read:false,modelVerified:true})}}
   const unique=stores.filter((p,i,a)=>a.findIndex(x=>x.store===p.store&&x.url===p.url&&x.searchedAt===p.searchedAt)===i);
