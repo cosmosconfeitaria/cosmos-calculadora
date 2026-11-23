@@ -29,20 +29,31 @@ function plainText(value) {
 function normalizeModel(value) { return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
 function normalizeCapacity(value) { const m=String(value||'').toUpperCase().replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/); return m ? Number(m[0]).toString().replace(/\.0$/,'')+'L' : ''; }
 function parseDisplayedPrice(row) {
-  const text=String(row.price||row.price_text||'');
+  const text=[row.price,row.price_text,row.installment,row.installments,row.installment_plan].filter(v=>v!=null&&v!=='').join(' · ');
   const matches=[...text.matchAll(/R\$\s*([\d.]+,\d{2}|[\d,]+\.\d{2})/gi)];
   const parse=v=>Number(String(v).replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));
-  const installment=/\b\d{1,2}\s*x\s*(?:de|\s)/i;
-  const valid=matches.filter(m=>!installment.test(text.slice(Math.max(0,m.index-14),m.index+2)));
-  const promotionalPrice=valid.find(m=>/por\s*$/i.test(text.slice(Math.max(0,m.index-12),m.index)));
-  const cashContext=valid.find(m=>/à\s?vista/i.test(text.slice(m.index,m.index+35)));
-  const cashMatch=promotionalPrice||cashContext||valid[0]||null;
-  const creditMatch=matches.find(m=>/cr[eé]dito|cart[aã]o/i.test(text.slice(Math.max(0,m.index-30),m.index+24))&&!installment.test(text.slice(Math.max(0,m.index-14),m.index+2)));
-  const installmentText=(text.match(/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s juros|com\s juros))?/i)||[])[0]||'';
   const installmentMatch=text.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
-  const installmentTotal=installmentMatch?Number(installmentMatch[2].replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'))*Number(installmentMatch[1]):null;
-  const fallback=(!text||(!matches.length&&!installment.test(text)))?Number(row.extracted_price??row.price_value??row.price??0):null;
-  return { cashPrice:cashMatch?parse(cashMatch[1]):(Number.isFinite(fallback)&&fallback>0?fallback:null), creditPrice:creditMatch?parse(creditMatch[1]):(Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:null), installmentPlan:installmentText };
+  const installmentAmount=installmentMatch?parse(installmentMatch[2]):null;
+  const installmentCount=installmentMatch?Number(installmentMatch[1]):null;
+  const installmentTotal=installmentAmount&&installmentCount?installmentAmount*installmentCount:null;
+  const installmentText=installmentMatch?(text.slice(installmentMatch.index,Math.min(text.length,installmentMatch.index+90)).match(/^\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:'';
+  const isInstallment=m=>/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*$/i.test(text.slice(Math.max(0,m.index-24),m.index));
+  const valid=matches.filter(m=>!isInstallment(m));
+  const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
+  const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(context(m)))||
+    valid.find(m=>/por\s*$/i.test(text.slice(Math.max(0,m.index-14),m.index)))||
+    (!installmentMatch?valid[0]:null);
+  const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(context(m))&&!/\d{1,2}\s*x/i.test(context(m)));
+  const numericFallback=(!matches.length&&!installmentMatch)?Number(row.extracted_price??row.price_value??row.price??0):null;
+  const cashPrice=cashMatch?parse(cashMatch[1]):(Number.isFinite(numericFallback)&&numericFallback>0?numericFallback:null);
+  const creditPrice=creditMatch?parse(creditMatch[1]):(Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:null);
+  const priceValue=cashPrice||creditPrice||null;
+  const priceText=[
+    cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
+    creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
+    installmentAmount&&installmentCount?'PARCELA '+installmentCount+'X DE '+installmentAmount.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+(/sem\s*juros/i.test(installmentText)?' SEM JUROS':/com\s*juros/i.test(installmentText)?' COM JUROS':''):''
+  ].filter(Boolean).join(' · ');
+  return {cashPrice,creditPrice,installmentAmount,installmentCount,installmentPlan:installmentText,priceValue,priceText};
 }
 function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\.)google\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
 function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
@@ -65,7 +76,7 @@ function technicalData(row) {
   else if (/\bBIVOLT\b|\b100\s?A\s?240\s?V\b/i.test(evidence)) voltageStatus = 'BIVOLT';
   else if (/\b220\s?V\b|\b220\s?VOLTS?\b/i.test(evidence)) voltageStatus = 'CONFIRMED_220V';
   const parsedPrice = parseDisplayedPrice(row);
-  const priceValue = parsedPrice.cashPrice;
+  const priceValue = parsedPrice.priceValue;
   return {
     title, description, source: String(row.source || row.seller || 'LOJA').slice(0, 100),
     link: directStoreUrl(row.link) || directStoreUrl(row.product_link),
@@ -75,7 +86,9 @@ function technicalData(row) {
     cashPrice: Number.isFinite(parsedPrice.cashPrice) && parsedPrice.cashPrice > 0 ? parsedPrice.cashPrice : null,
     creditPrice: Number.isFinite(parsedPrice.creditPrice) && parsedPrice.creditPrice > 0 ? parsedPrice.creditPrice : null,
     installmentPlan: parsedPrice.installmentPlan,
-    priceText: String(row.price || '').slice(0, 120),
+    installmentAmount: parsedPrice.installmentAmount,
+    installmentCount: parsedPrice.installmentCount,
+    priceText: parsedPrice.priceText,
     rating, ratingCount: ratingCount ? String(ratingCount) : '',
     model, capacity, power, warranty,
     brand: String(row.brand || '').slice(0, 100),
@@ -167,12 +180,12 @@ export async function POST(request) {
         const offers = (Array.isArray(product.stores) ? product.stores : []).map(store => {
           const link = directStoreUrl(store.link);
           const parsedOfferPrice = parseDisplayedPrice(store);
-          const priceValue = parsedOfferPrice.cashPrice;
+          const priceValue = parsedOfferPrice.priceValue;
           const offerTech = technicalData({ title: [product.title, store.title].filter(Boolean).join(' '), snippet: description, brand: product.brand || base.brand, rating: product.rating ?? base.rating, reviews: product.reviews ?? base.ratingCount, attributes });
           const model = offerTech.model || merged.model || base.model;
           const capacity = offerTech.capacity || merged.capacity || base.capacity;
           const voltageStatus = offerTech.voltageStatus !== 'UNKNOWN' ? offerTech.voltageStatus : merged.voltageStatus;
-          return { store: String(store.name || base.source || 'LOJA'), title: String(store.title || product.title || base.title), priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null, cashPrice: parsedOfferPrice.cashPrice, creditPrice: parsedOfferPrice.creditPrice, installmentPlan: parsedOfferPrice.installmentPlan, shipping: Number(store.shipping_extracted || 0) || 0, link, thumbnail: base.thumbnail, model, capacity, power: offerTech.power || merged.power || base.power, warranty: offerTech.warranty || merged.warranty || base.warranty, rating: merged.rating, ratingCount: merged.ratingCount, dimensions: merged.dimensions, voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT' };
+          return { store: String(store.name || base.source || 'LOJA'), title: String(store.title || product.title || base.title), priceValue: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null, cashPrice: parsedOfferPrice.cashPrice, creditPrice: parsedOfferPrice.creditPrice, installmentPlan: parsedOfferPrice.installmentPlan, installmentAmount: parsedOfferPrice.installmentAmount, installmentCount: parsedOfferPrice.installmentCount, shipping: Number(store.shipping_extracted || 0) || 0, link, thumbnail: base.thumbnail, model, capacity, power: offerTech.power || merged.power || base.power, warranty: offerTech.warranty || merged.warranty || base.warranty, rating: merged.rating, ratingCount: merged.ratingCount, dimensions: merged.dimensions, voltageStatus, voltageConfirmed: voltageStatus === 'CONFIRMED_220V' || voltageStatus === 'BIVOLT' };
         }).filter(offer => offer.link && offer.priceValue && offer.voltageConfirmed && (!requestedModelKey || normalizeModel(offer.model) === requestedModelKey) && (!requestedCapacity || (!!offer.capacity && normalizeCapacity(offer.capacity) === requestedCapacity)));
         const bestOffer = offers.slice().sort((a,b)=>(a.priceValue+a.shipping)-(b.priceValue+b.shipping))[0];
         const priceInsights = product.price_insights || {};
@@ -189,7 +202,7 @@ export async function POST(request) {
             }
           }
         }
-        return { ...merged, link: bestOffer?.link || base.link, source: bestOffer?.store || base.source, priceValue: bestOffer?.priceValue || base.priceValue, cashPrice: bestOffer?.cashPrice || base.cashPrice, creditPrice: bestOffer?.creditPrice || base.creditPrice, installmentPlan: bestOffer?.installmentPlan || base.installmentPlan, priceText: bestOffer ? 'À VISTA R$ ' + bestOffer.priceValue.toLocaleString('pt-BR',{minimumFractionDigits:2}) : base.priceText, voltageStatus: bestOffer?.voltageStatus || merged.voltageStatus, voltageConfirmed: bestOffer?.voltageConfirmed || merged.voltageConfirmed, offers, priceHistory: history };
+        return { ...merged, link: bestOffer?.link || base.link, source: bestOffer?.store || base.source, priceValue: bestOffer?.priceValue || base.priceValue, cashPrice: bestOffer?.cashPrice ?? base.cashPrice, creditPrice: bestOffer?.creditPrice ?? base.creditPrice, installmentAmount: bestOffer?.installmentAmount ?? base.installmentAmount, installmentCount: bestOffer?.installmentCount ?? base.installmentCount, installmentPlan: bestOffer?.installmentPlan || base.installmentPlan, priceValue: bestOffer?.priceValue ?? base.priceValue, priceText: bestOffer ? [bestOffer.cashPrice?'À VISTA '+Number(bestOffer.cashPrice).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',bestOffer.creditPrice?'TOTAL PARCELADO '+Number(bestOffer.creditPrice).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',bestOffer.installmentAmount&&bestOffer.installmentCount?'PARCELA '+bestOffer.installmentCount+'X DE '+Number(bestOffer.installmentAmount).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):''].filter(Boolean).join(' · ') : base.priceText, voltageStatus: bestOffer?.voltageStatus || merged.voltageStatus, voltageConfirmed: bestOffer?.voltageConfirmed || merged.voltageConfirmed, offers, priceHistory: history };
       } catch (lookupError) { console.warn('google product enrichment unavailable', base.title, lookupError); return base; }
     }));
     const filteredProducts = products.filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p) && (discover || (p.priceValue && p.link)));
