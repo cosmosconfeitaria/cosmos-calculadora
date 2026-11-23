@@ -779,7 +779,7 @@ async function searchWishlistProducts(){
    if(p.link){
     try{
      const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});
-     if(check.ok){const detail=await check.json();p={...p,...detail,source:p.source||detail.source,link:p.link,thumbnail:p.thumbnail||detail.image||'',description:[p.description,detail.description].filter(Boolean).join(' · '),technicalSummary:detail.technicalSummary||detail.specs||detail.description};const detailVoltage=voltageStatus({title:p.title,voltage:detail.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});if(status==='UNKNOWN'&&detailVoltage!=='UNKNOWN')status=detailVoltage;if(status==='UNKNOWN'&&/220\s?V/i.test(p.technicalSummary||''))status='CONFIRMED_220V';}
+     if(check.ok){const detail=await check.json();p={...p,...detail,source:p.source||detail.source,link:p.link,thumbnail:p.thumbnail||detail.image||'',priceValue:Number(detail.cashPrice||detail.creditPrice||p.priceValue||0),priceText:detail.priceText||p.priceText||'',description:[p.description,detail.description].filter(Boolean).join(' · '),technicalSummary:detail.technicalSummary||detail.specs||detail.description};const detailVoltage=voltageStatus({title:p.title,voltage:detail.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});if(status==='UNKNOWN'&&detailVoltage!=='UNKNOWN')status=detailVoltage;if(status==='UNKNOWN'&&/220\s?V/i.test(p.technicalSummary||''))status='CONFIRMED_220V';}
     }catch(_){}
    }
    p.voltageStatus=status;p.voltageConfirmed=status==='CONFIRMED_220V'||status==='BIVOLT';return p;
