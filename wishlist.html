@@ -914,6 +914,7 @@ function kitchenFitText(item,mixers){
  if(d.fit)parts.push(String(d.fit));
  else if(d.dimensions)parts.push('dimensões informadas: '+d.dimensions+'. confira largura, profundidade, altura livre e circulação antes da compra.');
  else parts.push('as dimensões não foram encontradas. ainda não é possível confirmar se o produto cabe no espaço disponível; meça a área de instalação antes de comprar.');
+ parts.push('a cozinha é pequena: considerar espaço físico, apoio ou instalação, abertura, circulação e necessidade de armazenamento. se o equipamento aumentar a produção, conferir também se o freezer atual de 175 L comporta o fluxo de trabalho.');
  if(mixers){
   const liters=numericValue(d.capacity),batch=liters?Math.round(30*liters/4):null;
   if(batch)parts.push('rendimento proporcional estimado: cerca de '+batch+' cookies de 70 g por lote. a cozinha é pequena e a batedeira atual fica sobre a máquina de lavar, então é preciso validar apoio, altura e circulação. o freezer atual tem 175 L; o lote maior é uma vantagem de produção, mas precisa ser dividido ou armazenado sem comprometer o espaço disponível.');
