@@ -675,7 +675,9 @@ function normalizeSavedIdea(idea){
   const chocolate=find('CHOCOLATE')?.[1]||'';
   const filling=find('RECHEIO')?.[1]||'brigadeiro cremoso';
   const complement=find('RECHEIO COMPLEMENTAR')?.[1]||'não se aplica';
-  return {...idea,parts:[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',filling],['RECHEIO COMPLEMENTAR',complement],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(idea.name,mass,filling,complement,idea.occasion)]]};
+  const softFilling=String(filling||'').replace(/brigadeiro(?! de colher)/i,'brigadeiro de colher');
+  const baseLabel=softFilling.includes('mesmo refrigerado')?softFilling:softFilling+' · textura cremosa e macia mesmo refrigerada, sem endurecer';
+  return {...idea,name:String(idea.name||'').replace(/^DOT\\s+/i,''),parts:[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE',baseLabel],['RECHEIO COMPLEMENTAR',complement],['TOPPING','creme nuvem'],['MIÇANGAS',dotPearlColors(idea.name,mass,filling,complement,idea.occasion)]]};
  }
  if(idea.type==='BROOKIE'){
   const mass=find('MASSA DO COOKIE')?.[1]||'massa de baunilha';
