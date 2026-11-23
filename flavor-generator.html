@@ -273,7 +273,7 @@ function add(type,category,name,mass,chocolate,filling,complement,topping,occasi
  let parts=[];
  if(type==='COOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['RECHEIO',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING',topping||'sem topping adicional']];
  if(type==='DOT') parts=[['MASSA DO COOKIE',mass],...(chocolate?[['CHOCOLATE NA MASSA',chocolate]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',filling],['RECHEIO COMPLEMENTAR',complement||'não se aplica'],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(name,mass,filling,complement,occasion)]];
- if(type==='BROOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',chocolate],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',filling],['TOPPING',topping||'sem topping adicional']];
+ if(type==='BROOKIE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',chocolate],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',filling],...(complement&&!/brownie/i.test(complement)?[['COMPLEMENTO',complement]]:[]),['TOPPING',topping||'sem topping adicional']];
  if(type==='ICE') parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',chocolate],['BASE DO SORVETE',filling],['COMPLEMENTO DO SORVETE',complement||'sem complemento adicional']];
  const id=[type,category,occasion||'GERAL',name].join('|');
  ideas.push({id,type,category,name,parts,occasion:occasion||'TODAS',keys:[...new Set([...keys,...(occasion?[occasion]:[])])]});
@@ -563,7 +563,7 @@ function buildCreativeIdeas(){
   let parts=[];
   if(type==='COOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE',choc],['RECHEIO',p[4]],['RECHEIO COMPLEMENTAR',p[5]],['TOPPING',p[6]]];
   if(type==='DOT')parts=[['MASSA DO COOKIE',mass],...(choc?[['CHOCOLATE NA MASSA',choc]]:[]),['RECHEIO BASE · BRIGADEIRO OU CREME',p[4]],['RECHEIO COMPLEMENTAR',/geleia|compota|curd|creme de fruta/i.test(p[5])?p[5]:'não se aplica'],['TOPPING FIXO','creme nuvem'],['MIÇANGAS · 3 CORES',dotPearlColors(p[1],mass,p[4],p[5],occasion)]];
-  if(type==='BROOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',choc],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',p[4]],['TOPPING',p[6]]];
+  if(type==='BROOKIE')parts=[['MASSA DO COOKIE',mass],['CHOCOLATE NA MASSA',choc],['BROWNIE FIXO','brownie de chocolate 50%'],['RECHEIO',p[4]],...(!/brownie/i.test(p[5])?[['COMPLEMENTO',p[5]]]:[]),['TOPPING',p[6]]];
   if(type==='ICE'){
    const n=p[1].toLowerCase();
    const base=/cafe/.test(n)?'sorvete de café':/pistache/.test(n)?'sorvete de pistache':/morango|framboesa|cereja/.test(n)?'sorvete de morango':/doce de leite|caramelo|churros/.test(n)?'sorvete de doce de leite':/abacaxi|coco/.test(n)?'sorvete de coco':/chocolate|cacau/.test(n)?'sorvete de chocolate':'sorvete de baunilha';
