@@ -39,12 +39,12 @@ export async function POST(request){
   const pageText=clean(html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' '));
   const moneyMatches=[...pageText.matchAll(/R\$\s*([\d.]+,\d{2}|[\d,]+\.\d{2})/gi)];
   const parseMoney=value=>moneyValue(value);
-  const installmentMatch=pageText.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
+   const installmentMatch=pageText.match(/\b(\d{1,2})\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})/i);
   const installmentAmount=installmentMatch?parseMoney(installmentMatch[2]):null;
   const installmentCount=installmentMatch?Number(installmentMatch[1]):null;
   const installmentTotal=installmentAmount&&installmentCount?installmentAmount*installmentCount:null;
-  const installmentPlan=installmentMatch?(pageText.slice(installmentMatch.index,installmentMatch.index+90).match(/^\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:'';
-  const isInstallment=m=>/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*$/i.test(pageText.slice(Math.max(0,m.index-24),m.index));
+   const installmentPlan=installmentMatch?(pageText.slice(installmentMatch.index,installmentMatch.index+110).match(/^\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:'';
+   const isInstallment=m=>/\b\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?$/i.test(pageText.slice(Math.max(0,m.index-55),m.index));
   const validMoney=moneyMatches.filter(m=>!isInstallment(m));
   const paymentContext=m=>{const before=pageText.slice(Math.max(0,m.index-24),m.index),after=pageText.slice(m.index,Math.min(pageText.length,m.index+34));return before+' '+after};
   const creditMatch=validMoney.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(paymentContext(m)));
