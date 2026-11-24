@@ -168,7 +168,14 @@ export async function POST(request) {
       } catch (fallbackError) { console.warn('fallback search unavailable', fallbackError); }
     }
     const rawProducts = rows.map(technicalData).filter(p => p.title && exactModelMatch(p) && exactCapacityMatch(p));
-    const products = await Promise.all(rawProducts.slice(0, 10).map(async base => {
+    const grouped = new Map();
+    for (const product of rawProducts) {
+      const key = product.productId ? 'google-product:' + product.productId : 'result:' + (product.title.toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]+/g,' ').trim());
+      const previous = grouped.get(key);
+      if (!previous || (!previous.thumbnail && product.thumbnail) || (!previous.link && product.link)) grouped.set(key, { ...previous, ...product });
+    }
+    const groupedProducts = [...grouped.values()];
+    const products = await Promise.all(groupedProducts.slice(0, 10).map(async base => {
       if (!base.productId) return base;
       try {
         const productResponse = await productLookup(base.productId);
