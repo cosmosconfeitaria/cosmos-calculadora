@@ -32,36 +32,27 @@ function parseDisplayedPrice(row) {
   const text=[row.price,row.price_text,row.priceText,row.installment,row.installments,row.installment_plan,row.extensions,row.snippets,row.product_highlights,row.description,row.snippet].map(plainText).filter(v=>v!=null&&v!=='').join(' · ');
   const matches=[...text.matchAll(/R\$\s*([\d.]+,\d{2}|[\d,]+\.\d{2})/gi)];
   const parse=v=>Number(String(v).replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));
-  const installmentMatch=text.match(/\b(\d{1,2})\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})/i);
+  const parseRaw=v=>{if(v==null||v==='')return null;if(typeof v==='number')return Number.isFinite(v)&&v>0?v:null;let raw=String(v).replace(/[^\d,.-]/g,'');if(raw.includes(',')&&raw.includes('.'))raw=raw.replace(/\./g,'').replace(',','.');else if(raw.includes(','))raw=raw.replace(',','.');const n=Number(raw);return Number.isFinite(n)&&n>0?n:null};
+  const forward=text.match(/\b(\d{1,2})\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})/i);
+  const reverse=text.match(/(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})\s*(?:por\s*m[eê]s\s*)?(?:x|×|em)\s*(\d{1,2})\s*(?:vezes|parcelas?)?/i);
   const countOnlyMatch=text.match(/\b(\d{1,2})\s*x\b|\b(\d{1,2})\s+parcelas?\b|\b(\d{1,2})\s+vezes\b/i);
-  const parseRaw=v=>{if(v==null||v==='')return null;if(typeof v==='number')return Number.isFinite(v)?v:null;let raw=String(v).replace(/[^\d,.-]/g,'');if(raw.includes(',')&&raw.includes('.'))raw=raw.replace(/\./g,'').replace(',','.');else if(raw.includes(','))raw=raw.replace(',','.');const n=Number(raw);return Number.isFinite(n)&&n>0?n:null};
-  const rawPrice=parseRaw(row.price_value??row.price??row.extracted_price);
+  const installmentCount=forward?Number(forward[1]):reverse?Number(reverse[2]):(countOnlyMatch?Number(countOnlyMatch[1]||countOnlyMatch[2]||countOnlyMatch[3]):Number(row.installment_count||row.installments_count||row.number_of_installments||row.installmentCount||0)||null);
   const explicitAmount=parseRaw(row.installment_amount??row.installment_value??row.installmentAmount);
-  const installmentCount=installmentMatch?Number(installmentMatch[1]):(countOnlyMatch?Number(countOnlyMatch[1]||countOnlyMatch[2]||countOnlyMatch[3]):Number(row.installment_count||row.installments_count||row.number_of_installments||row.installmentCount||0)||null);
-  const installmentAmount=installmentMatch?parse(installmentMatch[2]):(explicitAmount||(installmentCount>1?rawPrice:null));
-  const installmentTotal=installmentAmount&&installmentCount>1?installmentAmount*installmentCount:null;
-  const installmentText=installmentMatch?(text.slice(installmentMatch.index,Math.min(text.length,installmentMatch.index+110)).match(/^\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:(installmentCount>1?'PARCELAMENTO EM '+installmentCount+'X':'');
+  const installmentAmount=forward?parse(forward[2]):reverse?parse(reverse[1]):(explicitAmount||(installmentCount>1?parseRaw(row.price_value??row.extracted_price):null));
+  const installmentText=forward?forward[0]:reverse?reverse[0]:(installmentCount>1?'PARCELAMENTO EM '+installmentCount+'X':'');
   const isInstallment=m=>/\b\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?$/i.test(text.slice(Math.max(0,m.index-55),m.index));
-  const valid=matches.filter(m=>!isInstallment(m));
-  const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
-  const paymentContext=m=>text.slice(Math.max(0,m.index-24),Math.min(text.length,m.index+34));
+  const valid=matches.filter(m=>!isInstallment(m)&&!(installmentAmount&&Math.abs(parse(m[1])-installmentAmount)<0.01));
+  const paymentContext=m=>text.slice(Math.max(0,m.index-32),Math.min(text.length,m.index+70));
   const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]|vezes|parcelas|sem\s*juros|com\s*juros/i.test(paymentContext(m)));
-  const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m))&&!(installmentAmount&&Math.abs(parse(m[1])-installmentAmount)<0.01));
-  const numericFallback=(!matches.length&&!installmentCount&&!installmentMatch)?rawPrice:null;
-  const cashPrice=cashMatch?parse(cashMatch[1]):null;
-  const creditPrice=creditMatch?parse(creditMatch[1]):(Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:null);
-  const genericMatch=!cashPrice?valid.find(m=>m!==creditMatch&&(!installmentAmount||Math.abs(parse(m[1])-installmentAmount)>=0.01)):null;
-  const numericProductPrice=installmentCount>1&&rawPrice&&installmentAmount&&Math.abs(rawPrice-installmentAmount)>=0.01&&Math.abs(rawPrice-(installmentTotal||0))>=0.01?rawPrice:null;
-  const productPrice=genericMatch?parse(genericMatch[1]):(numericProductPrice||(!cashPrice&&!creditPrice&&Number.isFinite(numericFallback)&&numericFallback>0?numericFallback:null));
-  const fullPriceCandidates=[cashPrice,productPrice,creditPrice].filter(v=>Number.isFinite(v)&&v>0);
-  const priceValue=fullPriceCandidates.length?Math.max(...fullPriceCandidates):null;
-  const priceText=[
-    cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
-    creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
-    productPrice?'PREÇO ANUNCIADO '+productPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',
-    installmentAmount&&installmentCount?'PARCELA '+installmentCount+'X DE '+installmentAmount.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+(/sem\s*juros/i.test(installmentText)?' SEM JUROS':/com\s*juros/i.test(installmentText)?' COM JUROS':''):''
-  ].filter(Boolean).join(' · ');
-  return {cashPrice,creditPrice,productPrice,installmentAmount,installmentCount,installmentPlan:installmentText,priceValue,priceText};
+  const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m)));
+  const rawPrice=parseRaw(row.price_value??row.price??row.extracted_price);
+  const cashPrice=cashMatch?parse(cashMatch[1]):null,creditPrice=creditMatch?parse(creditMatch[1]):null;
+  const genericMatch=valid.find(m=>m!==creditMatch&&m!==cashMatch),genericPrice=genericMatch?parse(genericMatch[1]):null;
+  const rawIsInstallment=installmentAmount&&Math.abs(rawPrice-installmentAmount)<0.01;
+  const productPrice=genericPrice||(rawPrice&&!rawIsInstallment?rawPrice:null);
+  const priceValue=[cashPrice,creditPrice,productPrice].filter(v=>Number.isFinite(v)&&v>0).reduce((best,v)=>Math.max(best,v),0)||null;
+  const priceText=[cashPrice?'À VISTA '+cashPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',creditPrice?'TOTAL PARCELADO '+creditPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',productPrice?'PREÇO TOTAL '+productPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'',installmentAmount&&installmentCount?'PARCELA '+installmentCount+'X DE '+installmentAmount.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):''].filter(Boolean).join(' · ');
+  return {cashPrice,creditPrice,productPrice,installmentPlan:installmentText,installmentAmount,installmentCount,priceValue,priceText};
 }
 function directStoreUrl(value) { try { const url=new URL(String(value||'')); return url.protocol==='https:'&&!/(^|\.)google\./i.test(url.hostname)&&!url.hostname.endsWith('serpapi.com')?url.toString():''; } catch (_) { return ''; } }
 function extractModel(value) { return (String(value || '').match(/\b[A-Z]{2,10}[-]?\d{2,5}[A-Z]{0,4}(?:\s+(?:PLUS|PRO|MAX|PREMIUM|DIGITAL|ELETRÔNICA|ELETRONICA))?\b/i) || [])[0] || ''; }
