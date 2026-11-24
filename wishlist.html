@@ -760,7 +760,7 @@ async function autoFillTechnicalData(payload){
   candidates=candidates.filter(p=>p.voltageStatus!=='INCOMPATIBLE');
   for(const original of candidates.slice(0,5)){
    let p={...original};
-   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,link:original.link,thumbnail:original.thumbnail||detail.image||'',priceValue:Number(detail.cashPrice||detail.productPrice||detail.price||p.priceValue||0),priceText:detail.priceText||p.priceText||''}}}catch(_){}}
+   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,link:original.link,thumbnail:original.thumbnail||detail.image||'',priceValue:fullProductPrice(detail,fullProductPrice(p)||0)||0,priceText:detail.priceText||p.priceText||''}}}catch(_){}}
    const volts=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});
    const titleMatch=String(p.title||'').toLowerCase().includes(String(payload.model||payload.title||'').toLowerCase().split(' ').slice(0,2).join(' '))||String(payload.title||'').toLowerCase().includes(String(p.model||'').toLowerCase());
    if(volts==='INCOMPATIBLE'||(!titleMatch&&candidates.length>1))continue;
@@ -831,7 +831,7 @@ async function searchWishlistProducts(){
    if(p.link){
     try{
      const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});
-     if(check.ok){const detail=await check.json();p={...p,...detail,source:p.source||detail.source,link:p.link,thumbnail:p.thumbnail||detail.image||'',priceValue:Number(detail.cashPrice||detail.productPrice||detail.price||p.priceValue||0),priceText:detail.priceText||p.priceText||'',description:[p.description,detail.description].filter(Boolean).join(' · '),technicalSummary:detail.technicalSummary||detail.specs||detail.description};const detailVoltage=voltageStatus({title:p.title,voltage:detail.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});if(status==='UNKNOWN'&&detailVoltage!=='UNKNOWN')status=detailVoltage;if(status==='UNKNOWN'&&/220\s?V/i.test(p.technicalSummary||''))status='CONFIRMED_220V';}
+     if(check.ok){const detail=await check.json();p={...p,...detail,source:p.source||detail.source,link:p.link,thumbnail:p.thumbnail||detail.image||'',priceValue:fullProductPrice(detail,fullProductPrice(p)||0)||0,priceText:detail.priceText||p.priceText||'',description:[p.description,detail.description].filter(Boolean).join(' · '),technicalSummary:detail.technicalSummary||detail.specs||detail.description};const detailVoltage=voltageStatus({title:p.title,voltage:detail.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});if(status==='UNKNOWN'&&detailVoltage!=='UNKNOWN')status=detailVoltage;if(status==='UNKNOWN'&&/220\s?V/i.test(p.technicalSummary||''))status='CONFIRMED_220V';}
     }catch(_){}
    }
    p.voltageStatus=status;p.voltageConfirmed=status==='CONFIRMED_220V'||status==='BIVOLT';return p;
@@ -889,12 +889,12 @@ async function runPriceSearch(id){
   const result=await response.json();if(!response.ok)throw new Error(result.error||'FALHA NA BUSCA');
   const enriched=await Promise.all((result.products||[]).map(async original=>{
    let p={...original};
-   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,source:original.source||detail.source,link:original.link,thumbnail:original.thumbnail||detail.image||'',priceValue:Number(detail.cashPrice||detail.productPrice||detail.price||original.priceValue||0),priceText:detail.priceText||original.priceText||''}}}catch(_){}}
+   if(p.link){try{const check=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:p.link})});if(check.ok){const detail=await check.json();p={...p,...detail,source:original.source||detail.source,link:original.link,thumbnail:original.thumbnail||detail.image||'',priceValue:fullProductPrice(detail,fullProductPrice(original)||0)||0,priceText:detail.priceText||original.priceText||''}}}catch(_){}}
    const checkedVoltage=voltageStatus({title:p.title,voltage:p.voltage,description:[p.description,p.technicalSummary].filter(Boolean).join(' ')});p.voltageStatus=checkedVoltage==='UNKNOWN'?(original.voltageStatus||'UNKNOWN'):checkedVoltage;
    return p;
   }));
   const eligible=enriched.flatMap(product=>{const offers=Array.isArray(product.offers)&&product.offers.length?product.offers:[product];return offers.map(offer=>({...product,...offer,source:offer.store||offer.source||product.source,priceValue:Number(offer.priceValue??offer.cashPrice??offer.productPrice??offer.price),link:offer.link||product.link,voltageStatus:offer.voltageStatus||product.voltageStatus,thumbnail:offer.thumbnail||product.thumbnail,priceHistory:product.priceHistory||[]}));}).filter(p=>Number(p.priceValue)>0&&p.link&&['CONFIRMED_220V','BIVOLT'].includes(p.voltageStatus));
-   if(d.referenceUrl&&isStoreUrl(d.referenceUrl)){try{const refResponse=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:d.referenceUrl})});if(refResponse.ok){const ref=await refResponse.json(),refPrice=Number(ref.cashPrice||ref.price||0),refVoltage=voltageStatus({title:ref.title||item.title,voltage:ref.voltage||d.detectedVoltage||d.voltage,description:[ref.description,ref.technicalSummary].filter(Boolean).join(' ')});if(refPrice>0&&['CONFIRMED_220V','BIVOLT'].includes(refVoltage)&&!eligible.some(p=>p.link===d.referenceUrl))eligible.push({title:ref.title||item.title,source:ref.source||new URL(d.referenceUrl).hostname,priceValue:refPrice,cashPrice:ref.cashPrice??null,creditPrice:ref.creditPrice??null,installmentAmount:ref.installmentAmount??null,installmentCount:ref.installmentCount??null,installmentPlan:ref.installmentPlan||'',shipping:0,link:d.referenceUrl,voltageStatus:refVoltage,thumbnail:ref.image||d.productImageUrl||''})}}catch(referenceError){console.warn('reference price unavailable',referenceError)}}
+   if(d.referenceUrl&&isStoreUrl(d.referenceUrl)){try{const refResponse=await fetch('/api/product-details',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:d.referenceUrl})});if(refResponse.ok){const ref=await refResponse.json(),refPrice=fullProductPrice(ref)||0,refVoltage=voltageStatus({title:ref.title||item.title,voltage:ref.voltage||d.detectedVoltage||d.voltage,description:[ref.description,ref.technicalSummary].filter(Boolean).join(' ')});if(refPrice>0&&['CONFIRMED_220V','BIVOLT'].includes(refVoltage)&&!eligible.some(p=>p.link===d.referenceUrl))eligible.push({title:ref.title||item.title,source:ref.source||new URL(d.referenceUrl).hostname,priceValue:refPrice,cashPrice:ref.cashPrice??null,creditPrice:ref.creditPrice??null,installmentAmount:ref.installmentAmount??null,installmentCount:ref.installmentCount??null,installmentPlan:ref.installmentPlan||'',shipping:0,link:d.referenceUrl,voltageStatus:refVoltage,thumbnail:ref.image||d.productImageUrl||''})}}catch(referenceError){console.warn('reference price unavailable',referenceError)}}
   const fresh=items.find(x=>x.id===id)?.data||d,history=[...(fresh.priceHistory||[])],stores=[...(fresh.stores||[])],batch=result.searchId||new Date().toISOString(),previousSearchLowest=fresh.lastSearchLowest||null,candidates=eligible.map(p=>({title:p.title,store:p.source,price:Number(p.priceValue),url:p.link,thumbnail:p.thumbnail||'',voltageStatus:p.voltageStatus,searchedAt:today()}));
   for(const p of eligible){
    const price=Number(p.priceValue||0);
@@ -911,11 +911,17 @@ async function runPriceSearch(id){
  }catch(error){alert('NÃO FOI POSSÍVEL FAZER A BUSCA: '+error.message)}
  finally{if(button){button.disabled=false;button.textContent='BUSCAR PREÇOS'}}
 }
-function isFullProductPriceRecord(p){const amount=Number(p?.installmentAmount||0),count=Number(p?.installmentCount||0);return !!p&&p.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(p.url)&&Number(p.price)>0&&!(count>1&&amount>0&&Math.abs(Number(p.price)-amount)<0.01)}
+function fullProductPrice(record,fallback=0){
+ const p=record||{},amount=Number(p.installmentAmount||0),count=Number(p.installmentCount||0),installmentTotal=amount>0&&count>1?amount*count:0;
+ const raw=Number(p.price||p.priceValue||0),rawIsInstallment=count>1&&amount>0&&Math.abs(raw-amount)<0.01;
+ const candidates=[p.cashPrice,p.productPrice,p.creditPrice,installmentTotal,rawIsInstallment?0:raw,fallback].map(Number).filter(v=>Number.isFinite(v)&&v>0);
+ return candidates.length?Math.max(...candidates):null;
+}
+function isFullProductPriceRecord(p){return !!p&&p.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(p.url)&&fullProductPrice(p)>0}
 function productPrice(item){
- const d=item.data||{},storePrices=(d.stores||[]).filter(isFullProductPriceRecord).map(x=>Number(x.price||0)+Number(x.shipping||0)).filter(x=>x>0);
+ const d=item.data||{},storePrices=(d.stores||[]).filter(isFullProductPriceRecord).map(x=>fullProductPrice(x)+Number(x.shipping||0)).filter(x=>x>0);
  if(storePrices.length)return Math.min(...storePrices);
- return null;
+ return fullProductPrice({cashPrice:d.cashPrice,productPrice:d.productPrice,creditPrice:d.creditPrice,installmentAmount:d.installmentAmount,installmentCount:d.installmentCount,price:d.currentPrice})||null;
 }
 function numericValue(s){const m=String(s||'').replace(',','.').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):null}
 function warrantyMonths(s){const text=String(s||'').toLowerCase(),n=numericValue(text);if(n==null)return null;if(/ano/.test(text))return n*12;if(/mes/.test(text))return n;return n>5?n:n*12}
@@ -948,13 +954,12 @@ function discoveryPriceLines(p){
 function kitchenFitText(item,mixers){
  const d=item.data||{},parts=[];
  if(d.fit)parts.push(String(d.fit));
- else if(d.dimensions)parts.push('dimensões informadas: '+d.dimensions+'. confira largura, profundidade, altura livre e circulação antes da compra.');
- else parts.push('as dimensões não foram encontradas. ainda não é possível confirmar se o produto cabe no espaço disponível; meça a área de instalação antes de comprar.');
- parts.push('a cozinha é pequena: considerar espaço físico, apoio ou instalação, abertura, circulação e necessidade de armazenamento. se o equipamento aumentar a produção, conferir também se o freezer atual de 175 L comporta o fluxo de trabalho.');
+ else if(d.dimensions)parts.push('medidas: '+d.dimensions+'. conferir espaço, apoio e circulação.');
+ else parts.push('dimensões não informadas. medir o espaço e conferir apoio, altura e circulação antes da compra.');
  if(mixers){
   const liters=numericValue(d.capacity),batch=liters?Math.round(30*liters/4):null;
-  if(batch)parts.push('rendimento proporcional estimado: cerca de '+batch+' cookies de 70 g por lote. a cozinha é pequena e a batedeira atual fica sobre a máquina de lavar, então é preciso validar apoio, altura e circulação. o freezer atual tem 175 L; o lote maior é uma vantagem de produção, mas precisa ser dividido ou armazenado sem comprometer o espaço disponível.');
- }
+  if(batch)parts.push('lote estimado: '+batch+' cookies de 70 g. validar apoio da batedeira e espaço no freezer de 175 L; pode ser necessário dividir o lote.');
+ }else parts.push('cozinha pequena: conferir abertura e espaço de armazenamento; freezer atual de 175 L.');
  return parts.join(' ');
 }
 async function showTypeComparison(id){
@@ -1000,7 +1005,7 @@ async function showTypeComparison(id){
    return {item:x,score:parts?score/parts:0,parts};
   }).sort((a,b)=>b.score-a.score);
   const winner=rated[0],winnerTitle=compactProductTitle(winner.item.title,winner.item.data?.model,winner.item.data?.capacity,winner.item.data?.productBrand);
-  recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+esc(kitchenFitText(winner.item,mixers))+' '+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e as condições de instalação antes de decidir.')+'</div>';
+  recommendation='<div class="comparison-verdict"><strong>SUGESTÃO: '+esc(winnerTitle)+'</strong> é a opção mais equilibrada entre preço, capacidade, potência, garantia e dados disponíveis. '+(winner.parts<70?'ainda faltam dados técnicos para uma recomendação firme.':'confira as medidas externas e as condições de instalação antes de decidir.')+'</div>';
  }
  $('comparisonContent').innerHTML=(group.length<2?'<div class="notice">SÓ EXISTE UM PRODUTO DESTE TIPO NA WISHLIST. ADICIONE OUTRO MODELO PARA COMPARAR.</div>':'')+'<table class="comparison-table"><thead><tr><th>CRITÉRIO</th>'+columns.join('')+'</tr></thead><tbody>'+rows+extra+'</tbody></table>'+recommendation;
  $('comparisonBackdrop').classList.remove('hidden');$('comparisonPanel').classList.remove('hidden');
