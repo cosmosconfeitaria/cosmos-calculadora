@@ -32,7 +32,7 @@ function parseDisplayedPrice(row) {
   const text=[row.price,row.price_text,row.priceText,row.installment,row.installments,row.installment_plan,row.extensions,row.snippets,row.product_highlights,row.description,row.snippet].map(plainText).filter(v=>v!=null&&v!=='').join(' · ');
   const matches=[...text.matchAll(/R\$\s*([\d.]+,\d{2}|[\d,]+\.\d{2})/gi)];
   const parse=v=>Number(String(v).replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.'));
-  const installmentMatch=text.match(/\b(\d{1,2})\s*x\s*(?:de\s*)?R\$\s*([\d.,]+)/i);
+  const installmentMatch=text.match(/\b(\d{1,2})\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})/i);
   const countOnlyMatch=text.match(/\b(\d{1,2})\s*x\b|\b(\d{1,2})\s+parcelas?\b|\b(\d{1,2})\s+vezes\b/i);
   const parseRaw=v=>{if(v==null||v==='')return null;if(typeof v==='number')return Number.isFinite(v)?v:null;let raw=String(v).replace(/[^\d,.-]/g,'');if(raw.includes(',')&&raw.includes('.'))raw=raw.replace(/\./g,'').replace(',','.');else if(raw.includes(','))raw=raw.replace(',','.');const n=Number(raw);return Number.isFinite(n)&&n>0?n:null};
   const rawPrice=parseRaw(row.price_value??row.price??row.extracted_price);
@@ -40,8 +40,8 @@ function parseDisplayedPrice(row) {
   const installmentCount=installmentMatch?Number(installmentMatch[1]):(countOnlyMatch?Number(countOnlyMatch[1]||countOnlyMatch[2]||countOnlyMatch[3]):Number(row.installment_count||row.installments_count||row.number_of_installments||row.installmentCount||0)||null);
   const installmentAmount=installmentMatch?parse(installmentMatch[2]):(explicitAmount||(installmentCount>1?rawPrice:null));
   const installmentTotal=installmentAmount&&installmentCount>1?installmentAmount*installmentCount:null;
-  const installmentText=installmentMatch?(text.slice(installmentMatch.index,Math.min(text.length,installmentMatch.index+90)).match(/^\d{1,2}\s*x\s*(?:de\s*)?R\$\s*[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:(installmentCount>1?'PARCELAMENTO EM '+installmentCount+'X':'');
-  const isInstallment=m=>/\b\d{1,2}\s*x\s*(?:de\s*)?R\$\s*$/i.test(text.slice(Math.max(0,m.index-24),m.index));
+  const installmentText=installmentMatch?(text.slice(installmentMatch.index,Math.min(text.length,installmentMatch.index+110)).match(/^\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?[\d.,]+(?:\s*(?:sem\s*juros|com\s*juros))?/i)||[])[0]||installmentMatch[0]:(installmentCount>1?'PARCELAMENTO EM '+installmentCount+'X':'');
+  const isInstallment=m=>/\b\d{1,2}\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?$/i.test(text.slice(Math.max(0,m.index-55),m.index));
   const valid=matches.filter(m=>!isInstallment(m));
   const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
   const paymentContext=m=>text.slice(Math.max(0,m.index-24),Math.min(text.length,m.index+34));
