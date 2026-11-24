@@ -45,11 +45,11 @@ function parseDisplayedPrice(row) {
   const valid=matches.filter(m=>!isInstallment(m));
   const context=m=>text.slice(Math.max(0,m.index-48),Math.min(text.length,m.index+64));
   const paymentContext=m=>text.slice(Math.max(0,m.index-24),Math.min(text.length,m.index+34));
-  const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]/i.test(paymentContext(m)));
+  const creditMatch=valid.find(m=>/cart[aã]o|cr[eé]dito|parcelad[oa]|vezes|parcelas|sem\s*juros|com\s*juros/i.test(paymentContext(m)));
   const cashMatch=valid.find(m=>/à\s?vista|no\s*pix|pix|boleto|dinheiro/i.test(paymentContext(m))&&!(installmentAmount&&Math.abs(parse(m[1])-installmentAmount)<0.01));
   const numericFallback=(!matches.length&&!installmentCount&&!installmentMatch)?rawPrice:null;
   const cashPrice=cashMatch?parse(cashMatch[1]):null;
-  const creditPrice=Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:(creditMatch?parse(creditMatch[1]):null);
+  const creditPrice=creditMatch?parse(creditMatch[1]):(Number.isFinite(installmentTotal)&&installmentTotal>0?installmentTotal:null);
   const genericMatch=!cashPrice?valid.find(m=>m!==creditMatch&&(!installmentAmount||Math.abs(parse(m[1])-installmentAmount)>=0.01)):null;
   const numericProductPrice=installmentCount>1&&rawPrice&&installmentAmount&&Math.abs(rawPrice-installmentAmount)>=0.01&&Math.abs(rawPrice-(installmentTotal||0))>=0.01?rawPrice:null;
   const productPrice=genericMatch?parse(genericMatch[1]):(numericProductPrice||(!cashPrice&&!creditPrice&&Number.isFinite(numericFallback)&&numericFallback>0?numericFallback:null));
