@@ -912,9 +912,12 @@ async function runPriceSearch(id){
  finally{if(button){button.disabled=false;button.textContent='BUSCAR PREÇOS'}}
 }
 function fullProductPrice(record,fallback=0){
- const p=record||{},amount=Number(p.installmentAmount||0),count=Number(p.installmentCount||0),installmentTotal=amount>0&&count>1?amount*count:0;
- const raw=Number(p.price||p.priceValue||0),rawIsInstallment=count>1&&amount>0&&Math.abs(raw-amount)<0.01;
- const candidates=[p.cashPrice,p.productPrice,p.creditPrice,installmentTotal,rawIsInstallment?0:raw,fallback].map(Number).filter(v=>Number.isFinite(v)&&v>0);
+ const p=record||{},plan=String(p.installmentPlan||p.installments||''),planMatch=plan.match(/\b(\d{1,2})\s*(?:x|vezes|parcelas?)\s*(?:de\s*)?(?:R\$\s*)?([\d.]+,\d{2}|[\d,]+\.\d{2})/i);
+ const count=Number(p.installmentCount||planMatch?.[1]||0),amount=Number(p.installmentAmount||0)|| (planMatch?Number(String(planMatch[2]).replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.')):0);
+ const installmentTotal=amount>0&&count>1?amount*count:0,raw=Number(p.price||p.priceValue||0);
+ const rawIsInstallment=count>1&&amount>0&&Math.abs(raw-amount)<0.01;
+ const safeFallback=Number(fallback)>0&&!(count>1&&amount>0&&Math.abs(Number(fallback)-amount)<0.01)?Number(fallback):0;
+ const candidates=[p.cashPrice,p.productPrice,p.creditPrice,installmentTotal,rawIsInstallment?0:raw,safeFallback].map(Number).filter(v=>Number.isFinite(v)&&v>0);
  return candidates.length?Math.max(...candidates):null;
 }
 function isFullProductPriceRecord(p){return !!p&&p.priceType==='FULL_PRODUCT_PRICE'&&isStoreUrl(p.url)&&fullProductPrice(p)>0}
